@@ -1,24 +1,40 @@
 # Estratégia de Expansão no Mercado de Combustíveis (Sudeste)
 
-## Visão Geral
+## Cenário
 
-Este projeto simula um cenário real de negócio no qual uma distribuidora de combustíveis, com origem em Belo Horizonte (MG) e atuação consolidada em Minas Gerais, busca expandir suas operações no estado de São Paulo.
+Este projeto simula o contexto de uma distribuidora de combustíveis (fictícia), responsável por adquirir combustíveis de refinarias e revendê-los a postos que atendem o consumidor final.
 
-A análise utiliza dados públicos para entender o comportamento do mercado de combustíveis em nível municipal, com o objetivo de identificar regiões com maior potencial de crescimento e retorno.
+Nesse cenário, a empresa possui sede em Belo Horizonte (MG), com base operacional na região metropolitana, próxima à REGAP (Refinaria Gabriel Passos), e atuação consolidada em Minas Gerais.
 
-O foco do projeto é transformar dados em insights estratégicos, considerando fatores como demanda, crescimento, perfil econômico e características da frota de veículos.
+Atualmente, a empresa atende municípios estratégicos de MG:
+- Belo Horizonte  
+- Contagem  
+- Betim  
+- Uberlândia  
+- Uberaba  
+- Juiz de Fora  
+- Montes Claros  
+
+Com o crescimento da operação, a empresa busca expandir sua atuação no Sudeste, avaliando o potencial mercado em novos municípios no estado de São Paulo, além de oportunidades ainda não exploradas em Minas Gerais.
 
 ---
 
 ## Problema de Negócio
 
-Quais municípios apresentam maior potencial para expansão, considerando:
+Quais municípios ainda não atendidos apresentam maior potencial para expansão da distribuidora?
 
+---
+
+## Objetivo
+
+O objetivo do projeto é apoiar a tomada de decisão estratégica da distribuidora, identificando municípios com maior potencial de expansão com base em dados de mercado.
+
+A análise considera fatores como:
 - volume de consumo de combustíveis  
 - crescimento ao longo do tempo  
 - perfil de consumo por tipo de combustível  
 - características da frota de veículos  
-- contexto econômico local  
+- contexto econômico local
 
 ---
 
@@ -36,7 +52,7 @@ Bases utilizadas:
   - PIB dos municípios (total, per capita e composição setorial)
 
 - **SENATRAN**
-  - Frota de veículos por município (dados de dezembro de cada ano como proxy anual)
+  - Frota de veículos por tipo e município (dados de dezembro de cada ano como proxy anual)
 
 ---
 
@@ -55,17 +71,28 @@ Observações:
 
 ## Etapas do Projeto
 
-- Coleta de dados em múltiplas fontes  
-- Padronização e limpeza das bases  
-- Integração dos dados por município e ano  
-- Criação de métricas derivadas:
-  - consumo total  
-  - crescimento  
-  - consumo per capita  
-  - consumo por veículo  
-- Análise exploratória dos dados  
-- Geração de insights estratégicos  
-- Construção de dashboard (Power BI)  
+### 1. Coleta de dados em múltiplas fontes  
+
+### 2. Preparação dos dados (Pandas)
+  - Leitura de arquivos (CSV/XLS)
+  - Limpeza e padronização de colunas (nomes, tipos, unidades)
+  - Filtro por período (2015–2025) e região (MG e SP)
+  - Exportação dos dados tratados
+
+### 3. Integração e modelagem dos dados (SQL)
+  - Criação de tabelas estruturadas
+  - Junção das bases (vendas, preços, PIB, frota)
+  - Construção da base consolidada por município e ano
+  - Criação de métricas derivadas (ex: consumo total, crescimento)
+
+### 4. Análise exploratória (Pandas)
+  - Exploração dos dados consolidados
+  - Observação de padrões e tendências
+  - Identificação de oportunidades e anomalias
+
+### 5. Visualização e comunicação dos resultados
+  - Construção de dashboard no Power BI
+  - Apresentação de insights e recomendações estratégicas
 
 ---
 
