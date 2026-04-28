@@ -1,0 +1,111 @@
+# Observações e decisões do projeto (para revisar depois)
+
+## 1. PIB (IBGE)
+
+* Os dados de PIB estão a preços correntes (não ajustados pela inflação)
+* Comparações ao longo do tempo podem estar distorcidas por inflação
+* Evitar usar crescimento de PIB como métrica central sem ajuste
+* Considerar deflacionamento (ex: IPCA) como possível melhoria futura
+
+## 2. Gap de dados de PIB
+
+* Dados disponíveis apenas até 2023
+* Para 2024–2025:
+
+  * Opção 1: manter como NULL
+  * Opção 2: repetir valor de 2023 (LOCF)
+* Documentar claramente a decisão no README
+
+## 3. Granularidade temporal
+
+* Definir padrão: análise anual ou mensal
+* Dados de consumo podem estar em granularidade diferente dos preços
+* Preços provavelmente precisarão ser agregados (ex: média anual por município)
+
+## 4. Padronização de unidades
+
+* Combustíveis podem estar em diferentes unidades (litros, m³, kg)
+* Garantir consistência antes de integrar bases
+* Definir unidade padrão (preferencialmente litros)
+
+## 5. Padronização de chaves
+
+* Garantir consistência nos identificadores de município
+* Preferir código do município (IBGE) em vez de nome
+* Verificar diferenças de escrita entre bases (acentos, maiúsculas, etc.)
+
+## 6. Escopo geográfico
+
+* Foco em MG e SP
+* Filtrar isso logo nas etapas iniciais (staging)
+
+## 7. Dados brutos vs repositório
+
+* Não subir arquivos brutos muito grandes (ex: XLS da ANP)
+* Subir apenas dados tratados/filtrados ou amostras
+* Referenciar fontes oficiais no README
+
+## 8. Filtro de municípios
+
+* Não filtrar municípios cedo demais
+* Primeiro analisar base completa (MG + SP)
+* Definir critérios de relevância com base nos dados (ex: consumo, crescimento, etc.)
+
+## 9. Frota de veículos (SENATRAN)
+
+* Utilizar apenas dados de dezembro de cada ano como proxy anual. Essa foi uma decisão pensada para evitar baixar dados de todos os meses (para todos os anos considerados), já que no site não há uma base de dados consolidada (unificada). Como a diferença na frota não varia tanto dentre os meses de um dado ano, utilizando um único mês como proxy é perfeitamente cabível
+* Usar base por município (não por estado)
+* Estrutura final desejada:
+
+  * município
+  * UF
+  * ano
+  * total_veiculos
+  * veiculos_leves
+  * veiculos_pesados
+  * veiculos_2_rodas (opcional)
+
+## 10. Tratamento dos tipos de veículos
+
+* Agrupar tipos em categorias analíticas:
+
+  **Leves:**
+
+  * AUTOMOVEL
+  * CAMIONETA
+  * CAMINHONETE
+  * UTILITARIO
+
+  **2 rodas:**
+
+  * MOTOCICLETA
+  * MOTONETA
+  * CICLOMOTOR
+
+  **Pesados:**
+
+  * CAMINHAO
+  * CAMINHAO TRATOR
+  * ONIBUS
+  * MICRO-ONIBUS
+
+  **Opcional (decidir):**
+
+  * TRATOR RODAS / TRATOR ESTEIRAS (incluir em pesado ou separar como agro)
+
+* Excluir (não consomem combustível diretamente):
+
+  * REBOQUE
+  * SEMI-REBOQUE
+  * SIDE-CAR
+  * CHASSI PLATAF
+
+* OUTROS:
+
+  * Incluir no total, mas evitar uso analítico detalhado
+
+## 11. Relação frota x consumo
+
+* Leves → gasolina / etanol
+* Pesados → diesel
+* Usar essa relação para validar padrões e identificar oportunidades

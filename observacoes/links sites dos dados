@@ -1,0 +1,36 @@
+# Fontes de dados (para documentação / README)
+
+## Preços dos combustíveis (ANP)
+
+* Fonte: gov.br / ANP
+* Acesso em: 28/04/2026
+* Link:
+  https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/serie-historica-do-levantamento-de-precos
+
+## Vendas de combustíveis (ANP)
+
+* Fonte: dados.gov.br
+* Acesso em: 27/04/2026
+* Link base:
+  https://dados.gov.br/dados/conjuntos-dados
+* Observação:
+
+  * Necessário filtrar (ex: indústria + CSV) para encontrar datasets da ANP
+  * Instabilidade no acesso ao site (em 28/04/2026 não carregou corretamente as bases de dados disponíveis)
+
+## PIB dos municípios (IBGE)
+
+* Fonte: IBGE
+* Acesso em: 28/04/2026
+* Link:
+  https://www.ibge.gov.br/estatisticas/economicas/contas-nacionais/9088-produto-interno-bruto-dos-municipios.html?t=resultados&c=1100049
+* Observações:
+
+  * Acessar o item "Tabelas" na coluna esquerda do site, e então escolher a base de dados no período desejado
+
+## Frota de veículos (SENATRAN)
+
+* Fonte: gov.br / SENATRAN
+* Acesso em: 28/04/2026
+* Link:
+  https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/estatisticas-frota-de-veiculos-senatran
