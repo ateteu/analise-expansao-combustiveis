@@ -3,9 +3,10 @@ from pathlib import Path
 import re
 import pandas as pd
 
+# Obtém diretório raiz do projeto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-pasta = BASE_DIR / "dados/brutos/frota-senatran"
+pasta       = BASE_DIR / "dados/brutos/frota-senatran"
 pasta_saida = BASE_DIR / "dados/modificados"
 
 arquivos = list(pasta.glob("*.xls*"))
@@ -54,15 +55,15 @@ for arquivo in arquivos:
 
     dfs.append(df)
 
-frota = pd.concat(dfs, ignore_index=True)
+df_unificado_frota = pd.concat(dfs, ignore_index=True)
 
 # Ordena por ano, UF e município
-frota = frota.sort_values(
+df_unificado_ordenado_frota = df_unificado_frota.sort_values(
     ["ANO", "UF", "MUNICIPIO"]
 )
 
 # Salva como csv
-frota.to_csv(
+df_unificado_ordenado_frota.to_csv(
     pasta_saida / "frota-senatran.csv", 
     index=False
 )
