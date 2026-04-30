@@ -130,10 +130,11 @@ Essa abordagem permite análises comparativas e construção de indicadores mais
 
 ## Estrutura do Projeto
 
-- `/dados/brutos`
+- `/dados/brutos` → dados obtidos nas fontes citadas
 - `/dados/modificados` → dados tratados e consolidados  
 - `/notebooks` → análises exploratórias (Python)  
 - `/sql` → consultas e modelagem  
+- `/src` → scripts python para limpeza e tratamento inicial dos dados
 - `/dashboard` → arquivos do Power BI  
 
 ---
