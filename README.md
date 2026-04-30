@@ -21,20 +21,13 @@ Com o crescimento da operação, a empresa busca expandir sua atuação no Sudes
 
 ## Problema de Negócio
 
-Quais municípios ainda não atendidos apresentam maior potencial para expansão da distribuidora?
+Diante da expansão da distribuidora para o Sudeste (MG e SP), quais municípios devem ser priorizados para entrada, considerando potencial de demanda, crescimento de mercado e viabilidade econômica?
 
 ---
 
 ## Objetivo
 
-O objetivo do projeto é apoiar a tomada de decisão estratégica da distribuidora, identificando municípios com maior potencial de expansão com base em dados de mercado.
-
-A análise considera fatores como:
-- volume de consumo de combustíveis  
-- crescimento ao longo do tempo  
-- perfil de consumo por tipo de combustível  
-- características da frota de veículos  
-- contexto econômico local
+Desenvolver uma análise integrada que permita ranquear municípios com maior atratividade para expansão, a partir da combinação de indicadores de consumo de combustíveis, crescimento histórico, perfil da frota e contexto econômico, apoiando a tomada de decisão estratégica.
 
 ---
 
