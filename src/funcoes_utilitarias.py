@@ -1,6 +1,7 @@
 import pandas as pd
 import re
 from pathlib import Path
+import unicodedata
 
 
 def extrair_ano_do_nome_arquivo(nome_arquivo: Path) -> int:
@@ -66,10 +67,19 @@ def ler_arquivo(caminho: Path, linhas_a_pular: int) -> pd.DataFrame:
         # Arquivo de 2015 tem duas abas; a útil é "JUL_2015"
         planilha_frota = "JUL_2015" if "15" in caminho.name else 0
 
-        return pd.read_excel(caminho, skiprows=linhas_a_pular, sheet_name=planilha_frota, engine="xlrd")
+        return pd.read_excel(
+            caminho, 
+            skiprows=linhas_a_pular, 
+            sheet_name=planilha_frota, 
+            engine="xlrd"
+        )
     
     elif caminho.suffix == ".xlsx":
-        return pd.read_excel(caminho, skiprows=linhas_a_pular, engine="openpyxl")
+        return pd.read_excel(
+            caminho, 
+            skiprows=linhas_a_pular, 
+            engine="openpyxl"
+        )
     
     else:
         raise ValueError(f"Formato não suportado: {caminho.name}")
@@ -84,7 +94,8 @@ def verificar_se_existem_colunas_essenciais(df: pd.DataFrame, arquivo: Path):
             raise ValueError(f"Coluna '{coluna}' ausente em {arquivo.name}")
 
 
-def padronizar_colunas(df: pd.DataFrame) -> pd.DataFrame:
+def padronizar_cabecalho_colunas(df: pd.DataFrame) -> pd.DataFrame:
+
     df.columns = (
         df.columns
         .astype(str)
@@ -96,18 +107,25 @@ def padronizar_colunas(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def limpar_dados(df: pd.DataFrame) -> pd.DataFrame:
-    # remove linhas sem UF
-    df = df[df["UF"].notna()]
 
-    # remove cabeçalho duplicado
-    df = df[df["UF"] != "UF"]
-
-    # mantém apenas UF válida (2 letras)
+    # Remove linhas sem UF
     df = df[
-        df["UF"].astype(str).str.len() == 2
+        df["UF"].notna()
     ]
 
-    # remove linhas completamente vazias
+    # Remove cabeçalho duplicado
+    df = df[
+        df["UF"] != "UF"
+    ]
+
+    # Mantém apenas linhas com UF válida (2 letras)
+    df = df[
+        df["UF"]
+        .astype(str)
+        .str.len() == 2
+    ]
+
+    # Remove linhas completamente vazias
     df = df.dropna(how="all")
 
     return df
@@ -123,6 +141,7 @@ def criar_coluna_ano(df: pd.DataFrame, ano: int) -> pd.DataFrame:
 
 
 def concatenar_dfs_e_ordenar(dfs: list, ) -> pd.DataFrame:
+
     df = pd.concat(
         dfs, 
         ignore_index = True
@@ -146,7 +165,34 @@ def salvar_como_csv(df: pd.DataFrame, pasta_saida: str, nome_arquivo: str):
     print(f"\nArquivo final salvo em: {caminho_saida}")
 
 
-def carregar_codigos_ibge(caminho: Path) -> pd.DataFrame:
+def remover_acentos(texto):
+
+    if pd.isna(texto): return texto
+    
+    return ''.join(
+        c for c in unicodedata.normalize('NFKD', texto)
+        if not unicodedata.combining(c)
+    )
+
+
+def padronizar_uf_e_municipio(df: pd.DataFrame) -> pd.DataFrame:
+
+    df["MUNICIPIO"] = (
+        df["MUNICIPIO"]
+        .str.strip()
+        .str.upper()
+        .apply(remover_acentos)
+    )
+    df["UF"] = (
+        df["UF"]
+        .str.strip()
+        .str.upper()
+    )
+    return df
+
+
+def carregar_e_padronizar_codigos_ibge(caminho: Path) -> pd.DataFrame:
+
     df = pd.read_excel(
         caminho,
         skiprows=6,    # Cabeçalho na linha 7, índice 6
@@ -161,27 +207,73 @@ def carregar_codigos_ibge(caminho: Path) -> pd.DataFrame:
     
     # Nome_UF vem por extenso: mapear pra sigla
     siglas = {
-        "Minas Gerais"   : "MG", 
-        "São Paulo"      : "SP",
-        "Rio de Janeiro" : "RJ", 
-        "Espírito Santo" : "ES"
-        # Adicionar mais estados se necessário
+        "Acre"                 : "AC",
+        "Alagoas"              : "AL",
+        "Amapá"                : "AP",
+        "Amazonas"             : "AM",
+        "Bahia"                : "BA",
+        "Ceará"                : "CE",
+        "Distrito Federal"     : "DF",
+        "Espírito Santo"       : "ES",
+        "Goiás"                : "GO",
+        "Maranhão"             : "MA",
+        "Mato Grosso"          : "MT",
+        "Mato Grosso do Sul"   : "MS",
+        "Minas Gerais"         : "MG",
+        "Pará"                 : "PA",
+        "Paraíba"              : "PB",
+        "Paraná"               : "PR",
+        "Pernambuco"           : "PE",
+        "Piauí"                : "PI",
+        "Rio de Janeiro"       : "RJ",
+        "Rio Grande do Norte"  : "RN",
+        "Rio Grande do Sul"    : "RS",
+        "Rondônia"             : "RO",
+        "Roraima"              : "RR",
+        "Santa Catarina"       : "SC",
+        "São Paulo"            : "SP",
+        "Sergipe"              : "SE",
+        "Tocantins"            : "TO"
     }
-    df["UF"] = df["UF"].str.strip().map(siglas)
-    df["MUNICIPIO"] = df["MUNICIPIO"].str.strip().str.upper()
-    df["ID_MUNICIPIO"] = df["ID_MUNICIPIO"].astype(str).str.strip()
+
+    # Troca os nomes completos de UF pelas siglas
+    df["UF"] = (
+        df["UF"]
+        .str.strip()
+        .map(siglas)
+    )
+
+    # Coloca o nome dos municípios em maiúsculo
+    df["MUNICIPIO"] = (
+        df["MUNICIPIO"]
+        .str.strip()
+        .str.upper()
+        .apply(remover_acentos)
+    )
+
+    # Padroniza o id dos municípios (cod. IBGE)
+    df["ID_MUNICIPIO"] = (
+        df["ID_MUNICIPIO"]
+        .astype(str)
+        .str.strip()
+    )
     
     return df
 
 
 def adicionar_codigo_ibge(df: pd.DataFrame, df_ibge: pd.DataFrame) -> pd.DataFrame:
-    df["MUNICIPIO"] = df["MUNICIPIO"].str.strip().str.upper()
-    df["UF"] = df["UF"].str.strip().str.upper()
+
+    df = padronizar_uf_e_municipio(df)
     
-    df = df.merge(df_ibge, on=["UF", "MUNICIPIO"], how="left")
+    df = df.merge(
+        df_ibge, 
+        on=["UF", "MUNICIPIO"], 
+        how="left"
+    )
     
     # Alerta se ficou algum município sem código
     sem_codigo = df[df["ID_MUNICIPIO"].isna()]["MUNICIPIO"].unique()
+
     if len(sem_codigo) > 0:
         print(f"⚠️  {len(sem_codigo)} municípios sem código IBGE encontrados!")
     
