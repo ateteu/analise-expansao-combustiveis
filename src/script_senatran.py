@@ -1,69 +1,45 @@
-import glob
 from pathlib import Path
-import re
-import pandas as pd
+import funcoes_utilitarias as f
 
 # Obtém diretório raiz do projeto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-pasta       = BASE_DIR / "dados/brutos/frota-senatran"
-pasta_saida = BASE_DIR / "dados/modificados"
+pasta_entrada = BASE_DIR / "dados/1-brutos/frota-senatran"
+pasta_destino = BASE_DIR / "dados/2-intermediarios"
 
-arquivos = list(pasta.glob("*.xls*"))
+# Carrega dados da tabela de códigos do IBGE
+caminho_codigos_ibge = BASE_DIR / "dados/1-brutos/codigos-ibge/RELATORIO_DTB_BRASIL_2024_MUNICIPIOS.xls"
+df_ibge = f.carregar_codigos_ibge(caminho_codigos_ibge)
 
-
+# Encontra arquivos excel (.xls, .xlsx, .xlsb) na pasta
+arquivos = list(pasta_entrada.glob("*.xls*"))
 dfs = []
 
 for arquivo in arquivos:
 
-    # Busca pelo ano no nome do arquivo
-    ano = int(
-        re.search(
-            r'\d{4}', 
-            str(arquivo)
-        ).group()
-    )
+    ano = f.extrair_ano_do_nome_arquivo(arquivo.name)
 
-    # Tenta ler os arquivos da pasta
     try:
-        if arquivo.suffix == ".xls":
-            df = pd.read_excel(
-                arquivo, 
-                skiprows=2, 
-                engine="xlrd"
-            )
-        elif  arquivo.suffix == ".xlsx":
-            df = pd.read_excel(
-                arquivo, 
-                skiprows=2, 
-                engine="openpyxl"
-            )
-        else:
-            continue
-        
-        if "UF" not in df.columns:
-            raise ValueError(f"Header inválido no arquivo: {arquivo}")
-        
+        df_bruto = f.ler_arquivo_bruto(arquivo)
+        indice_cabecalho = f.encontrar_linha_cabecalho(df_bruto)
+        df = f.ler_arquivo(arquivo, indice_cabecalho)
+        df = f.padronizar_colunas(df)
+        f.verificar_se_existem_colunas_essenciais(df, arquivo)
+        df = f.limpar_dados(df)
+        df = f.criar_coluna_ano(df, ano)
+
     except Exception as e:
         print(f"Erro no arquivo {arquivo}: {e}")
         continue
     
-    # Cria a coluna ano e a deixa como 1a coluna
-    df['ANO'] = ano
-    cols = ["ANO"] + [c for c in df.columns if c != "ANO"]
-    df = df[cols]
-
     dfs.append(df)
 
-df_unificado_frota = pd.concat(dfs, ignore_index=True)
+df_final = f.concatenar_dfs_e_ordenar(dfs)
+df_final = f.adicionar_codigo_ibge(df_final, df_ibge)
 
-# Ordena por ano, UF e município
-df_unificado_ordenado_frota = df_unificado_frota.sort_values(
-    ["ANO", "UF", "MUNICIPIO"]
-)
+# Ordena a ordem final das colunas
+primeiras_col = ["ANO", "UF", "MUNICIPIO", "ID_MUNICIPIO"]
+colunas = primeiras_col + [c for c in df_final.columns if c not in primeiras_col]
+df_final = df_final[colunas]
 
-# Salva como csv
-df_unificado_ordenado_frota.to_csv(
-    pasta_saida / "frota-senatran.csv", 
-    index=False
-)
+f.salvar_como_csv(df_final, pasta_destino, "frota-senatran.csv")
