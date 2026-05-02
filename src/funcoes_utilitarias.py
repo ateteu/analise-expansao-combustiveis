@@ -170,18 +170,38 @@ def remover_acentos(texto):
     if pd.isna(texto): return texto
     
     return ''.join(
+        # Separa acentos e simplifica caracteres compatíveis
         c for c in unicodedata.normalize('NFKD', texto)
         if not unicodedata.combining(c)
     )
+
+
+def normalizar_texto(texto):
+
+    if pd.isna(texto):
+        return texto
+
+    # Remove acentos
+    texto = unicodedata.normalize('NFKD', texto)
+    texto = ''.join(c for c in texto if not unicodedata.combining(c))
+
+    # Maiúsculo + strip
+    texto = texto.upper().strip()
+
+    # Remove pontuação (mantém letras/números/espaço)
+    texto = re.sub(r"[^\w\s]", " ", texto)
+
+    # Remove espaços duplicados
+    texto = re.sub(r"\s+", " ", texto)
+
+    return texto
 
 
 def padronizar_uf_e_municipio(df: pd.DataFrame) -> pd.DataFrame:
 
     df["MUNICIPIO"] = (
         df["MUNICIPIO"]
-        .str.strip()
-        .str.upper()
-        .apply(remover_acentos)
+        .apply(normalizar_texto)
     )
     df["UF"] = (
         df["UF"]
@@ -246,9 +266,7 @@ def carregar_e_padronizar_codigos_ibge(caminho: Path) -> pd.DataFrame:
     # Coloca o nome dos municípios em maiúsculo
     df["MUNICIPIO"] = (
         df["MUNICIPIO"]
-        .str.strip()
-        .str.upper()
-        .apply(remover_acentos)
+        .apply(normalizar_texto)
     )
 
     # Padroniza o id dos municípios (cod. IBGE)
@@ -261,14 +279,70 @@ def carregar_e_padronizar_codigos_ibge(caminho: Path) -> pd.DataFrame:
     return df
 
 
+def corrigir_municipios(df: pd.DataFrame) -> pd.DataFrame:
+
+    correcoes = {
+        ("BA", "LAGEDO DO TABOCAL")              : "LAJEDO DO TABOCAL",
+        ("BA", "SANTA TERESINHA")                : "SANTA TEREZINHA",
+        ("GO", "BOM JESUS")                      : "BOM JESUS DE GOIAS",
+        ("MG", "AMPARO DA SERRA")                : "AMPARO DO SERRA",
+        ("MG", "BARAO D0 MONTE ALTO")            : "BARAO DO MONTE ALTO",
+        ("MG", "GOUVEA")                         : "GOUVEIA",
+        ("MG", "QUELUZITA")                      : "QUELUZITO",
+        ("MT", "POXOREO")                        : "POXOREU",
+        ("MT", "SANTO ANTONIO DO LEVERGER")      : "SANTO ANTONIO DE LEVERGER",
+        ("MT", "VILA BELA DA SANTISSIMA TRINDA") : "VILA BELA DA SANTISSIMA TRINDADE",
+        ("PA", "ELDORADO DOS CARAJAS")           : "ELDORADO DO CARAJAS",
+        ("PA", "SANTA ISABEL DO PARA")           : "SANTA IZABEL DO PARA",
+        ("PE", "IGUARACI")                       : "IGUARACY",
+        ("PE", "LAGOA DO ITAENGA")               : "LAGOA DE ITAENGA",
+        ("PI", "SAO FRANCISCO DE ASSIS DO PIAU") : "SAO FRANCISCO DE ASSIS DO PIAUI",
+        ("PR", "BELA VISTA DO CAROBA")           : "BELA VISTA DA CAROBA",
+        ("PR", "MUNHOZ DE MELLO")                : "MUNHOZ DE MELO",
+        ("PR", "PINHAL DO SAO BENTO")            : "PINHAL DE SAO BENTO",
+        ("PR", "SANTA CRUZ DO MONTE CASTELO")    : "SANTA CRUZ DE MONTE CASTELO",
+        ("RJ", "ARMACAO DE BUZIOS")              : "ARMACAO DOS BUZIOS",
+        ("RJ", "PARATI")                         : "PARATY",
+        ("RJ", "TRAJANO DE MORAIS")              : "TRAJANO DE MORAES",
+        ("RN", "ASSU")                           : "ACU",
+        ("RN", "LAGOA DANTA")                    : "LAGOA D ANTA",
+        ("RO", "NOVA DO MAMORE")                 : "NOVA MAMORE",
+        ("RS", "SANTANA DO LIVRAMENTO")          : "SANT ANA DO LIVRAMENTO",
+        ("SC", "BALNEARIO DE PICARRAS")          : "BALNEARIO PICARRAS",
+        ("SC", "LAGEADO GRANDE")                 : "LAJEADO GRANDE",
+        ("SC", "PRESIDENTE CASTELO BRANCO")      : "PRESIDENTE CASTELLO BRANCO",
+        ("SC", "SAO LOURENCO D OESTE")           : "SAO LOURENCO DO OESTE",
+        ("SC", "SAO MIGUEL D OESTE")             : "SAO MIGUEL DO OESTE",
+        ("SE", "AMPARO DE SAO FRANCISCO")        : "AMPARO DO SAO FRANCISCO",
+        ("TO", "COUTO DE MAGALHAES")             : "COUTO MAGALHAES",
+    }
+
+    df["MUNICIPIO"] = df.apply(
+        lambda r: correcoes.get((r["UF"], r["MUNICIPIO"]), r["MUNICIPIO"]),
+        axis=1
+    )
+
+    return df
+
+
 def adicionar_codigo_ibge(df: pd.DataFrame, df_ibge: pd.DataFrame) -> pd.DataFrame:
 
     df = padronizar_uf_e_municipio(df)
+
+    # Remove linhas sem município informado
+    df = df[df["MUNICIPIO"] != "MUNICIPIO NAO INFORMADO"]
+
+    df = corrigir_municipios(df)
     
     df = df.merge(
         df_ibge, 
         on=["UF", "MUNICIPIO"], 
         how="left"
+    )
+
+    # Caso o município não esteja mapeado pelo IBGE, cria o label NAO_MAPEADO
+    df["STATUS_MUNICIPIO"] = df["ID_MUNICIPIO"].apply(
+        lambda x: "OK" if pd.notna(x) else "NAO_MAPEADO"
     )
     
     # Alerta se ficou algum município sem código
@@ -277,4 +351,12 @@ def adicionar_codigo_ibge(df: pd.DataFrame, df_ibge: pd.DataFrame) -> pd.DataFra
     if len(sem_codigo) > 0:
         print(f"⚠️  {len(sem_codigo)} municípios sem código IBGE encontrados!")
     
+    df_cidades_sem_codigo = (
+        df[df["ID_MUNICIPIO"].isna()][["UF", "MUNICIPIO"]]
+        .drop_duplicates()
+        .sort_values(["UF", "MUNICIPIO"])
+    )
+
+    print(df_cidades_sem_codigo)
+
     return df
