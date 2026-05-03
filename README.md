@@ -1,33 +1,116 @@
-# Estratégia de Expansão no Mercado de Combustíveis (Sudeste)
+# Estratégia de Expansão de uma Distribuidora de Combustíveis
 
-## Cenário
+## Contexto
 
-Este projeto simula o contexto de uma distribuidora de combustíveis (fictícia), responsável por adquirir combustíveis de refinarias e revendê-los a postos que atendem o consumidor final.
+Este projeto simula o cenário de uma distribuidora de combustíveis (fictícia) regional, de médio-grande porte, com atuação consolidada em Minas Gerais.
 
-Nesse cenário, a empresa possui sede em Belo Horizonte (MG), com base operacional na região metropolitana, próxima à REGAP (Refinaria Gabriel Passos), e atuação consolidada em Minas Gerais.
+A empresa opera com duas bases de distribuição:
 
-Atualmente, a empresa atende municípios estratégicos de MG:
-- Belo Horizonte  
-- Contagem  
-- Betim  
-- Uberlândia  
-- Uberaba  
-- Juiz de Fora  
-- Montes Claros  
+- Base principal em Betim (MG), abastecida pela Refinaria Gabriel Passos (REGAP)
+- Base secundária em Oliveira (MG), com função de suporte logístico e redução do raio de atendimento
 
-Com o crescimento da operação, a empresa busca expandir sua atuação no Sudeste, avaliando o potencial mercado em novos municípios no estado de São Paulo, além de oportunidades ainda não exploradas em Minas Gerais.
+A operação é estruturada ao longo de um eixo logístico principal, utilizando as rodovias BR-381 e BR-262 como corredores de distribuição.
 
----
+O modelo operacional segue o fluxo:
+`Refinaria → Base de distribuição → Postos atendidos`
+
+
+## Área de Atuação Atual
+
+A empresa possui atuação consolidada nas seguintes regiões:
+
+### Região Intermediária de Belo Horizonte
+- Região Imediata de Belo Horizonte: [Belo Horizonte, Contagem, Betim, Mateus Leme, Ribeirão das Neves, Juatuba]
+
+### Região Intermediária de Divinópolis
+
+- Região Imediata de Pará de Minas: [Pará de Minas, Igaratinga]
+- Região Imediata de Oliveira: [Itaguara, Carmópolis de Minas, Oliveira]
+- Região Imediata de Divinópolis: [Itatiaiuçu, Itaúna, Divinópolis, São Gonçalo do Pará, Nova Serrana]
+
+### Região Intermediária de Varginha
+
+- Região Imediata de Lavras: [Lavras, Santo Antônio do Amparo, Perdões]
+- Região Imediata de Três Corações: [Três Corações, Carmo da Cachoeira]
+- Região Imediata de Varginha: [Varginha]
+
+Além disso, a empresa atende postos localizados ao longo das rodovias BR-381 e BR-262.
+
 
 ## Problema de Negócio
 
-Diante da expansão da distribuidora para o Sudeste (MG e SP), quais municípios devem ser priorizados para entrada, considerando potencial de demanda, crescimento de mercado e viabilidade econômica?
+Com a expansão da área de atuação, a empresa enfrenta aumento da distância média de entrega, elevando os custos logísticos.
+
+O problema central é:
+
+**"Como expandir a malha de distribuição maximizando a cobertura de demanda e minimizando os custos logísticos?"**
+
+
+## Estrutura do Problema
+
+A decisão de expansão envolve três dimensões:
+
+- Seleção de novos mercados (municípios/regiões)
+- Viabilidade logística a partir das bases existentes
+- Avaliação da necessidade de criação de uma nova base ou polo logístico
 
 ---
 
-## Objetivo
+## Hipóteses de Expansão
 
-Desenvolver uma análise integrada que permita ranquear municípios com maior atratividade para expansão, a partir da combinação de indicadores de consumo de combustíveis, crescimento histórico, perfil da frota e contexto econômico, apoiando a tomada de decisão estratégica.
+O projeto considera três caminhos estratégicos:
+
+### Hipótese 1 — Expansão contínua no eixo atual (REGAP)
+
+- Manutenção do modelo atual (Betim + Oliveira)
+- Expansão ao longo da BR-381 (sentido sul de Minas)
+- Avanço para municípios no entorno
+- Criação de uma nova base no sul de Minas, atendido via base de Oliveira
+
+### Hipótese 2 — Criação de novo polo logístico (REPLAN)
+
+- Implantação de uma nova base conectada à Refinaria de Paulínia (REPLAN) em SP
+- Formação de um segundo eixo logístico independente
+- Possibilidade de atendimento eficiente ao Sul de MG e interior de SP (região de Campinas)
+
+### Hipótese 3 — Expansão alternativa dentro de Minas Gerais
+
+- Avaliação de expansão para outras regiões do estado (Ex: oeste ou norte de Minas)
+- Comparação de atratividade vs custo logístico
+
+---
+
+## Abordagem Analítica
+
+A análise será estruturada em três etapas, considerando dados no período de 2015 a 2025:
+
+### 1. Potencial de Demanda
+
+Identificação de mercados prioritários com base em:
+
+- Frota de veículos (SENATRAN)
+- PIB municipal (IBGE)
+- Vendas de combustíveis (ANP)
+
+### 2. Viabilidade Logística
+
+Avaliação da capacidade de atendimento considerando:
+
+- Distância entre bases e municípios
+- Eixos rodoviários (BR-381, BR-262)
+- Tempo estimado de deslocamento
+
+### 3. Trade-off Custo vs Cobertura
+
+Análise do equilíbrio entre:
+
+- Expansão da área atendida
+- Aumento do custo logístico
+
+Objetivos:
+
+- Identificar o limite eficiente de expansão com a estrutura atual
+- Avaliar o ponto em que uma nova base se torna viável
 
 ---
 
@@ -43,110 +126,59 @@ Bases utilizadas:
 
 - **IBGE**
   - PIB dos municípios (total, per capita e composição setorial)
+  - Mapas de regiões
+  - Códigos dos municípios e regiões
 
 - **SENATRAN**
   - Frota de veículos por tipo e município (dados de dezembro de cada ano como proxy anual)
 
----
-
-## Escopo do Projeto
-
-- Período analisado: **2015 a 2025**
-- Região de foco:
-  - Minas Gerais (MG)
-  - São Paulo (SP)
-
-Observações:
-- Dados de PIB disponíveis até 2023 (anos posteriores tratados como ausência ou proxy)
-- PIB a preços correntes (não ajustado pela inflação)
-
----
-
-## Etapas do Projeto
-
-### 1. Coleta de dados em múltiplas fontes  
-
-### 2. Preparação dos dados (Pandas)
-  - Leitura de arquivos (CSV/XLS)
-  - Limpeza e padronização de colunas (nomes, tipos, unidades)
-  - Filtro por período (2015–2025) e região (MG e SP)
-  - Exportação dos dados tratados
-
-### 3. Integração e modelagem dos dados (SQL)
-  - Criação de tabelas estruturadas
-  - Junção das bases (vendas, preços, PIB, frota)
-  - Construção da base consolidada por município e ano
-  - Criação de métricas derivadas (ex: consumo total, crescimento)
-
-### 4. Análise exploratória (Pandas)
-  - Exploração dos dados consolidados
-  - Observação de padrões e tendências
-  - Identificação de oportunidades e anomalias
-
-### 5. Visualização e comunicação dos resultados
-  - Construção de dashboard no Power BI
-  - Apresentação de insights e recomendações estratégicas
-
----
-
-## Modelagem dos Dados
-
-O projeto utiliza uma estrutura integrada por município e ano, combinando:
-
-- Consumo de combustíveis  
-- Preços médios (agregados)  
-- Indicadores econômicos (PIB)  
-- Frota de veículos (total, leves, pesados)  
-
-Essa abordagem permite análises comparativas e construção de indicadores mais robustos de potencial de mercado.
-
----
-
-## Principais Análises
-
-- Ranking de municípios por volume de consumo  
-- Evolução temporal do consumo de combustíveis  
-- Identificação de municípios com maior crescimento  
-- Comparação entre tipos de combustível (gasolina, etanol, diesel)  
-- Análise de consumo ajustado:
-  - por habitante  
-  - por veículo  
-- Relação entre:
-  - frota e consumo  
-  - PIB e consumo
-- Identificação de padrões regionais (MG vs SP)  
-
----
-
-## Resultados Esperados
-
-- Identificação de municípios com maior potencial de expansão  
-- Detecção de mercados emergentes vs saturados  
-- Compreensão do perfil de consumo por região  
-- Definição de estratégias por tipo de combustível  
-- Apoio à tomada de decisão estratégica  
-
----
 
 ## Estrutura do Projeto
 
-- `/dados/brutos` → dados obtidos nas fontes citadas
-- `/dados/modificados` → dados tratados e consolidados  
-- `/notebooks` → análises exploratórias (Python)  
-- `/sql` → consultas e modelagem  
-- `/src` → scripts python para limpeza e tratamento inicial dos dados
-- `/dashboard` → arquivos do Power BI  
+- `/dados/1-brutos` → dados obtidos nas fontes
+- `/dados/2-modificados` → dados tratados
+- `/dados/3-modelados` → dados finais para análise
+- `/notebooks` → análises exploratórias (Python)
+- `/sql` → consultas e modelagem
+- `/src` → scripts de tratamento de dados
+- `/dashboard` → arquivos do Power BI
 
----
+
+## Pipeline de Dados
+
+1. Coleta de dados
+   - Frota (SENATRAN)
+   - PIB municipal (IBGE)
+   - Vendas e preços (ANP)
+
+2. Tratamento (Python)
+   - Limpeza e padronização
+   - Consolidação de séries históricas
+
+3. Modelagem (SQL)
+   - Filtros por região e período
+   - Agregações
+   - Construção de tabelas analíticas
+
+4. Análise (Python)
+   - Exploração de padrões
+   - Criação de métricas
+
+5. Visualização (Power BI)
+   - Mapas geográficos
+   - Indicadores de demanda
+   - Análise logística
+
 
 ## Ferramentas Utilizadas
 
-- SQL  
-- Python (Pandas)  
-- Power BI  
+- SQL
+- Python (Pandas)
+- Power BI
 
 ---
 
 ## Observações
 
-Este projeto faz parte de um portfólio voltado à análise de dados aplicada a cenários reais de decisão.
+- Dados de PIB disponíveis até 2023 (anos posteriores tratados como ausência ou proxy)
+- PIB a preços correntes (não ajustado pela inflação)
