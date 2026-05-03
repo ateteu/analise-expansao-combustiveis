@@ -287,6 +287,7 @@ def corrigir_municipios(df: pd.DataFrame) -> pd.DataFrame:
         ("GO", "BOM JESUS")                      : "BOM JESUS DE GOIAS",
         ("MG", "AMPARO DA SERRA")                : "AMPARO DO SERRA",
         ("MG", "BARAO D0 MONTE ALTO")            : "BARAO DO MONTE ALTO",
+        ("MG", "BRASOPOLIS")                     : "BRAZOPOLIS",
         ("MG", "GOUVEA")                         : "GOUVEIA",
         ("MG", "QUELUZITA")                      : "QUELUZITO",
         ("MT", "POXOREO")                        : "POXOREU",
@@ -294,6 +295,10 @@ def corrigir_municipios(df: pd.DataFrame) -> pd.DataFrame:
         ("MT", "VILA BELA DA SANTISSIMA TRINDA") : "VILA BELA DA SANTISSIMA TRINDADE",
         ("PA", "ELDORADO DOS CARAJAS")           : "ELDORADO DO CARAJAS",
         ("PA", "SANTA ISABEL DO PARA")           : "SANTA IZABEL DO PARA",
+        ("PB", "CAMPO DE SANTANA")               : "TACIMA",
+        ("PB", "SANTAREM")                       : "JOCA CLAUDINO",
+        ("PB", "SAO DOMINGOS DE POMBAL")         : "SAO DOMINGOS",
+        ("PE", "BELEM DE SAO FRANCISCO")         : "BELEM DO SAO FRANCISCO",
         ("PE", "IGUARACI")                       : "IGUARACY",
         ("PE", "LAGOA DO ITAENGA")               : "LAGOA DE ITAENGA",
         ("PI", "SAO FRANCISCO DE ASSIS DO PIAU") : "SAO FRANCISCO DE ASSIS DO PIAUI",
@@ -305,6 +310,7 @@ def corrigir_municipios(df: pd.DataFrame) -> pd.DataFrame:
         ("RJ", "PARATI")                         : "PARATY",
         ("RJ", "TRAJANO DE MORAIS")              : "TRAJANO DE MORAES",
         ("RN", "ASSU")                           : "ACU",
+        ("RN", "BOA SAUDE")                      : "JANUARIO CICCO",
         ("RN", "LAGOA DANTA")                    : "LAGOA D ANTA",
         ("RO", "NOVA DO MAMORE")                 : "NOVA MAMORE",
         ("RS", "SANTANA DO LIVRAMENTO")          : "SANT ANA DO LIVRAMENTO",
@@ -314,7 +320,10 @@ def corrigir_municipios(df: pd.DataFrame) -> pd.DataFrame:
         ("SC", "SAO LOURENCO D OESTE")           : "SAO LOURENCO DO OESTE",
         ("SC", "SAO MIGUEL D OESTE")             : "SAO MIGUEL DO OESTE",
         ("SE", "AMPARO DE SAO FRANCISCO")        : "AMPARO DO SAO FRANCISCO",
+        ("SP", "EMBU")                           : "EMBU DAS ARTES",
         ("TO", "COUTO DE MAGALHAES")             : "COUTO MAGALHAES",
+        ("TO", "FORTALEZA DO TABOCAO")           : "TABOCAO",
+        ("TO", "SAO VALERIO DA NATIVIDADE")      : "SAO VALERIO",
     }
 
     df["MUNICIPIO"] = df.apply(
@@ -338,11 +347,6 @@ def adicionar_codigo_ibge(df: pd.DataFrame, df_ibge: pd.DataFrame) -> pd.DataFra
         df_ibge, 
         on=["UF", "MUNICIPIO"], 
         how="left"
-    )
-
-    # Caso o município não esteja mapeado pelo IBGE, cria o label NAO_MAPEADO
-    df["STATUS_MUNICIPIO"] = df["ID_MUNICIPIO"].apply(
-        lambda x: "OK" if pd.notna(x) else "NAO_MAPEADO"
     )
     
     # Alerta se ficou algum município sem código
