@@ -1,56 +1,59 @@
 from pathlib import Path
-import funcoes_utilitarias as f
+import ibge
+import senatran
+import utils
+import warnings
 
 
-# Obtém diretório raiz do projeto
+warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
+
+# ---------------------------------------------------------------------------
+# Caminhos
+# ---------------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-diretorio_entrada = BASE_DIR / "dados/1-brutos/frota-senatran"
-diretorio_destino = BASE_DIR / "dados/2-intermediarios"
-
-
-# Carrega dados da tabela de códigos do IBGE
-arquivo_codigos_ibge = (
+ENTRADA  = BASE_DIR / "dados/1-brutos/frota-senatran"
+SAIDA    = BASE_DIR / "dados/2-intermediarios"
+IBGE_XLS = (
     BASE_DIR / 
-    "dados/1-brutos/codigos-ibge" / 
-    "RELATORIO_DTB_BRASIL_2024_MUNICIPIOS.xls"
+    "dados/1-brutos/codigos-ibge/RELATORIO_DTB_BRASIL_2024_MUNICIPIOS.xls"
 )
-df_ibge = f.carregar_e_padronizar_codigos_ibge(arquivo_codigos_ibge)
 
+# ---------------------------------------------------------------------------
+# Carrega tabela de referência do IBGE
+# ---------------------------------------------------------------------------
+df_ibge = ibge.carregar_e_padronizar_codigos(IBGE_XLS)
 
-# Encontra arquivos excel (.xls, .xlsx, .xlsb) na pasta
-arquivos = list(diretorio_entrada.glob("*.xls*"))
-
+# ---------------------------------------------------------------------------
+# Processa cada arquivo SENATRAN
+# ---------------------------------------------------------------------------
+arquivos = [
+    f for f in ENTRADA.glob("*.xls*")
+    if not f.name.startswith(".~lock")
+]
 
 dfs = []
 for arquivo in arquivos:
-
-    ano = f.extrair_ano_do_nome_arquivo(arquivo.name)
-
     try:
-        df_bruto = f.ler_arquivo_bruto(arquivo)
-        indice_cabecalho = f.encontrar_linha_cabecalho(df_bruto)
-        df = f.ler_arquivo(arquivo, indice_cabecalho)
-        df = f.padronizar_cabecalho_colunas(df)
-        f.verificar_se_existem_colunas_essenciais(df, arquivo)
-        df = f.limpar_dados(df)
-        df = f.criar_coluna_ano(df, ano)
-
+        ano = utils.extrair_ano_do_nome_arquivo(arquivo.name)
+        df  = senatran.processar_arquivo(arquivo, ano)
+        dfs.append(df)
+        print(f"✓ {arquivo.name} ({ano})")
     except Exception as e:
-        print(f"Erro no arquivo {arquivo}: {e}")
-        continue
-    
-    dfs.append(df)
+        print(f"✗ {arquivo.name}: {e}")
 
+# ---------------------------------------------------------------------------
+# Consolida, enriquece com IBGE e salva
+# ---------------------------------------------------------------------------
+df_final = utils.concatenar_dfs_e_ordenar(dfs)
+df_final = ibge.adicionar_codigo_ibge(df_final, df_ibge)
 
-df_final = f.concatenar_dfs_e_ordenar(dfs)
-df_final = f.adicionar_codigo_ibge(df_final, df_ibge)
+PRIMEIRAS = [
+    "ANO", "UF", 
+    "ID_MUNICIPIO", "MUNICIPIO",
+    "ID_RG_IMEDIATA", "RG_IMEDIATA",
+    "ID_RG_INTERMEDIARIA", "RG_INTERMEDIARIA"
+]
+df_final = utils.reordenar_colunas(df_final, PRIMEIRAS)
 
-
-# Ordena a ordem final das colunas
-primeiras_col = ["ANO", "UF", "MUNICIPIO", "ID_MUNICIPIO"]
-colunas = primeiras_col + [c for c in df_final.columns if c not in primeiras_col]
-df_final = df_final[colunas]
-
-
-f.salvar_como_csv(df_final, diretorio_destino, "frota-senatran.csv")
+utils.salvar_como_csv(df_final, SAIDA, "frota-senatran.csv")
