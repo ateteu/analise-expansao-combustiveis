@@ -136,7 +136,7 @@ Bases utilizadas:
 ## Estrutura do Projeto
 
 ```text
-src/
+analise-expansao-combustiveis/
 ├── dados/
 │   ├── 1-brutos/        # Dados originais das fontes
 │   ├── 2-modificados/   # Dados limpos e padronizados
