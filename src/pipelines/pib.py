@@ -1,19 +1,19 @@
-from arquivos.de_excel     import ler_excel
-from arquivos.para_csv     import salvar_csv
-from configs.caminhos      import (
+from arquivos.de_excel         import ler_excel
+from arquivos.para_csv         import salvar_csv
+from configs.caminhos          import (
     DADOS_MODIFICADOS,
     ARQUIVO_PIB
 )
-from configs.constantes    import NOME_CSV_GERADO_PIB
+from configs.constantes        import NOME_CSV_GERADO_PIB
 from transformadores.dataframe import ordenar_linhas
-from configs.colunas       import (
+from configs.colunas           import (
     ORDEM_LINHAS,
     COLUNAS_NUM_PIB,
     COLUNAS_STR_PIB
 )
-from configs.esquemas      import ESQUEMA_PIB
-from transformadores.texto import normalizar_texto
-from transformadores.tipos import (
+from configs.esquemas          import ESQUEMA_PIB
+from transformadores.texto     import normalizar_texto
+from transformadores.tipos     import (
     colunas_para_string,
     colunas_para_inteiro,
     colunas_para_float

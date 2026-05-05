@@ -1,8 +1,7 @@
 from arquivos.para_csv         import salvar_csv
 from configs.caminhos          import (
     CAMINHO_SENATRAN,
-    DADOS_MODIFICADOS,
-    ARQUIVO_CODIGOS_IBGE
+    DADOS_MODIFICADOS
 )
 from configs.constantes        import NOME_CSV_GERADO_SENATRAN
 from dominios.d_senatran       import processar_arquivo_senatran
@@ -69,6 +68,7 @@ def executar():
             pasta_saida  = DADOS_MODIFICADOS,
             nome_arquivo = NOME_CSV_GERADO_SENATRAN
         )
+    
     except Exception as erro:
         print(f"✗ Erro ao salvar CSV: {erro}")
         raise
