@@ -135,14 +135,24 @@ Bases utilizadas:
 
 ## Estrutura do Projeto
 
-- `/dados/1-brutos` → dados obtidos nas fontes
-- `/dados/2-modificados` → dados tratados
-- `/dados/3-modelados` → dados finais para análise
-- `/notebooks` → análises exploratórias (Python)
-- `/sql` → consultas e modelagem
-- `/src` → scripts de tratamento de dados
-- `/dashboard` → arquivos do Power BI
-
+```text
+src/
+├── dados/
+│   ├── 1-brutos/        # Dados originais das fontes
+│   ├── 2-modificados/   # Dados limpos e padronizados
+│   └── 3-modelados/     # Dados finais prontos para análise
+│
+├── notebooks/           # Análises exploratórias e validações
+├── sql/                 # Consultas e scripts SQL
+│
+└── src/
+    ├── pipelines/       # Fluxos de processamento por fonte de dados
+    ├── transformadores/ # Funções reutilizáveis de transformação
+    ├── dominios/        # Regras específicas de cada domínio
+    ├── io/              # Leitura e escrita de arquivos
+    ├── configs/         # Configurações estáticas e mapeamentos
+    └── main.py          # Ponto de entrada da aplicação
+```
 
 ## Pipeline de Dados
 
