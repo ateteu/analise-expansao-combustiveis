@@ -1,0 +1,77 @@
+# Este arquivo contém listas com nomes de colunas e linhas
+
+PRIMEIRAS_COL_SENATRAN = [
+    "ANO",
+    "UF",
+    "ID_MUNICIPIO",
+    "MUNICIPIO",
+    "ID_RG_IMEDIATA",
+    "RG_IMEDIATA",
+    "ID_RG_INTERMEDIARIA",
+    "RG_INTERMEDIARIA"
+]
+
+
+COLUNAS_INT_SENATRAN = [
+    "TOTAL",
+    "AUTOMOVEL",
+    "BONDE",
+    "CAMINHAO",
+    "CAMINHAO_TRATOR",
+    "CAMINHONETE",
+    "CAMIONETA",
+    "CHASSI_PLATAF",
+    "CICLOMOTOR",
+    "MICRO_ONIBUS",
+    "MOTOCICLETA",
+    "MOTONETA",
+    "ONIBUS",
+    "QUADRICICLO",
+    "REBOQUE",
+    "SEMI_REBOQUE",
+    "SIDE_CAR",
+    "OUTROS",
+    "TRATOR_ESTEI",
+    "TRATOR_RODAS",
+    "TRICICLO",
+    "UTILITARIO",
+]
+
+
+COLUNAS_IDS_IBGE = [
+    "ID_MUNICIPIO", 
+    "ID_RG_IMEDIATA", 
+    "ID_RG_INTERMEDIARIA"
+]
+
+
+COLUNAS_NUM_PIB = [
+    "VAB_AGROPECUARIA",
+    "VAB_INDUSTRIA",
+    "VAB_SERVICOS",
+    "VAB_ADMINISTRACAO_PUBLICA",
+    "VAB_TOTAL",
+    "PIB",
+    "PIB_PER_CAPITA"
+]
+
+
+COLUNAS_STR_PIB = [
+    "UF",
+    "ID_MUNICIPIO",
+    "MUNICIPIO",
+    "ID_RG_IMEDIATA",
+    "RG_IMEDIATA",
+    "ID_RG_INTERMEDIARIA",
+    "RG_INTERMEDIARIA",
+    "ATIVIDADE_1",
+    "ATIVIDADE_2",
+    "ATIVIDADE_3",
+]
+
+
+ORDEM_LINHAS = [
+    "ANO", 
+    "UF", 
+    "MUNICIPIO"
+]
