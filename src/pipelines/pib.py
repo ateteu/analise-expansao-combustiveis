@@ -56,7 +56,6 @@ def executar():
     df = ordenar_linhas(df, ORDEM_LINHAS)
 
     try:
-        print("\n")
         salvar_csv(
             df, 
             pasta_saida  = DADOS_MODIFICADOS, 

@@ -11,5 +11,8 @@ DADOS_MODIFICADOS    = BASE_DIR / "dados/2-intermediarios"
 
 
 ARQUIVO_PIB          = DADOS_BRUTOS / "pib-ibge" / "PIB dos Municipios - base de dados 2010-2023.xlsx"
-CAMINHO_SENATRAN     = DADOS_BRUTOS / "frota-senatran"
 ARQUIVO_CODIGOS_IBGE = DADOS_BRUTOS / "codigos-ibge" / "RELATORIO_DTB_BRASIL_2024_MUNICIPIOS.xls"
+
+
+CAMINHO_SENATRAN     = DADOS_BRUTOS / "frota-senatran"
+CAMINHO_VENDAS_ANP   = DADOS_BRUTOS / "vendas-anp"

@@ -1,6 +1,10 @@
 import pandas as pd
+from pathlib                   import Path
 from configs.constantes        import NOME_ABA_FROTA_2015
-from configs.colunas           import COLUNAS_INT_SENATRAN
+from configs.colunas           import (
+    COLUNAS_INT_SENATRAN, 
+    COLUNAS_STR_SENATRAN
+)
 from transformadores.arquivos  import extrair_ano
 from arquivos.de_excel         import ler_excel
 from transformadores.texto     import normalizar_texto
@@ -56,7 +60,7 @@ def _remover_linhas_invalidas(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def processar_arquivo_senatran(caminho):
+def processar_arquivo_senatran(caminho: Path) -> pd.DataFrame:
     """
     Carrega, limpa e padroniza um arquivo de frota da SENATRAN.
     """
@@ -83,10 +87,11 @@ def processar_arquivo_senatran(caminho):
 
     df = _remover_linhas_invalidas(df)
 
-    # Garante que MUNICIPIO e UF são str e normaliza os textos
-    df = colunas_para_string(df, ["MUNICIPIO", "UF"])
-    df["MUNICIPIO"] = df["MUNICIPIO"].apply(normalizar_texto)
-    df["UF"]        = df["UF"]       .apply(normalizar_texto)
+    # Garante que MUNICIPIO, UF e ID_MUNICIPIO são str e normaliza os textos
+    df = colunas_para_string(df, COLUNAS_STR_SENATRAN)
+    print("_")
+    for col in COLUNAS_STR_SENATRAN:
+        df[col] = df[col].apply(normalizar_texto)
     
     # Garante que demais colunas estão como int
     df = colunas_para_inteiro(df, COLUNAS_INT_SENATRAN)

@@ -15,6 +15,7 @@ from configs.colunas           import (
     PRIMEIRAS_COL_SENATRAN,
     ORDEM_LINHAS
 )
+from arquivos.listagem         import listar_arquivos
 
 
 def executar():
@@ -30,11 +31,7 @@ def executar():
     print("BASE DE DADOS SENATRAN\n")
 
     # Lista arquivos da pasta
-    arquivos = [
-        arquivo
-        for arquivo in CAMINHO_SENATRAN.glob("*.xls*")
-        if not arquivo.name.startswith(".~lock")
-    ]
+    arquivos = listar_arquivos(CAMINHO_SENATRAN)
 
     if not arquivos:
         raise FileNotFoundError("Nenhum arquivo SENATRAN encontrado.")
@@ -53,12 +50,16 @@ def executar():
     if not dfs:
         raise RuntimeError("Nenhum arquivo SENATRAN foi processado com sucesso.")
 
-    # Junta os dados de vários anos
+    # Junta os dados dos diferentes arquivos em um só
     df_final = concatenar(dfs)
 
     # Adiciona códigos IBGE a cada município
     df_final = adicionar_codigo_ibge(df_final)
 
+    # Deixa apenas ID_MUNICIPIO como identificador do município
+    df_final = df_final.drop(columns = "MUNICIPIO")
+
+    # Ordena linhas e colunas
     df_final = ordenar_linhas(df_final, ORDEM_LINHAS)
     df_final = reordenar_colunas(df_final, PRIMEIRAS_COL_SENATRAN)
 

@@ -8,4 +8,4 @@ def salvar_csv(df, pasta_saida: Path, nome_arquivo: str):
     caminho = pasta_saida / nome_arquivo
     df.to_csv(caminho, index = False, sep=";")
 
-    print(f"Arquivo salvo em: {caminho}")
+    print(f"\nArquivo salvo em: {caminho}")

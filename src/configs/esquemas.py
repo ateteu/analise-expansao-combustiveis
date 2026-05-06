@@ -50,10 +50,16 @@ ESQUEMA_PIB = {
 
 ESQUEMA_DOMINIO_IBGE = {
     "Nome_UF"                              : "UF",
-    "Região Geográfica Intermediária"      : "ID_RG_INTERMEDIARIA",
-    "Nome Região Geográfica Intermediária" : "RG_INTERMEDIARIA",
-    "Região Geográfica Imediata"           : "ID_RG_IMEDIATA",
-    "Nome Região Geográfica Imediata"      : "RG_IMEDIATA",
     "Código Município Completo"            : "ID_MUNICIPIO",
     "Nome_Município"                       : "MUNICIPIO"
+}
+
+
+# Não será usado a coluna "MUNICÍPIO" nem "GRANDE REGIÃO"
+ESQUEMA_VENDAS_ANP = {
+    "ANO"         : "ANO",
+    "UF"          : "UF",
+    "CÓDIGO IBGE" : "ID_MUNICIPIO",
+    "PRODUTO"     : "COMBUSTIVEL",
+    "VENDAS"      : "VOLUME_VENDIDO_M3"
 }

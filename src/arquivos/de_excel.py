@@ -9,6 +9,11 @@ def ler_excel(
     cabecalho    = 0,
     usar_colunas = None
 ):
+    """
+    Lê um arquivo Excel e retorna um DataFrame.
+
+    Ajusta automaticamente o engine com base na extensão do arquivo.
+    """
     engine = _definir_engine(caminho)
 
     return pd.read_excel(
@@ -22,6 +27,9 @@ def ler_excel(
 
 
 def _definir_engine(caminho: Path):
+    """
+    Retorna o engine do pandas apropriado para a extensão do arquivo Excel.
+    """
     extensao = caminho.suffix.lower()
 
     if extensao == ".xls":

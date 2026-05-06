@@ -1,14 +1,22 @@
 # Este arquivo contém listas com nomes de colunas e linhas
 
-PRIMEIRAS_COL_SENATRAN = [
+
+ORDEM_LINHAS = [
+    "ANO", 
+    "UF",
+    "ID_MUNICIPIO"
+]
+
+
+PRIMEIRAS_COL_SENATRAN = ORDEM_LINHAS
+
+
+ORDEM_COL_VENDAS_ANP = [
     "ANO",
     "UF",
     "ID_MUNICIPIO",
-    "MUNICIPIO",
-    "ID_RG_IMEDIATA",
-    "RG_IMEDIATA",
-    "ID_RG_INTERMEDIARIA",
-    "RG_INTERMEDIARIA"
+    "COMBUSTIVEL",
+    "VOLUME_VENDIDO_M3"
 ]
 
 
@@ -38,10 +46,10 @@ COLUNAS_INT_SENATRAN = [
 ]
 
 
-COLUNAS_IDS_IBGE = [
-    "ID_MUNICIPIO", 
-    "ID_RG_IMEDIATA", 
-    "ID_RG_INTERMEDIARIA"
+COLUNAS_STR_SENATRAN = [
+    "UF",
+    "ID_MUNICIPIO",
+    "MUNICIPIO"
 ]
 
 
@@ -67,11 +75,4 @@ COLUNAS_STR_PIB = [
     "ATIVIDADE_1",
     "ATIVIDADE_2",
     "ATIVIDADE_3",
-]
-
-
-ORDEM_LINHAS = [
-    "ANO", 
-    "UF", 
-    "MUNICIPIO"
 ]

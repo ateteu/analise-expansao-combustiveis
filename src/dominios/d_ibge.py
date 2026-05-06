@@ -8,7 +8,6 @@ from configs.mapeamentos   import (
     CORRECOES_MUNICIPIOS
 )
 from configs.caminhos      import ARQUIVO_CODIGOS_IBGE
-from configs.colunas       import COLUNAS_IDS_IBGE
 from configs.esquemas      import ESQUEMA_DOMINIO_IBGE
 from configs.constantes    import INDICE_CABECALHO_IBGE
 
@@ -24,7 +23,7 @@ def _carregar_codigos_ibge(caminho: Path) -> pd.DataFrame:
         usar_colunas = list(ESQUEMA_DOMINIO_IBGE.keys())
     )
 
-    df = df.rename(columns=ESQUEMA_DOMINIO_IBGE)
+    df = df.rename(columns = ESQUEMA_DOMINIO_IBGE)
 
     # Troca nomes de UF por siglas correspondentes
     df["UF"] = (
@@ -33,12 +32,9 @@ def _carregar_codigos_ibge(caminho: Path) -> pd.DataFrame:
         .map(SIGLAS_UF)
     )
 
-    for coluna in ["MUNICIPIO", "RG_IMEDIATA", "RG_INTERMEDIARIA"]:
-        df[coluna] = df[coluna].apply(
-            normalizar_texto
-        )
-
-    df = colunas_para_string(df, COLUNAS_IDS_IBGE)
+    # Normaliza e padroniza tipo dos valores da coluna MUNICIPIO
+    df["MUNICIPIO"] = df["MUNICIPIO"].apply(normalizar_texto)
+    df = colunas_para_string(df, ["MUNICIPIO"])
 
     return df
 
@@ -65,10 +61,10 @@ def _corrigir_municipios(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def adicionar_codigo_ibge(df: pd.DataFrame, df_ibge: pd.DataFrame) -> pd.DataFrame:
+def adicionar_codigo_ibge(df: pd.DataFrame) -> pd.DataFrame:
     """
     Faz merge com a tabela de referência IBGE
-    para adicionar código do município e regiões.
+    para adicionar código do município.
     """
     # Remove linhas sem município informado
     df = df[

@@ -1,6 +1,7 @@
 import warnings
-from pipelines.senatran import executar
-from pipelines.pib      import executar
+from pipelines.senatran    import executar as executar1
+from pipelines.pib         import executar as executar2
+from pipelines.vendas_anp  import executar as executar3
 
 
 # Ignorar avisos sobre headers e footers
@@ -11,8 +12,9 @@ def main():
     Executa todos os pipelines de tratamento de dados.
     """
     pipelines = [
-        ("SENATRAN", executar),
-        ("PIB"     , executar),
+        ("SENATRAN"   , executar1),
+        #("PIB"        , executar2),
+        #("VENDAS_ANP" , executar3),
     ]
 
     # Se um pipeline falhar, tenta o próximo
@@ -21,7 +23,7 @@ def main():
             pipeline()
 
         except Exception as erro:
-            print(f"Falha em {nome}: {erro}")
+            print(f"\nFalha em {nome}: {erro}")
 
 
 if __name__ == "__main__":
