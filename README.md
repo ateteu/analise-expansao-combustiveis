@@ -188,6 +188,27 @@ analise-expansao-combustiveis/
 
 ---
 
+## Como executar
+
+```bash
+git clone <URL_DO_REPOSITORIO>
+cd <NOME_DO_REPOSITORIO>
+
+# Criar virtual environment (venv)
+python -m venv .venv
+
+# Ativar a virtual environment:
+
+# Linux / macOS
+source .venv/bin/activate
+
+# Windows
+.venv\Scripts\activate
+
+# Instalar dependências
+pip install -r requirements.txt
+```
+
 ## Observações
 
 - Dados de PIB disponíveis até 2023 (anos posteriores tratados como ausência ou proxy)
