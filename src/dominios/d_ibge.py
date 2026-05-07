@@ -2,7 +2,7 @@ import pandas as pd
 from pathlib               import Path
 from arquivos.de_excel     import ler_excel
 from transformadores.texto import normalizar_texto
-from transformadores.tipos import colunas_para_string
+from transformadores.tipos import colunas_para_string, colunas_para_inteiro
 from configs.mapeamentos   import (
     SIGLAS_UF,
     CORRECOES_MUNICIPIOS
@@ -41,7 +41,8 @@ def _carregar_codigos_ibge(caminho: Path) -> pd.DataFrame:
 
 def _corrigir_municipios(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Corrige nomes divergentes de municípios
+    Corrige nomes divergentes de municípios 
+    (segundo erros da base de dados de frota SENATRAN) 
     para compatibilização com a base oficial IBGE.
     """
     # Para cada linha, busca correção pelo par (UF, MUNICIPIO);
@@ -80,6 +81,11 @@ def adicionar_codigo_ibge(df: pd.DataFrame) -> pd.DataFrame:
         on  = ["UF", "MUNICIPIO"],
         how = "left"
     )
+
+    # Garante que ID_MUNICIPIO é str
+    # (estava aparecendo como float, por isso a conversão para int antes)
+    df = colunas_para_inteiro(df, ["ID_MUNICIPIO"])
+    df = colunas_para_string(df, ["ID_MUNICIPIO"])
 
     municipios_sem_codigo = (
         df[df["ID_MUNICIPIO"].isna()]

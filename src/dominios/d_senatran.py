@@ -87,10 +87,9 @@ def processar_arquivo_senatran(caminho: Path) -> pd.DataFrame:
 
     df = _remover_linhas_invalidas(df)
 
-    # Garante que MUNICIPIO, UF e ID_MUNICIPIO são str e normaliza os textos
-    df = colunas_para_string(df, COLUNAS_STR_SENATRAN)
-    print("_")
-    for col in COLUNAS_STR_SENATRAN:
+    # Garante que MUNICIPIO e UF são str e normaliza os textos
+    df = colunas_para_string(df, ["UF", "MUNICIPIO"])
+    for col in ["UF", "MUNICIPIO"]:
         df[col] = df[col].apply(normalizar_texto)
     
     # Garante que demais colunas estão como int
