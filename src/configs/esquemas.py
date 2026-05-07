@@ -5,11 +5,6 @@ ESQUEMA_PIB = {
     "Ano"                                                  : "ANO",
     "Sigla da Unidade da Federação"                        : "UF",
     "Código do Município"                                  : "ID_MUNICIPIO",
-    "Nome do Município"                                    : "MUNICIPIO",
-    "Código da Região Geográfica Imediata"                 : "ID_RG_IMEDIATA",
-    "Nome da Região Geográfica Imediata"                   : "RG_IMEDIATA",
-    "Código da Região Geográfica Intermediária"            : "ID_RG_INTERMEDIARIA",
-    "Nome da Região Geográfica Intermediária"              : "RG_INTERMEDIARIA",
 
 
     "Valor adicionado bruto da Agropecuária, " \

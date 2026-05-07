@@ -12,8 +12,8 @@ def main():
     Executa todos os pipelines de tratamento de dados.
     """
     pipelines = [
-        ("SENATRAN"   , executar1),
-        #("PIB"        , executar2),
+        #("SENATRAN"   , executar1),
+        ("PIB"        , executar2),
         #("VENDAS_ANP" , executar3),
     ]
 

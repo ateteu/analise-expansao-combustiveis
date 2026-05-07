@@ -20,6 +20,16 @@ ORDEM_COL_VENDAS_ANP = [
 ]
 
 
+ORDEM_COL_PIB = [
+    "ANO",
+    "UF",
+    "ID_MUNICIPIO",
+    "PIB",
+    "PIB_PER_CAPITA",
+    "VAB_TOTAL"
+]
+
+
 COLUNAS_INT_SENATRAN = [
     "TOTAL",
     "AUTOMOVEL",
@@ -67,11 +77,6 @@ COLUNAS_NUM_PIB = [
 COLUNAS_STR_PIB = [
     "UF",
     "ID_MUNICIPIO",
-    "MUNICIPIO",
-    "ID_RG_IMEDIATA",
-    "RG_IMEDIATA",
-    "ID_RG_INTERMEDIARIA",
-    "RG_INTERMEDIARIA",
     "ATIVIDADE_1",
     "ATIVIDADE_2",
     "ATIVIDADE_3",

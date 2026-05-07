@@ -5,14 +5,17 @@ from configs.caminhos          import (
     ARQUIVO_PIB
 )
 from configs.constantes        import NOME_CSV_GERADO_PIB
-from transformadores.dataframe import ordenar_linhas
+from transformadores.dataframe import (
+    ordenar_linhas,
+    reordenar_colunas
+)
 from configs.colunas           import (
     ORDEM_LINHAS,
+    ORDEM_COL_PIB,
     COLUNAS_NUM_PIB,
     COLUNAS_STR_PIB
 )
 from configs.esquemas          import ESQUEMA_PIB
-from transformadores.texto     import normalizar_texto
 from transformadores.tipos     import (
     colunas_para_string,
     colunas_para_inteiro,
@@ -32,28 +35,26 @@ def executar():
     print("BASE DE DADOS PIB IBGE\n")
 
     try:
-        df = ler_excel(ARQUIVO_PIB)
+        df = ler_excel(
+            ARQUIVO_PIB, 
+            usar_colunas = ESQUEMA_PIB.keys()
+        )
         print(f"✓ Processado:  [{ARQUIVO_PIB.name}]")
     
     except Exception as erro:
         print(f"✗ Erro em:     [{ARQUIVO_PIB.name}]:  {erro}")
 
-    df = df[list(ESQUEMA_PIB.keys())]
+    # Renomeia as colunas segundo o esquema
     df = df.rename(columns = ESQUEMA_PIB)
-
-    for col in [
-        "MUNICIPIO",
-        "RG_IMEDIATA",
-        "RG_INTERMEDIARIA"
-    ]:
-        df[col] = df[col].apply(normalizar_texto)
 
     # Padroniza os tipos dos dados
     df = colunas_para_string(df, COLUNAS_STR_PIB)
     df = colunas_para_inteiro(df, ["ANO"])
     df = colunas_para_float(df, COLUNAS_NUM_PIB)
 
+    # Ordena colunas e linhas
     df = ordenar_linhas(df, ORDEM_LINHAS)
+    df = reordenar_colunas(df, ORDEM_COL_PIB)
 
     try:
         salvar_csv(
