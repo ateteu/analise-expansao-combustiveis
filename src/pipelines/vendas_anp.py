@@ -28,7 +28,7 @@ def executar():
     print("=======================================================")
     print("BASE DE DADOS VENDAS ANP\n")
 
-    # Lista arquivos da pasta
+    # Lista arquivos presentes na pasta
     arquivos = listar_arquivos(CAMINHO_VENDAS_ANP, padrao = "*.csv")
 
     if not arquivos:

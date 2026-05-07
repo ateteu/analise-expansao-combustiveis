@@ -27,25 +27,31 @@ def processar_arquivo_anp(arquivo: Path) -> pd.DataFrame:
     df = df.drop(columns = ["GRANDE REGIÃO","MUNICÍPIO"])
     df = df.rename(columns = ESQUEMA_VENDAS_ANP)
 
-    arquivo_str = arquivo.name.lower()
+    mapeamento = {"ÓLEO DIESEL": "DIESEL"}
+    df["COMBUSTIVEL"] = df["COMBUSTIVEL"].replace(mapeamento)
 
-    # Identifica o tipo de combustível
-    if "diesel" in arquivo_str:
-        combustivel = "DIESEL"
-    
-    elif "gasolina" in arquivo_str:
-        combustivel = "GASOLINA C"
-    
-    elif "etanol" in arquivo_str:
-        combustivel = "ETANOL"
+    duplicados = df.duplicated().sum()
 
-    # Atribui o nome às linhas (para garantir consistência de nomenclatura)
-    df["COMBUSTIVEL"] = combustivel
+    if duplicados > 0:
+        print(f"! Duplicados encontrados: {duplicados}")
+        df = df.drop_duplicates()
+
+    # Padroniza decimal brasileiro
+    df["VOLUME_VENDIDO_M3"] = (
+        df["VOLUME_VENDIDO_M3"]
+        .astype(str)
+        .str.replace(",", ".", regex = False)
+    )
+
+    # Converte para número
+    df["VOLUME_VENDIDO_M3"] = pd.to_numeric(
+        df["VOLUME_VENDIDO_M3"],
+        errors = "coerce"
+    )
 
     # Garante a tipagem correta nas colunas
     df = colunas_para_string(df, ["UF"])
     df = colunas_para_inteiro(df, ["ANO"])
-    df = colunas_para_float(df, ["VOLUME_VENDIDO_M3"])
 
     # Garantir que UF tá certinho
 
