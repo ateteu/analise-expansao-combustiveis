@@ -1,10 +1,7 @@
 import pandas as pd
 from pathlib                   import Path
 from configs.constantes        import NOME_ABA_FROTA_2015
-from configs.colunas           import (
-    COLUNAS_INT_SENATRAN, 
-    COLUNAS_STR_SENATRAN
-)
+from configs.colunas           import COLUNAS_INT_SENATRAN
 from transformadores.arquivos  import extrair_ano
 from arquivos.de_excel         import ler_excel
 from transformadores.texto     import normalizar_texto

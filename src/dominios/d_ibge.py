@@ -2,7 +2,10 @@ import pandas as pd
 from pathlib               import Path
 from arquivos.de_excel     import ler_excel
 from transformadores.texto import normalizar_texto
-from transformadores.tipos import colunas_para_string, colunas_para_inteiro
+from transformadores.tipos import (
+    colunas_para_string, 
+    colunas_para_inteiro
+)
 from configs.mapeamentos   import (
     SIGLAS_UF,
     CORRECOES_MUNICIPIOS
