@@ -138,43 +138,46 @@ Bases utilizadas:
 ```text
 analise-expansao-combustiveis/
 ├── dados/
-│   ├── 1-brutos/        # Dados originais das fontes
-│   ├── 2-modificados/   # Dados limpos e padronizados
-│   └── 3-modelados/     # Dados finais prontos para análise
+│   ├── 1-brutos/          # Dados originais das fontes
+│   ├── 2-modificados/     # Dados limpos e padronizados
+│   ├── 3-modelados/       # Dados finais prontos para análise
+│   └── banco_dados.duckdb # Banco de dados local
 │
-├── notebooks/           # Análises exploratórias e validações
-├── sql/                 # Consultas e scripts SQL
+├── notebooks/             # Análises exploratórias e validações
+├── sql/                   # Consultas e scripts SQL
 │
 └── src/
-    ├── pipelines/       # Fluxos de processamento por fonte de dados
-    ├── transformadores/ # Funções reutilizáveis de transformação
-    ├── dominios/        # Regras específicas de cada domínio
-    ├── io/              # Leitura e escrita de arquivos
-    ├── configs/         # Configurações estáticas e mapeamentos
-    └── main.py          # Ponto de entrada da aplicação
+    ├── pipelines/         # Fluxos de processamento por fonte de dados
+    ├── transformadores/   # Funções reutilizáveis de transformação
+    ├── dominios/          # Regras específicas de cada domínio
+    ├── io/                # Leitura e escrita de arquivos
+    ├── configs/           # Configurações estáticas e mapeamentos
+    ├── carregar_duckdb.py # Gera o BD e as tabelas
+    └── main.py            # Ponto de entrada da aplicação
 ```
 
 ## Pipeline de Dados
 
-1. Coleta de dados
+1. Coleta de dados:
    - Frota (SENATRAN)
    - PIB municipal (IBGE)
    - Vendas e preços (ANP)
+   - Coordenadas dos municípios (Rep. Github)
 
-2. Tratamento (Python)
+2. Tratamento (Python):
    - Limpeza e padronização
    - Consolidação de séries históricas
 
-3. Modelagem (SQL)
+3. Modelagem (SQL | Duck DB):
    - Filtros por região e período
    - Agregações
    - Construção de tabelas analíticas
 
-4. Análise (Python)
+4. Análise (Python):
    - Exploração de padrões
    - Criação de métricas
 
-5. Visualização (Power BI)
+5. Visualização (Power BI):
    - Mapas geográficos
    - Indicadores de demanda
    - Análise logística
@@ -183,6 +186,7 @@ analise-expansao-combustiveis/
 ## Ferramentas Utilizadas
 
 - SQL
+- Duck DB
 - Python (Pandas)
 - Power BI
 

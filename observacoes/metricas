@@ -1,0 +1,39 @@
+- status_atendimento_municipio - [atendido, candidato, fora] informa se um dado municipio já é atentido pela empresa, se é um candidato, ou se está fora do escopo
+
+------------------------------------------------------
+DEMANDA
+Objetivo: medir o tamanho e potencial do mercado consumidor.
+
+- volume_total_m3_anual - soma dos volumes de combustivel do municipio
+- percentagem_diesel = volume_diesel / volume total
+- percentagem_combustivel_leve = (volume_etanol + volume_gasolinac) / volume total
+
+- combustivel_por_veiculo_total = volume_total / frota total
+
+- diesel_por_veiculo_pesado = volume_diesel / (frota caminhoes+onibus+..)
+- combustivel_por_veiculo_leve = (volume_etanol + volume_gasolinac) / (frota carros+motos+...)
+
+- crescimento_linear_volume = inclinação regressao linear de volume (2015-2024)
+- cagr_volume_3a = (volume_ano_x+3 / volume_ano_x) ^ (1/3) - 1
+- cagr_volume_9a = (volume_ano_x+9 / volume_ano_x) ^ (1/9) - 1
+
+- crescimento_linear_frota = inclinação regressao linear da frota (2015-2024)
+- cagr_frota_3a = (frota_ano_x+3 / frota_ano_x) ^ (1/3) - 1
+- cagr_frota_9a = (frota_ano_x+9 / frota_ano_x) ^ (1/9) - 1
+------------------------------------------------------
+ECONOMICAS
+- pib_per_capita_relativo = pib_per_capita municipio / media_estadual municipio
+- contribuicao_agro = vab_agro municipio / vab_total municipio
+- contribuicao_industria = vab_industria municipio / vab_total municipio
+- contribuicao_servicos = vab_servicos municipio / vab_total municipio
+- intensidade_economica = pib_total municipio / frota_total municipio (é um proxy de capacidade de pagto | riqueza por veiculo)
+------------------------------------------------------
+LOGISTICAS
+
+- distancia_base_km = distancia euclidiana municipio a base mais proxima
+- distancia_base_principal_km = distancia euclidiana do municipio ate betim
+- base_referencia = base existente responsavel pelo atendimento do municipio
+- distancia_referencia = valor constante
+- fator_distancia = 1 + (distancia_base_km / distancia_referencia) . peso
+------------------------------------------------------
+
