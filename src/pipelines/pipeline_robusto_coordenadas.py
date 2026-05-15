@@ -50,14 +50,12 @@ SCHEMA_ORIGINAL = {
 
 COLUNAS_FINAIS = [
     "id_municipio",
-    "uf",
     "latitude",
     "longitude",
 ]
 
 COLUNAS_CRITICAS = [
     "id_municipio",
-    "uf",
     "latitude",
     "longitude",
 ]
@@ -169,7 +167,6 @@ def padronizar_colunas(df):
 
     return df.rename(columns={
         "codigo_ibge": "id_municipio",
-        "codigo_uf": "uf",
         "latitude": "latitude",
         "longitude": "longitude",
     })
@@ -196,13 +193,6 @@ def converter_tipos(df):
         df["id_municipio"]
         .str.strip()
         .str.zfill(7)
-    )
-
-    # uf
-    df["uf"] = (
-        df["uf"]
-        .str.strip()
-        .str.zfill(2)
     )
 
     # latitude
@@ -250,13 +240,11 @@ def validar_formatos(df):
         r"^\d{7}$",
         na=False,
     )
-    mask_uf  = df["uf"].isin(MAPA_UF_CODIGO)
     mask_lat = df["latitude"].between(-90, 90)
     mask_lon = df["longitude"].between(-180, 180)
     
     mask_final = (
         mask_id &
-        mask_uf &
         mask_lat &
         mask_lon
     )
@@ -280,7 +268,7 @@ def validar_formatos(df):
 
 def tratar_duplicidades(df):
 
-    chave = ["id_municipio", "uf"]
+    chave = ["id_municipio"]
 
     # duplicata exata
     duplicatas_exatas = df[df.duplicated(keep=False)]
@@ -322,8 +310,7 @@ def carregar_ibge(caminho):
     )
 
     colunas_esperadas = {
-        "UF",
-        "Código Município Completo",
+        "Código Município Completo"
     }
 
     faltando = (
@@ -341,15 +328,7 @@ def carregar_ibge(caminho):
         "Código Município Completo": "id_municipio",
     })
 
-    df = df[
-        ["uf", "id_municipio"]
-    ].copy()
-
-    df["uf"] = (
-        df["uf"]
-        .str.strip()
-        .str.zfill(2)
-    )
+    df = df[["id_municipio"]].copy()
 
     df["id_municipio"] = (
         df["id_municipio"]
@@ -364,15 +343,13 @@ def validar_com_ibge(df, df_ibge):
 
     chaves_validas = set(
         zip(
-            df_ibge["uf"],
-            df_ibge["id_municipio"],
+            df_ibge["id_municipio"]
         )
     )
 
     chaves_df = list(
         zip(
-            df["uf"],
-            df["id_municipio"],
+            df["id_municipio"]
         )
     )
 
@@ -403,7 +380,7 @@ def exportar(df):
     df = (
         df[COLUNAS_FINAIS]
         .sort_values(
-            by=["uf", "id_municipio"]
+            by=["id_municipio"]
         )
         .reset_index(drop=True)
     )
