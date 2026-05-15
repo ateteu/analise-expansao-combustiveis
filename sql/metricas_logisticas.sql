@@ -1,4 +1,11 @@
-CREATE OR REPLACE TABLE distancia_base_km AS 
+CREATE OR REPLACE TABLE metricas_logisticas AS 
+
+-- Resumo das métricas:
+
+-- dist_base_principal_km   : Distância (km) do município em questão até a base principal, em betim
+-- dist_base_oliveira_km    : Distância (km) do município em questão até a base em Oliveira
+-- base_atendimento         : Base responsável (Betim ou Oliveira) pelo atendimento do município
+-- dist_base_atendimento_km : Distância (km) do município em questão até a base responsável pelo atendimento do município
 
 WITH distancias AS (
     SELECT 
@@ -15,7 +22,7 @@ WITH distancias AS (
                 * POWER(SIN(RADIANS(longitude - (-44.2008)) / 2), 2)
             )
         )
-    ) AS distancia_betim_km,
+    ) AS dist_base_principal_km,
 
     -- Distância Haversine do município selecionado até Oliveira:
     (
@@ -28,25 +35,26 @@ WITH distancias AS (
                 * POWER(SIN(RADIANS(longitude - (-44.8290)) / 2), 2)
             )
         )
-    ) AS distancia_oliveira_km
+    ) AS dist_base_oliveira_km
 
     FROM coordenadas_municipios.csv
 )
 
 SELECT 
     id_municipio,
-    distancia_betim_km,
-    distancia_oliveira_km,
+    dist_base_principal_km,
+    dist_base_oliveira_km,
+
     LEAST(
-        distancia_betim_km,
-        distancia_oliveira_km
-    ) AS distancia_base_km,
+        dist_base_principal_km,
+        dist_base_oliveira_km
+    ) AS dist_base_atendimento_km,
 
     CASE
-        WHEN distancia_betim_km <= distancia_oliveira_km
+        WHEN dist_base_principal_km <= dist_base_oliveira_km
             THEN 3106705 -- ID de Betim
         ELSE 3145604 -- ID de Oliveira
     
-    END AS base_referencia
+    END AS base_atendimento,
 
 FROM distancias
