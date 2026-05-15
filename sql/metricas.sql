@@ -2,9 +2,9 @@ CREATE OR REPLACE TABLE distancia_base_km AS
 
 WITH distancias AS (
     SELECT 
-    ID_MUNICIPIO,
+    id_municipio,
 
-    -- Distância Haversine até Betim:
+    -- Distância Haversine do município selecionado até Betim:
     (
         6371 * 2 * ASIN(
             SQRT(
@@ -17,7 +17,7 @@ WITH distancias AS (
         )
     ) AS distancia_betim_km,
 
-    -- Distância Haversine até Oliveira:
+    -- Distância Haversine do município selecionado até Oliveira:
     (
         6371 * 2 * ASIN(
             SQRT(
@@ -34,9 +34,9 @@ WITH distancias AS (
 )
 
 SELECT 
-    ID_MUNICIPIO,
+    id_municipio,
     distancia_betim_km,
-    distancia_betim_km,
+    distancia_oliveira_km,
     LEAST(
         distancia_betim_km,
         distancia_oliveira_km
