@@ -3,12 +3,16 @@ import pandas as pd
 import unicodedata
 
 
-def normalizar_texto(texto, separador = " "):
+def normalizar_texto(texto, separador = " ", maiusculo = True):
     """
     Padroniza texto para comparação:
     remove acentos, pontuação e espaços extras.
 
-    OBS: Separador padrão é espaço.
+    Parâmetros:
+    - separador: separador usado entre palavras
+    - maiusculo:
+        True  -> maiúsculo
+        False -> minúsculo
     """
     # Se o valor é nulo, retorna como está
     if pd.isna(texto):
@@ -21,8 +25,11 @@ def normalizar_texto(texto, separador = " "):
         if not unicodedata.combining(c)
     )
 
-    # Põe em maiúsculas e remove espaços nas bordas
-    texto = texto.upper().strip()
+    # Define caixa
+    if maiusculo:
+        texto = texto.upper().strip()
+    else:
+        texto = texto.lower().strip()
 
     # Troca pontuação por espaço
     texto = re.sub(r"[^\w\s]", " ", texto)
