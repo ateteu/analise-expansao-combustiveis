@@ -29,7 +29,7 @@ ARQUIVO_SAIDA = (
     / "coordenadas_municipios.csv"
 )
 
-PASTA_AUDITORIA = BASE_DIR / "auditoria-coord-municipios"
+PASTA_AUDITORIA = DIR_DADOS_INTERMEDIARIOS / "auditoria-coord-municipios"
 PASTA_AUDITORIA.mkdir(exist_ok=True)
 
 # =========================================================
@@ -49,17 +49,17 @@ SCHEMA_ORIGINAL = {
 }
 
 COLUNAS_FINAIS = [
-    "ID_MUNICIPIO",
-    "UF",
-    "LATITUDE",
-    "LONGITUDE",
+    "id_municipio",
+    "uf",
+    "latitude",
+    "longitude",
 ]
 
 COLUNAS_CRITICAS = [
-    "ID_MUNICIPIO",
-    "UF",
-    "LATITUDE",
-    "LONGITUDE",
+    "id_municipio",
+    "uf",
+    "latitude",
+    "longitude",
 ]
 
 MAPA_UF_CODIGO = {
@@ -168,10 +168,10 @@ Sobrando: {sorted(sobrando)}
 def padronizar_colunas(df):
 
     return df.rename(columns={
-        "codigo_ibge": "ID_MUNICIPIO",
-        "codigo_uf": "UF",
-        "latitude": "LATITUDE",
-        "longitude": "LONGITUDE",
+        "codigo_ibge": "id_municipio",
+        "codigo_uf": "uf",
+        "latitude": "latitude",
+        "longitude": "longitude",
     })
 
 # =========================================================
@@ -192,28 +192,28 @@ def limpar(df):
 def converter_tipos(df):
 
     # ID município
-    df["ID_MUNICIPIO"] = (
-        df["ID_MUNICIPIO"]
+    df["id_municipio"] = (
+        df["id_municipio"]
         .str.strip()
         .str.zfill(7)
     )
 
-    # UF
-    df["UF"] = (
-        df["UF"]
+    # uf
+    df["uf"] = (
+        df["uf"]
         .str.strip()
         .str.zfill(2)
     )
 
     # latitude
-    df["LATITUDE"] = pd.to_numeric(
-        df["LATITUDE"],
+    df["latitude"] = pd.to_numeric(
+        df["latitude"],
         errors="coerce",
     )
 
     # longitude
-    df["LONGITUDE"] = pd.to_numeric(
-        df["LONGITUDE"],
+    df["longitude"] = pd.to_numeric(
+        df["longitude"],
         errors="coerce",
     )
 
@@ -246,21 +246,14 @@ def remover_nulos(df):
 
 def validar_formatos(df):
 
-    # id município
-    mask_id = df["ID_MUNICIPIO"].str.match(
+    mask_id = df["id_municipio"].str.match(
         r"^\d{7}$",
         na=False,
     )
-
-    # uf
-    mask_uf = df["UF"].isin(MAPA_UF_CODIGO)
-
-    # latitude
-    mask_lat = df["LATITUDE"].between(-90, 90)
-
-    # longitude
-    mask_lon = df["LONGITUDE"].between(-180, 180)
-
+    mask_uf  = df["uf"].isin(MAPA_UF_CODIGO)
+    mask_lat = df["latitude"].between(-90, 90)
+    mask_lon = df["longitude"].between(-180, 180)
+    
     mask_final = (
         mask_id &
         mask_uf &
@@ -287,7 +280,7 @@ def validar_formatos(df):
 
 def tratar_duplicidades(df):
 
-    chave = ["ID_MUNICIPIO", "UF"]
+    chave = ["id_municipio", "uf"]
 
     # duplicata exata
     duplicatas_exatas = df[df.duplicated(keep=False)]
@@ -344,22 +337,22 @@ def carregar_ibge(caminho):
         )
 
     df = df.rename(columns={
-        "UF": "UF",
-        "Código Município Completo": "ID_MUNICIPIO",
+        "UF": "uf",
+        "Código Município Completo": "id_municipio",
     })
 
     df = df[
-        ["UF", "ID_MUNICIPIO"]
+        ["uf", "id_municipio"]
     ].copy()
 
-    df["UF"] = (
-        df["UF"]
+    df["uf"] = (
+        df["uf"]
         .str.strip()
         .str.zfill(2)
     )
 
-    df["ID_MUNICIPIO"] = (
-        df["ID_MUNICIPIO"]
+    df["id_municipio"] = (
+        df["id_municipio"]
         .str.strip()
         .str.zfill(7)
     )
@@ -371,15 +364,15 @@ def validar_com_ibge(df, df_ibge):
 
     chaves_validas = set(
         zip(
-            df_ibge["UF"],
-            df_ibge["ID_MUNICIPIO"],
+            df_ibge["uf"],
+            df_ibge["id_municipio"],
         )
     )
 
     chaves_df = list(
         zip(
-            df["UF"],
-            df["ID_MUNICIPIO"],
+            df["uf"],
+            df["id_municipio"],
         )
     )
 
@@ -410,7 +403,7 @@ def exportar(df):
     df = (
         df[COLUNAS_FINAIS]
         .sort_values(
-            by=["UF", "ID_MUNICIPIO"]
+            by=["uf", "id_municipio"]
         )
         .reset_index(drop=True)
     )
