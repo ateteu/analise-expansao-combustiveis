@@ -29,15 +29,15 @@ def _carregar_codigos_ibge(caminho: Path) -> pd.DataFrame:
     df = df.rename(columns = ESQUEMA_DOMINIO_IBGE)
 
     # Troca nomes de UF por siglas correspondentes
-    df["UF"] = (
-        df["UF"]
+    df["uf"] = (
+        df["uf"]
         .str.strip()
         .map(SIGLAS_UF)
     )
 
-    # Normaliza e padroniza tipo dos valores da coluna MUNICIPIO
-    df["MUNICIPIO"] = df["MUNICIPIO"].apply(normalizar_texto)
-    df = colunas_para_string(df, ["MUNICIPIO"])
+    # Normaliza e padroniza tipo dos valores da coluna municipio
+    df["municipio"] = df["municipio"].apply(normalizar_texto)
+    df = colunas_para_string(df, ["municipio"])
 
     return df
 
@@ -48,16 +48,16 @@ def _corrigir_municipios(df: pd.DataFrame) -> pd.DataFrame:
     (segundo erros da base de dados de frota SENATRAN) 
     para compatibilização com a base oficial IBGE.
     """
-    # Para cada linha, busca correção pelo par (UF, MUNICIPIO);
+    # Para cada linha, busca correção pelo par (uf, municipio);
     # se não houver correção mapeada, mantém o valor original
 
-    df["MUNICIPIO"] = df.apply(
+    df["municipio"] = df.apply(
         lambda linha: CORRECOES_MUNICIPIOS.get(
             (
-                linha["UF"], 
-                linha["MUNICIPIO"]
+                linha["uf"], 
+                linha["municipio"]
             ),
-            linha["MUNICIPIO"]
+            linha["municipio"]
         ),
         axis=1
     )
@@ -72,7 +72,7 @@ def adicionar_codigo_ibge(df: pd.DataFrame) -> pd.DataFrame:
     """
     # Remove linhas sem município informado
     df = df[
-        df["MUNICIPIO"] != "MUNICIPIO NAO INFORMADO"
+        df["municipio"] != "MUNICIPIO NAO INFORMADO"
     ]
 
     df = _corrigir_municipios(df)
@@ -81,18 +81,18 @@ def adicionar_codigo_ibge(df: pd.DataFrame) -> pd.DataFrame:
     df_ibge = _carregar_codigos_ibge(ARQUIVO_CODIGOS_IBGE)
     df = df.merge(
         df_ibge,
-        on  = ["UF", "MUNICIPIO"],
+        on  = ["uf", "municipio"],
         how = "left"
     )
 
-    # Garante que ID_MUNICIPIO é str
+    # Garante que id_municipio é str
     # (estava aparecendo como float, por isso a conversão para int antes)
-    df = colunas_para_inteiro(df, ["ID_MUNICIPIO"])
-    df = colunas_para_string(df, ["ID_MUNICIPIO"])
+    df = colunas_para_inteiro(df, ["id_municipio"])
+    df = colunas_para_string(df, ["id_municipio"])
 
     municipios_sem_codigo = (
-        df[df["ID_MUNICIPIO"].isna()]
-        [["UF", "MUNICIPIO"]]
+        df[df["id_municipio"].isna()]
+        [["uf", "municipio"]]
         .drop_duplicates()
     )
 
@@ -103,7 +103,7 @@ def adicionar_codigo_ibge(df: pd.DataFrame) -> pd.DataFrame:
 
         print(
             municipios_sem_codigo
-            .sort_values(["UF", "MUNICIPIO"])
+            .sort_values(["uf", "municipio"])
             .to_string(index=False)
         )
 

@@ -34,22 +34,22 @@ def _encontrar_linha_cabecalho(df_bruto: pd.DataFrame) -> int:
 
 def _remover_linhas_invalidas(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Remove linhas vazias, cabeçalhos duplicados e linhas sem UF válida
+    Remove linhas vazias, cabeçalhos duplicados e linhas sem uf válida
     """
     df = df.dropna(how="all") # Remove linhas vazias
-    df = df[df["UF"].notna()] # Remove linhas sem UF
+    df = df[df["uf"].notna()] # Remove linhas sem uf
 
     # Remove cabeçalho repetido
     df = df[
-        df["UF"]
+        df["uf"]
         .astype(str)
         .str.upper()
-        != "UF"
+        != "uf"
     ]
 
     # Mantém apenas UFs válidas (2 chars)
     df = df[
-        df["UF"]
+        df["uf"]
         .astype(str)
         .str.len() == 2
     ]
@@ -75,20 +75,21 @@ def processar_arquivo_senatran(caminho: Path) -> pd.DataFrame:
         pular_linhas = linha_cabecalho
     )
 
-    df["ANO"] = ano # Add col ANO
+    df["ano"] = ano # Add coluna ano
 
     # Padroniza nomes do cabeçalho
     df.columns = df.columns.map(
-        lambda col: normalizar_texto(col, separador = "_")
+        lambda col: normalizar_texto(col, separador = "_", maiusculo = False)
     )
 
     df = _remover_linhas_invalidas(df)
 
-    # Garante que MUNICIPIO e UF são str e normaliza os textos
-    df = colunas_para_string(df, ["UF", "MUNICIPIO"])
-    for col in ["UF", "MUNICIPIO"]:
-        df[col] = df[col].apply(normalizar_texto)
-    
+    # Garante que municipio e uf são str e normaliza os textos
+    df = colunas_para_string(df, ["uf", "municipio"])
+
+    df["municipio"] = df["municipio"].apply(normalizar_texto)
+    df["uf"] = df["uf"].apply(normalizar_texto)
+
     # Garante que demais colunas estão como int
     df = colunas_para_inteiro(df, COLUNAS_INT_SENATRAN)
 

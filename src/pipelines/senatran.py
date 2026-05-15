@@ -56,8 +56,8 @@ def executar():
     # Adiciona códigos IBGE a cada município
     df_final = adicionar_codigo_ibge(df_final)
 
-    # Deixa apenas ID_MUNICIPIO como identificador do município
-    df_final = df_final.drop(columns = "MUNICIPIO")
+    # Remove uf e nome do município, agora não mais necessários
+    df_final = df_final.drop(columns = ["municipio", "uf"])
 
     # Ordena linhas e colunas
     df_final = ordenar_linhas(df_final, ORDEM_LINHAS)

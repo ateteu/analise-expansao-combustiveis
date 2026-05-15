@@ -2,59 +2,57 @@
 # [coluna original] -> [nova coluna]
 
 ESQUEMA_PIB = {
-    "Ano"                                                  : "ANO",
-    "Sigla da Unidade da Federação"                        : "UF",
-    "Código do Município"                                  : "ID_MUNICIPIO",
+    "Ano"                                                  : "ano",
+    "Código do Município"                                  : "id_municipio",
 
 
     "Valor adicionado bruto da Agropecuária, " \
-    "\na preços correntes\n(R$ 1.000)"                     : "VAB_AGROPECUARIA",
+    "\na preços correntes\n(R$ 1.000)"                     : "vab_agropecuaria",
 
 
     "Valor adicionado bruto da Indústria,"     \
-    "\na preços correntes\n(R$ 1.000)"                     : "VAB_INDUSTRIA",
+    "\na preços correntes\n(R$ 1.000)"                     : "vab_industria",
 
 
     "Valor adicionado bruto dos Serviços,"              \
     "\na preços correntes \n"                           \
     "- exceto Administração, defesa, educação e saúde " \
-    "públicas e seguridade social\n(R$ 1.000)"             : "VAB_SERVICOS",
+    "públicas e seguridade social\n(R$ 1.000)"             : "vab_servicos",
 
     "Valor adicionado bruto da Administração, " \
     "defesa, educação e saúde públicas e "      \
-    "seguridade social, \na preços correntes\n(R$ 1.000)"  : "VAB_ADMINISTRACAO_PUBLICA",
+    "seguridade social, \na preços correntes\n(R$ 1.000)"  : "vab_adm_publica",
 
 
     "Valor adicionado bruto total, "     \
-    "\na preços correntes\n(R$ 1.000)"                     : "VAB_TOTAL",
+    "\na preços correntes\n(R$ 1.000)"                     : "vab_total",
 
 
     "Produto Interno Bruto, "            \
-    "\na preços correntes\n(R$ 1.000)"                     : "PIB",
+    "\na preços correntes\n(R$ 1.000)"                     : "pib",
 
 
     "Produto Interno Bruto per capita, " \
-    "\na preços correntes\n(R$ 1,00)"                      : "PIB_PER_CAPITA",
+    "\na preços correntes\n(R$ 1,00)"                      : "pib_per_capita",
 
 
-    "Atividade com maior valor adicionado bruto"           : "ATIVIDADE_1",
-    "Atividade com segundo maior valor adicionado bruto"   : "ATIVIDADE_2",
-    "Atividade com terceiro maior valor adicionado bruto"  : "ATIVIDADE_3",
+    "Atividade com maior valor adicionado bruto"           : "atividade_1",
+    "Atividade com segundo maior valor adicionado bruto"   : "atividade_2",
+    "Atividade com terceiro maior valor adicionado bruto"  : "atividade_3",
 }
 
 
 ESQUEMA_DOMINIO_IBGE = {
-    "Nome_UF"                              : "UF",
-    "Código Município Completo"            : "ID_MUNICIPIO",
-    "Nome_Município"                       : "MUNICIPIO"
+    "Nome_UF"                       : "uf",
+    "Código Município Completo"     : "id_municipio",
+    "Nome_Município"                : "municipio"
 }
 
 
-# Não será usado a coluna "MUNICÍPIO" nem "GRANDE REGIÃO"
 ESQUEMA_VENDAS_ANP = {
-    "ANO"         : "ANO",
-    "UF"          : "UF",
-    "CÓDIGO IBGE" : "ID_MUNICIPIO",
-    "PRODUTO"     : "COMBUSTIVEL",
-    "VENDAS"      : "VOLUME_VENDIDO_M3"
+    "ANO"         : "ano",
+    "UF"          : "uf",
+    "CÓDIGO IBGE" : "id_municipio",
+    "PRODUTO"     : "tipo_combustivel",
+    "VENDAS"      : "volume_vendido_m3"
 }

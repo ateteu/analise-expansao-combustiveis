@@ -2,9 +2,8 @@
 
 
 ORDEM_LINHAS = [
-    "ANO", 
-    "UF",
-    "ID_MUNICIPIO"
+    "ano",
+    "id_municipio"
 ]
 
 
@@ -12,72 +11,70 @@ PRIMEIRAS_COL_SENATRAN = ORDEM_LINHAS
 
 
 ORDEM_COL_VENDAS_ANP = [
-    "ANO",
-    "UF",
-    "ID_MUNICIPIO",
-    "COMBUSTIVEL",
-    "VOLUME_VENDIDO_M3"
+    "ano",
+    "uf",
+    "id_municipio",
+    "tipo_combustivel",
+    "volume_vendido_m3"
 ]
 
 
 ORDEM_COL_PIB = [
-    "ANO",
-    "UF",
-    "ID_MUNICIPIO",
-    "PIB",
-    "PIB_PER_CAPITA",
-    "VAB_TOTAL"
+    "ano",
+    "id_municipio",
+    "pib",
+    "pib_per_capita",
+    "vab_total"
 ]
 
 
 COLUNAS_INT_SENATRAN = [
-    "TOTAL",
-    "AUTOMOVEL",
-    "BONDE",
-    "CAMINHAO",
-    "CAMINHAO_TRATOR",
-    "CAMINHONETE",
-    "CAMIONETA",
-    "CHASSI_PLATAF",
-    "CICLOMOTOR",
-    "MICRO_ONIBUS",
-    "MOTOCICLETA",
-    "MOTONETA",
-    "ONIBUS",
-    "QUADRICICLO",
-    "REBOQUE",
-    "SEMI_REBOQUE",
-    "SIDE_CAR",
-    "OUTROS",
-    "TRATOR_ESTEI",
-    "TRATOR_RODAS",
-    "TRICICLO",
-    "UTILITARIO",
+    "total",
+    "automovel",
+    "bonde",
+    "caminhao",
+    "caminhao_trator",
+    "caminhonete",
+    "camioneta",
+    "chassi_plataf",
+    "ciclomotor",
+    "micro_onibus",
+    "motocicleta",
+    "motoneta",
+    "onibus",
+    "quadriciclo",
+    "reboque",
+    "semi_reboque",
+    "side_car",
+    "outros",
+    "trator_estei",
+    "trator_rodas",
+    "triciclo",
+    "utilitario"
 ]
 
 
 COLUNAS_STR_SENATRAN = [
-    "UF",
-    "ID_MUNICIPIO",
-    "MUNICIPIO"
+    "uf",
+    "id_municipio",
+    "municipio"
 ]
 
 
 COLUNAS_NUM_PIB = [
-    "VAB_AGROPECUARIA",
-    "VAB_INDUSTRIA",
-    "VAB_SERVICOS",
-    "VAB_ADMINISTRACAO_PUBLICA",
-    "VAB_TOTAL",
-    "PIB",
-    "PIB_PER_CAPITA"
+    "vab_agropecuaria",
+    "vab_industria",
+    "vab_servicos",
+    "vab_adm_publica",
+    "vab_total",
+    "pib",
+    "pib_per_capita"
 ]
 
 
 COLUNAS_STR_PIB = [
-    "UF",
-    "ID_MUNICIPIO",
-    "ATIVIDADE_1",
-    "ATIVIDADE_2",
-    "ATIVIDADE_3",
+    "id_municipio",
+    "atividade_1",
+    "atividade_2",
+    "atividade_3",
 ]

@@ -49,7 +49,7 @@ def executar():
 
     # Padroniza os tipos dos dados
     df = colunas_para_string(df, COLUNAS_STR_PIB)
-    df = colunas_para_inteiro(df, ["ANO"])
+    df = colunas_para_inteiro(df, ["ano"])
     df = colunas_para_float(df, COLUNAS_NUM_PIB)
 
     # Ordena colunas e linhas
