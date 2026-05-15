@@ -51,34 +51,34 @@ PASTA_AUDITORIA.mkdir(
 # =========================================================
 
 SCHEMA_ORIGINAL = {
-    "ANO": "ANO",
+    "ANO": "ano",
+    "UF": "uf",
     "GRANDE REGIÃO": "REGIAO",
-    "UF": "UF",
-    "PRODUTO": "COMBUSTIVEL",
-    "CÓDIGO IBGE": "ID_MUNICIPIO",
-    "MUNICÍPIO": "MUNICIPIO",
-    "VENDAS": "VOLUME_VENDAS_M3",
+    "PRODUTO": "tipo_combustivel",
+    "CÓDIGO IBGE": "id_municipio",
+    "MUNICÍPIO": "municipio",
+    "VENDAS": "volume_vendas_m3",
 }
 
 # Colunas que vão para o resultado final
 COLUNAS_FINAIS = [
-    "ANO",
-    "UF",
-    "ID_MUNICIPIO",
-    "COMBUSTIVEL",
-    "VOLUME_VENDAS_M3",
+    "ano",
+    "uf",
+    "id_municipio",
+    "tipo_combustivel",
+    "volume_vendas_m3",
 ]
 
 # Colunas essenciais — linha sem qualquer uma dessas vai pra quarentena
 COLUNAS_CRITICAS = [
-    "ANO",
-    "UF",
-    "ID_MUNICIPIO",
-    "COMBUSTIVEL",
-    "VOLUME_VENDAS_M3",
+    "ano",
+    "uf",
+    "id_municipio",
+    "tipo_combustivel",
+    "volume_vendas_m3",
 ]
 
-# Relação nome UF - código UF
+# Relação nome uf - código uf
 MAPA_UF_SIGLA_PARA_CODIGO = {
     "RO": "11", "AC": "12", "AM": "13", "RR": "14", "PA": "15", "AP": "16", "TO": "17",
     "MA": "21", "PI": "22", "CE": "23", "RN": "24", "PB": "25", "PE": "26", "AL": "27","SE": "28","BA": "29",
@@ -193,7 +193,7 @@ def ler_csv_seguro(caminho, origem=""):
     )
 
     # Limpa BOM e espaços dos nomes ANTES de qualquer validação de schema.
-    # Sem isso, "ANO"(BOM) != "ANO" e o schema validation quebra.
+    # Sem isso, "ano"(BOM) != "ano" e o schema validation quebra.
     df.columns = df.columns.str.strip().str.replace("\ufeff", "", regex=False)
 
     return df
@@ -246,7 +246,7 @@ def limpar_textos(df):
       (ex: "", "NA", "-"). Com keep_default_na=False na leitura, essas strings
       entram como texto e precisam ser convertidas explicitamente aqui.
     """
-    for coluna in ["REGIAO", "UF", "COMBUSTIVEL", "MUNICIPIO"]:
+    for coluna in ["uf", "tipo_combustivel", "municipio"]:
         df[coluna] = df[coluna].apply(normalizar_texto)
     return df
 
@@ -261,32 +261,32 @@ def converter_tipos(df):
     Valores inválidos viram pd.NA (via errors="coerce").
 
     Mudança em relação à versão anterior:
-    - ID_MUNICIPIO mantido como string com zero-fill de 7 dígitos,
+    - id_municipio mantido como string com zero-fill de 7 dígitos,
       não convertido para Int64. Isso evita perda de representação
       e problemas de join futuro no SQL (código IBGE é identificador,
       não um número sobre o qual se faz aritmética).
     """
     # Ano
-    df["ANO"] = pd.to_numeric(df["ANO"], errors="coerce").astype("Int64")
+    df["ano"] = pd.to_numeric(df["ano"], errors="coerce").astype("Int64")
 
-    # UF -> código IBGE
-    df["UF"] = df["UF"].map(MAPA_UF_SIGLA_PARA_CODIGO)
+    # uf -> código IBGE
+    df["uf"] = df["uf"].map(MAPA_UF_SIGLA_PARA_CODIGO)
 
     # Código IBGE do município: mantido como string, 7 dígitos, zero à esquerda
-    df["ID_MUNICIPIO"] = (
-        df["ID_MUNICIPIO"]
+    df["id_municipio"] = (
+        df["id_municipio"]
         .str.strip()
         .apply(lambda x: x.zfill(7) if pd.notna(x) and x.strip() != "" else pd.NA)
     )
 
     # Volume de vendas, tratando separadores no padrão brasileiro
-    df["VOLUME_VENDAS_M3"] = (
-        df["VOLUME_VENDAS_M3"]
+    df["volume_vendas_m3"] = (
+        df["volume_vendas_m3"]
         .str.strip()
         .str.replace(".", "", regex=False)   # separador de milhar
         .str.replace(",", ".", regex=False)  # decimal brasileiro → ponto
     )
-    df["VOLUME_VENDAS_M3"] = pd.to_numeric(df["VOLUME_VENDAS_M3"], errors="coerce")
+    df["volume_vendas_m3"] = pd.to_numeric(df["volume_vendas_m3"], errors="coerce")
 
     return df
 
@@ -310,20 +310,20 @@ def separar_linhas_invalidas(df, origem=""):
 
 
 # =========================================================
-# ETAPA 7 - VALIDAÇÃO DO ID_MUNICIPIO
+# ETAPA 7 - VALIDAÇÃO DO id_municipio
 # =========================================================
 
 def validar_formato_id_municipio(df, origem=""):
     """
-    Verifica se ID_MUNICIPIO tem exatamente 7 dígitos numéricos.
+    Verifica se id_municipio tem exatamente 7 dígitos numéricos.
     Linhas fora do formato vão para quarentena.
     """
     n_antes = len(df)
-    mask_valido = df["ID_MUNICIPIO"].str.match(r"^\d{7}$", na=False)
+    mask_valido = df["id_municipio"].str.match(r"^\d{7}$", na=False)
     invalidos = df[~mask_valido].copy()
     salvar_quarentena(invalidos, f"id_municipio_formato_invalido_{origem}.csv")
     df = df[mask_valido].copy()
-    log_etapa("Validação formato ID_MUNICIPIO", pd.concat([invalidos, df]), df, origem)
+    log_etapa("Validação formato id_municipio", pd.concat([invalidos, df]), df, origem)
     return df
 
 
@@ -342,27 +342,27 @@ def aplicar_regras_de_dominio(df, origem=""):
     n_antes = len(df)
 
     # Ano plausível
-    mask_ano = df["ANO"].between(ANO_MIN, ANO_MAX)
+    mask_ano = df["ano"].between(ANO_MIN, ANO_MAX)
     salvar_quarentena(df[~mask_ano].copy(), f"dominio_ano_invalido_{origem}.csv")
     df = df[mask_ano].copy()
 
-    # UF válida
-    mask_uf = df["UF"].isin(UFS_VALIDAS)
+    # uf válida
+    mask_uf = df["uf"].isin(UFS_VALIDAS)
     salvar_quarentena(df[~mask_uf].copy(), f"dominio_uf_invalida_{origem}.csv")
     df = df[mask_uf].copy()
 
-    # UF dentro do escopo
-    mask_escopo = df["UF"].isin(UFS_ESCOPO)
+    # uf dentro do escopo
+    mask_escopo = df["uf"].isin(UFS_ESCOPO)
     salvar_quarentena(df[~mask_escopo].copy(), f"dominio_uf_fora_escopo_{origem}.csv")
     df = df[mask_escopo].copy()
 
     # Combustível válido
-    mask_comb = df["COMBUSTIVEL"].isin(COMBUSTIVEIS_VALIDOS)
+    mask_comb = df["tipo_combustivel"].isin(COMBUSTIVEIS_VALIDOS)
     salvar_quarentena(df[~mask_comb].copy(), f"dominio_combustivel_invalido_{origem}.csv")
     df = df[mask_comb].copy()
 
     # Volume não pode ser negativo
-    mask_vol = df["VOLUME_VENDAS_M3"] >= 0
+    mask_vol = df["volume_vendas_m3"] >= 0
     salvar_quarentena(df[~mask_vol].copy(), f"dominio_volume_negativo_{origem}.csv")
     df = df[mask_vol].copy()
 
@@ -388,7 +388,7 @@ def tratar_duplicidades(df, origem=""):
     - Substituído o filtro via MultiIndex (frágil) por duplicated(keep=False),
       que é mais legível e confiável entre versões do pandas.
     """
-    chave_logica = ["ANO", "UF", "ID_MUNICIPIO", "COMBUSTIVEL"]
+    chave_logica = ["ano", "uf", "id_municipio", "tipo_combustivel"]
     n_antes = len(df)
 
     # Duplicatas exatas: salva para auditoria, mantém apenas uma ocorrência
@@ -397,7 +397,7 @@ def tratar_duplicidades(df, origem=""):
     df = df.drop_duplicates(keep="first").copy()
 
     # Duplicatas lógicas: mesma chave de negócio, mas linhas distintas
-    # (valores de VOLUME_VENDAS_M3 diferentes, por exemplo)
+    # (valores de volume_vendas_m3 diferentes, por exemplo)
     mask_logicas = df.duplicated(subset=chave_logica, keep=False)
     duplicatas_logicas = df[mask_logicas].copy()
     salvar_quarentena(duplicatas_logicas, f"duplicatas_logicas_{origem}.csv")
@@ -414,7 +414,7 @@ def tratar_duplicidades(df, origem=""):
 def carregar_ibge(caminho_ibge):
     """
     Carrega a tabela de referência do IBGE.
-    Usada para validar se o código do município existe e se a UF bate.
+    Usada para validar se o código do município existe e se a uf bate.
 
     Mudança em relação à versão anterior:
     - Adicionada validação de schema da planilha do IBGE, similar à feita
@@ -437,33 +437,33 @@ def carregar_ibge(caminho_ibge):
         )
 
     df_ibge = df_ibge.rename(columns={
-        "UF": "UF",
-        "Código Município Completo": "ID_MUNICIPIO",
-        "Nome_Município": "NOME_MUNICIPIO_IBGE",
+        "UF": "uf",
+        "Código Município Completo": "id_municipio",
+        "Nome_Município": "nome_municipio_ibge",
     })
 
-    df_ibge = df_ibge[["UF", "ID_MUNICIPIO", "NOME_MUNICIPIO_IBGE"]].copy()
+    df_ibge = df_ibge[["uf", "id_municipio", "nome_municipio_ibge"]].copy()
 
-    df_ibge["UF"] = df_ibge["UF"].apply(normalizar_texto)
-    df_ibge["ID_MUNICIPIO"] = (
-        df_ibge["ID_MUNICIPIO"]
+    df_ibge["uf"] = df_ibge["uf"].apply(normalizar_texto)
+    df_ibge["id_municipio"] = (
+        df_ibge["id_municipio"]
         .str.strip()
         .apply(lambda x: x.zfill(7) if pd.notna(x) and x.strip() != "" else pd.NA)
     )
-    df_ibge = df_ibge.dropna(subset=["UF", "ID_MUNICIPIO"])
+    df_ibge = df_ibge.dropna(subset=["uf", "id_municipio"])
 
     return df_ibge
 
 
 def validar_com_ibge(df, df_ibge, origem=""):
     """
-    Valida UF + ID do município contra a tabela de referência do IBGE.
+    Valida uf + ID do município contra a tabela de referência do IBGE.
     Linhas fora da referência vão para quarentena.
     """
     n_antes = len(df)
 
-    chaves_validas = set(zip(df_ibge["UF"], df_ibge["ID_MUNICIPIO"]))
-    chaves_df = list(zip(df["UF"], df["ID_MUNICIPIO"]))
+    chaves_validas = set(zip(df_ibge["uf"], df_ibge["id_municipio"]))
+    chaves_df = list(zip(df["uf"], df["id_municipio"]))
 
     mask_valida = pd.Series([c in chaves_validas for c in chaves_df], index=df.index)
 
@@ -482,20 +482,20 @@ def validar_com_ibge(df, df_ibge, origem=""):
 def validar_consistencia_interna(df, origem=""):
     """
     Valida se um mesmo ID de município aparece associado a múltiplas UFs.
-    Isso não deveria acontecer: cada código IBGE pertence a uma única UF.
+    Isso não deveria acontecer: cada código IBGE pertence a uma única uf.
 
     Mudança em relação à versão anterior:
     - Salva os casos inconsistentes em quarentena em vez de só printar.
     """
-    ufs_por_municipio = df.groupby("ID_MUNICIPIO")["UF"].nunique()
+    ufs_por_municipio = df.groupby("id_municipio")["uf"].nunique()
     ids_inconsistentes = ufs_por_municipio[ufs_por_municipio > 1].index
 
     if not ids_inconsistentes.empty:
-        inconsistencias = df[df["ID_MUNICIPIO"].isin(ids_inconsistentes)].copy()
-        print(f"  ⚠ [{origem}] {len(ids_inconsistentes)} IDs de município com UF inconsistente.")
+        inconsistencias = df[df["id_municipio"].isin(ids_inconsistentes)].copy()
+        print(f"  ⚠ [{origem}] {len(ids_inconsistentes)} IDs de município com uf inconsistente.")
         salvar_quarentena(inconsistencias, f"inconsistencia_municipio_uf_{origem}.csv")
     else:
-        print(f"  ✓ [{origem}] Consistência UF × ID_MUNICIPIO: OK")
+        print(f"  ✓ [{origem}] Consistência uf x id_municipio: OK")
 
 
 # =========================================================
@@ -514,10 +514,10 @@ def identificar_outliers(df, sufixo=""):
     if df.empty:
         return
 
-    q99 = df["VOLUME_VENDAS_M3"].quantile(0.99)
-    suspeitos = df[df["VOLUME_VENDAS_M3"] > q99].copy()
+    q99 = df["volume_vendas_m3"].quantile(0.99)
+    suspeitos = df[df["volume_vendas_m3"] > q99].copy()
     salvar_quarentena(suspeitos, f"outliers_acima_p99{sufixo}.csv")
-    print(f"  P99 VOLUME_VENDAS_M3: {q99:,.2f} — {len(suspeitos)} linhas acima desse limiar")
+    print(f"  P99 volume_vendas_m3: {q99:,.2f} — {len(suspeitos)} linhas acima desse limiar")
 
 
 # =========================================================
@@ -558,11 +558,11 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_ibge):
     # Remove linhas sem campos essenciais
     df = separar_linhas_invalidas(df, origem)
 
-    # Valida formato do ID_MUNICIPIO (7 dígitos numéricos)
+    # Valida formato do id_municipio (7 dígitos numéricos)
     df = validar_formato_id_municipio(df, origem)
 
     # Força o combustível fixo do arquivo — evita inconsistência na origem
-    df["COMBUSTIVEL"] = combustivel_fixo
+    df["tipo_combustivel"] = combustivel_fixo
 
     # Regras de domínio
     df = aplicar_regras_de_dominio(df, origem)
@@ -573,7 +573,7 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_ibge):
     # Deduplicação conservadora
     df = tratar_duplicidades(df, origem)
 
-    # Validação interna de consistência UF × ID_MUNICIPIO
+    # Validação interna de consistência uf × id_municipio
     validar_consistencia_interna(df, origem)
 
     print(f"  ✓ [{origem}] Linhas aprovadas: {len(df)}")
@@ -610,7 +610,7 @@ def main():
 
     # Ordenação determinística
     df_final = df_final.sort_values(
-        by=["ANO", "UF", "ID_MUNICIPIO", "COMBUSTIVEL"],
+        by=["ano", "uf", "id_municipio", "tipo_combustivel"],
         ignore_index=True,
     )
 
@@ -619,7 +619,7 @@ def main():
     identificar_outliers(df_final, sufixo="_consolidado")
 
     # Verificação final: não pode sobrar duplicidade lógica no resultado
-    chave_final = ["ANO", "UF", "ID_MUNICIPIO", "COMBUSTIVEL"]
+    chave_final = ["ano", "uf", "id_municipio", "tipo_combustivel"]
     n_dupl_final = df_final.duplicated(subset=chave_final).sum()
     if n_dupl_final > 0:
         raise ValueError(
@@ -640,9 +640,9 @@ def main():
     print("PROCESSAMENTO FINALIZADO")
     print(f"{'='*60}")
     print(f"  Total de linhas finais : {len(df_final)}")
-    print(f"  Combustíveis presentes : {sorted(df_final['COMBUSTIVEL'].unique())}")
-    print(f"  Anos cobertos          : {int(df_final['ANO'].min())} – {int(df_final['ANO'].max())}")
-    print(f"  Municípios distintos   : {df_final['ID_MUNICIPIO'].nunique()}")
+    print(f"  Combustíveis presentes : {sorted(df_final['tipo_combustivel'].unique())}")
+    print(f"  Anos cobertos          : {int(df_final['ano'].min())} – {int(df_final['ano'].max())}")
+    print(f"  Municípios distintos   : {df_final['id_municipio'].nunique()}")
     print(f"  Arquivo salvo em       : {ARQUIVO_SAIDA}")
     print(f"  Quarentena/auditoria   : {PASTA_AUDITORIA}/")
     print(f"{'='*60}")
