@@ -1,0 +1,27 @@
+sql/
+│
+├── 01_base/
+│   ├── base_vendas.sql
+│   ├── base_frota.sql
+│   ├── base_pib.sql
+│   └── base_coordenadas.sql
+│
+├── 02_metricas/
+│   ├── metricas_demanda.sql
+│   ├── metricas_economicas.sql
+│   ├── metricas_logisticas.sql
+│   └── metricas_crescimento.sql
+│
+├── 03_scores/
+│   ├── score_demanda.sql
+│   ├── score_economico.sql
+│   ├── score_logistico.sql
+│   └── score_final.sql
+│
+├── 04_views/
+│   └── analise_municipios.sql
+│
+└── 05_validacoes/
+    ├── validar_nulos.sql
+    ├── validar_chaves.sql
+    └── validar_outliers.sql

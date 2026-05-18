@@ -1,0 +1,101 @@
+Camada 1 — medidas
+
+dados brutos limpos
+
+Camada 2 — métricas derivadas
+
+ratios
+crescimentos
+distâncias
+proporções
+
+Camada 3 — scores dimensionais
+
+score_demanda
+score_economico
+score_logistico
+
+Camada 4 — score final
+
+------------------------------------------------------
+
+STATUS_ATENDIMENTO_MUNICIPIO — [atendido, candidato, fora]
+
+══════════════════════════════════════════════════════
+DEMANDA — tamanho e potencial do mercado consumidor
+══════════════════════════════════════════════════════
+
+ok VOLUME_TOTAL_M3                     soma anual dos volumes de diesel + etanol + gasolina C
+ok PCT_DIESEL                          volume_diesel / volume_total
+ok PCT_COMBUSTIVEL_LEVE                (volume_etanol + volume_gasolina_c) / volume_total
+
+ok COMBUSTIVEL_POR_VEICULO_M3          volume_total / frota_total
+ok DIESEL_POR_VEICULO_PESADO_M3        volume_diesel / (frota caminhões + ônibus + similares)
+ok COMBUSTIVEL_LEVE_POR_VEICULO_M3     (volume_etanol + volume_gasolina_c) / (frota carros + motos + similares)
+
+ok CRESCIMENTO_LINEAR_VOLUME           slope da regressão linear de volume_total (2015–2024)
+ok CAGR_VOLUME_3A                      (volume_ano_final / volume_ano_inicial)^(1/3) - 1
+ok CAGR_VOLUME_9A                      (volume_ano_final / volume_ano_inicial)^(1/9) - 1
+
+ok CRESCIMENTO_LINEAR_FROTA            slope da regressão linear da frota_total (2015–2024)
+ok CAGR_FROTA_3A                       (frota_ano_final / frota_ano_inicial)^(1/3) - 1
+ok CAGR_FROTA_9A                       (frota_ano_final / frota_ano_inicial)^(1/9) - 1
+
+Nota CAGR: usar 2015 e 2024 como pontas (excluir 2025 por dados incompletos).
+Para CAGR_3A: usar 2021–2024. Para CAGR_9A: usar 2015–2024.
+CRESCIMENTO_LINEAR é mais robusto a outliers por usar todos os anos da série.
+Usar slope normalizado (slope / média do período) para comparar municípios de tamanhos diferentes.
+
+══════════════════════════════════════════════════════
+ECONÔMICAS — qualificação do mercado
+══════════════════════════════════════════════════════
+
+ok PIB_PER_CAPITA_RELATIVO             pib_per_capita_municipio / pib_per_capita_estadual
+                                    (média estadual ponderada pela população: sum(pib_total) / sum(populacao) por ano)
+                                    Valor > 1 indica acima da média estadual
+
+ok CONTRIBUICAO_AGRO                   vab_agropecuaria / vab_total
+ok CONTRIBUICAO_INDUSTRIA              vab_industria / vab_total
+ok CONTRIBUICAO_SERVICOS               vab_servicos / vab_total
+
+INTENSIDADE_ECONOMICA               pib_total / frota_total
+                                    (proxy de riqueza por veículo / capacidade de pagamento)
+
+══════════════════════════════════════════════════════
+LOGÍSTICAS — viabilidade de atendimento
+══════════════════════════════════════════════════════
+ 
+ok DISTANCIA_BASE_KM                   distância Haversine do município à base mais próxima (Betim ou Oliveira)
+ok DISTANCIA_BASE_PRINCIPAL_KM         distância Haversine do município até Betim
+ok BASE_REFERENCIA                     base mais próxima responsável pelo atendimento [betim, oliveira]
+
+ok DISTANCIA_REFERENCIA_KM             constante global — limite empírico de operação aceitável.
+                                    Derivar a partir dos municípios já atendidos:
+                                    calcular DISTANCIA_BASE_KM para todos os municípios com STATUS = atendido
+                                    e usar o percentil 90 dessa distribuição como valor de referência.
+                                    Isso ancora o parâmetro na operação real, não em julgamento arbitrário.
+
+FLAG_CORREDOR_BR                    [0, 1] — indica se o município está sobre a BR-381 ou BR-262.
+                                    Municípios corredores têm volume ANP inflado por tráfego de passagem,
+                                    o que distorce métricas de demanda local (ex: COMBUSTIVEL_POR_VEICULO_M3).
+                                    Devem ser analisados separadamente — o critério relevante para eles
+                                    é posicionamento no eixo logístico, não atratividade de mercado local.
+
+SCORE_LOGISTICO                     1 / (1 + (distancia_base_km / distancia_referencia_km))
+                                    Municípios dentro do raio de referência → fator próximo de 1
+                                    Municípios além do raio → fator cresce proporcionalmente
+
+══════════════════════════════════════════════════════
+SCORE FINAL
+══════════════════════════════════════════════════════
+
+SCORE_MUNICIPIO = (peso_demanda × SCORE_DEMANDA) + (peso_economico × SCORE_ECONOMICO) + (peso_logistico × SCORE_LOGISTICO)
+
+SCORE_NORMALIZADO = (SCORE_MUNICIPIO - min) / (max - min)
+                    Normalização feita apenas sobre municípios com STATUS = candidato.
+
+Pesos: não há forma puramente matemática de defini-los — refletem julgamento sobre o que importa mais.
+Abordagem recomendada:
+  1. Definir pesos base com justificativa explícita (ex: demanda > logística > econômico para uma distribuidora)
+  2. Rodar análise de sensibilidade variando os pesos
+  3. Se o ranking for estável entre cenários, a decisão é robusta; se mudar muito, há tensão real entre dimensões
