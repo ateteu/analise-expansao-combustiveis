@@ -138,22 +138,24 @@ Bases utilizadas:
 ```text
 analise-expansao-combustiveis/
 ├── dados/
-│   ├── 1-brutos/          # Dados originais das fontes
-│   ├── 2-modificados/     # Dados limpos e padronizados
-│   ├── 3-modelados/       # Dados finais prontos para análise
-│   └── banco_dados.duckdb # Banco de dados local
+│   ├── 1-brutos/             # Dados originais das fontes
+│   ├── 2-modificados/        # Dados limpos e padronizados
+│   └── banco_dados.duckdb    # Banco de dados local
 │
-├── notebooks/             # Análises exploratórias e validações
-├── sql/                   # Consultas e scripts SQL
+├── notebooks/                # Análises exploratórias e validações
+├── sql/
+│   ├── 1-metricas/           # Cálculo de métricas derivadas a partir das medidas
+│   ├── 2-pontuacoes/         # Cálculo dos scores dimensionais e score final
+│   └── 3-tabelas-analiticas/ # Consolidação das tabelas finais para análise e BI
 │
 └── src/
-    ├── pipelines/         # Fluxos de processamento por fonte de dados
-    ├── transformadores/   # Funções reutilizáveis de transformação
-    ├── dominios/          # Regras específicas de cada domínio
-    ├── io/                # Leitura e escrita de arquivos
-    ├── configs/           # Configurações estáticas e mapeamentos
-    ├── carregar_duckdb.py # Gera o BD e as tabelas
-    └── main.py            # Ponto de entrada da aplicação
+    ├── pipelines/            # Fluxos de processamento por fonte de dados
+    ├── transformadores/      # Funções reutilizáveis de transformação
+    ├── dominios/             # Regras específicas de cada domínio
+    ├── io/                   # Leitura e escrita de arquivos
+    ├── configs/              # Configurações estáticas e mapeamentos
+    ├── carregar_duckdb.py    # Gera o BD e as tabelas
+    └── main.py               # Ponto de entrada da aplicação
 ```
 
 ## Pipeline de Dados
