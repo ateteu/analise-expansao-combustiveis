@@ -124,15 +124,15 @@ Bases utilizadas:
   - Vendas de combustíveis por município (gasolina, diesel, etanol)
   - Preços de combustíveis por município e estado
 
-- **IBGE**
+- **IBGE (Instituo Brasileiro de Geografia e Estatística)** 
   - PIB dos municípios (total, per capita e composição setorial)
   - Mapas de regiões
   - Códigos dos municípios e regiões
 
-- **SENATRAN**
+- **SENATRAN (Secretaria Nacional de Trânsito)** 
   - Frota de veículos por tipo e município (dados de dezembro de cada ano como proxy anual)
 
-- **GitHub - 'kelvins/municípios-brasileiros'**
+- **GitHub: kelvins/municípios-brasileiros**
   - Coordenadas geográficas dos municípios brasileiros
 
 ## Métricas e Scores Analíticos
@@ -150,14 +150,9 @@ As métricas incluem:
 
 A partir dessas métricas são calculados três scores dimensionais:
 
-- `**Score de Demanda**`  
-  Mede o potencial de consumo e intensidade de mercado.
-
-- `**Score Econômico**`
-  Avalia a qualificação econômica dos municípios com base em renda e perfil produtivo.
-
-- `**Score Logístico**`
-  Representa a eficiência operacional considerando a distância até a base de atendimento.
+- `Score de Demanda`: Mede o potencial de consumo e intensidade de mercado.
+- `Score Econômico`: Avalia a qualificação econômica dos municípios com base em renda e perfil produtivo.
+- `Score Logístico`: Representa a eficiência operacional considerando a distância até a base de atendimento.
 
 Os scores são posteriormente consolidados em um score final de atratividade do município, para apoiar a decisão de expansão.
 
@@ -173,8 +168,8 @@ analise-expansao-combustiveis/
 │   └── banco_dados.duckdb    # Banco de dados local
 │
 ├── sql/
-│   ├── 1-metricas/           # Cálculo de métricas derivadas a partir das medidas
-│   ├── 2-pontuacoes/         # Cálculo dos scores dimensionais e score final
+│   ├── 1-metricas/           # Cálculo de métricas
+│   ├── 2-pontuacoes/         # Cálculo dos scores
 │   └── 3-tabelas-analiticas/ # Consolidação das tabelas finais para análise e BI
 │
 └── src/
