@@ -11,10 +11,12 @@ CREATE OR REPLACE TABLE scores AS
     -- combina renda relativa e perfil produtivo (indústria e serviços) em escala normalizada
 
 -- score_demanda:
-    -- algum resumo explicando aqui. nao mt grande.
+    -- Score de potencial de consumo do município;
+    -- combina tamanho do mercado e intensidade de consumo de combustíveis
 
 -- score_final:
-    -- algum resumo explicando aqui. nao mt grande.
+    -- Score consolidado de atratividade do município;
+    -- combina demanda, perfil econômico e viabilidade logística
 
 WITH 
     scores_individuais AS (
@@ -64,19 +66,36 @@ WITH
         -- Logísticas
         JOIN metricas_logisticas l
             ON e.id_municipio = l.id_municipio
+    ),
+
+    score_base AS (
+        SELECT
+            *,
+
+            -- Calcula o score final com base nos scores anteriores e pesos
+            -- Pesos inicialmente em 1; ajustar depois
+            (
+                1 * score_logistico
+                +
+                1 * score_economico
+                +
+                1 * score_demanda
+            ) AS score_final
+
+        FROM scores_individuais
     )
 
 SELECT
     *,
-
-    -- Calcula o score final com base nos scores anteriores e pesos
-    -- Pesos inicialmente em 1; ajustar depois
     (
-        1 * score_logistico
-        +
-        1 * score_economico
-        +
-        1 * score_demanda
-    ) AS score_final
+        -- Normaliza o score final, para ficar entre 0 e 1
+        (score_final - MIN(score_final) OVER())
+        /
+        NULLIF(
+            (MAX(score_final) OVER() - MIN(score_final) OVER()),
+            0
+        )
+        
+    ) AS score_final_norm
 
-FROM scores_individuais
+FROM score_base
