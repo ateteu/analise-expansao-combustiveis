@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE metricas_cresc_frota AS
+CREATE OR REPLACE TABLE metricas_crescimento_frota AS
 
 -- Resumo das métricas:
 
