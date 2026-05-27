@@ -221,7 +221,7 @@ git clone <URL_DO_REPOSITORIO>
 cd <NOME_DO_REPOSITORIO>
 
 # Criar virtual environment (venv)
-python -m venv .venv
+python3 -m venv .venv
 
 # Ativar a virtual environment:
 
