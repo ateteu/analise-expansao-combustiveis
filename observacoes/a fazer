@@ -1,0 +1,15 @@
+- Lista de coisas a fazer:
+
+--------------------------------
+- modificar código python do pib_ibge pra deixar a tabela gerada ter o nome e id de região imediata e intermediária, além da uf (nome/id). Checar se precisa tratar os dados de alguma dessas colunas
+
+contexto: a tabela dimensao_municipio.sql vai servir de base geral
+--------------------------------
+- normalizar (0-1) os scores individuais (demanda, logistico e economico); atualizar em municipios_bi_anual.sql depois
+--------------------------------
+- atualizar o nome 'combustivel_leve_por_veiculo' para 'combustivel_leve_por_veiculo_leve' (ou algo assim) na tabela metricas_frota e onde mais estiver sendo usado (municipios_bi_anual e scores, imagino)
+--------------------------------
+- 
+--------------------------------
+- 
+--------------------------------
