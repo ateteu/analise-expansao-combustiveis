@@ -2,6 +2,15 @@
 
 CREATE OR REPLACE TABLE municipios_bi_crescimento AS
 
+WITH score_medio AS (
+    SELECT 
+        id_municipio,
+        AVG(score_final_norm) AS score_final_medio
+    
+    FROM scores
+    GROUP BY id_municipio
+)
+
 SELECT
     v.id_municipio,
 
@@ -15,6 +24,9 @@ SELECT
 
     l.base_atendimento,
     l.dist_base_atendimento_km,
+    l.dist_referencia_km,
+
+    s.score_final_medio
 
 FROM 
     metricas_crescimento_vendas v
@@ -25,4 +37,5 @@ LEFT JOIN metricas_crescimento_frota f
 LEFT JOIN metricas_logisticas l 
     ON v.id_municipio = l.id_municipio 
 
-ORDER BY id_municipio ASC
+LEFT JOIN score_medio s
+    ON v.id_municipio = s.id_municipio
