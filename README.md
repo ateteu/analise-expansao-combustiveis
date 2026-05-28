@@ -122,7 +122,6 @@ Bases utilizadas:
 
 - **ANP (Agência Nacional do Petróleo)**
   - Vendas de combustíveis por município (gasolina, diesel, etanol)
-  - Preços de combustíveis por município e estado
 
 - **IBGE (Instituo Brasileiro de Geografia e Estatística)** 
   - PIB dos municípios (total, per capita e composição setorial)
@@ -148,13 +147,13 @@ As métricas incluem:
 - PIB per capita relativo ao estado
 - Distância logística até as bases operacionais
 
-A partir dessas métricas são calculados três scores dimensionais:
+A partir das métricas, são calculados três scores dimensionais:
 
 - `Score de Demanda`: Mede o potencial de consumo e intensidade de mercado.
 - `Score Econômico`: Avalia a qualificação econômica dos municípios com base em renda e perfil produtivo.
 - `Score Logístico`: Representa a eficiência operacional considerando a distância até a base de atendimento.
 
-Os scores são posteriormente consolidados em um score final de atratividade do município, para apoiar a decisão de expansão.
+Os scores são posteriormente consolidados em um `Score Final` de atratividade do município, para apoiar a decisão de expansão.
 
 ---
 
@@ -173,12 +172,12 @@ analise-expansao-combustiveis/
 │   └── 3-tabelas-analiticas/ # Consolidação das tabelas finais para análise e BI
 │
 └── src/
+    ├── arquivos/             # Leitura e escrita de arquivos
+    ├── bd/                   # Realiza operações ligadas ao BD
+    ├── configs/              # Configurações estáticas e mapeamentos
+    ├── dominios/             # Regras específicas de cada domínio
     ├── pipelines/            # Fluxos de processamento por fonte de dados
     ├── transformadores/      # Funções reutilizáveis de transformação
-    ├── dominios/             # Regras específicas de cada domínio
-    ├── io/                   # Leitura e escrita de arquivos
-    ├── configs/              # Configurações estáticas e mapeamentos
-    ├── carregar_duckdb.py    # Gera o BD e as tabelas
     └── main.py               # Ponto de entrada da aplicação
 ```
 
