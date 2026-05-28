@@ -15,10 +15,16 @@ WITH
         SELECT
             ano,
 
+            SUM(pib / NULLIF(pib_per_capita, 0)) 
+            AS populacao,
+
             (
-                SUM(pib_total) 
+                SUM(pib) 
                 / 
-                SUM(populacao)
+                NULLIF(
+                    SUM(pib / NULLIF(pib_per_capita, 0)),
+                    0
+                )
             ) AS pib_per_capita_estadual
 
         FROM pib_ibge

@@ -28,17 +28,20 @@ SELECT
     f.combustivel_leve_por_veiculo,
 
     -- Métricas e medidas econômicas
-    e.pib_per_capita_relativo,
-    e.contribuicao_agro,
-    e.contribuicao_industria,
-    e.contribuicao_servicos,
     p.vab_total,
     p.vab_agro,
     p.vab_industria,
     p.vab_servicos,
     p.atividade_1,
     p.atividade_2,
-    p.atividade_3
+    p.atividade_3,
+    p.populacao,
+    p.pib,
+    p.pib_per_capita,
+    e.pib_per_capita_relativo,
+    e.contribuicao_agro,
+    e.contribuicao_industria,
+    e.contribuicao_servicos
 
 FROM 
     scores s 
