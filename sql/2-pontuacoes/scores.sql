@@ -25,22 +25,25 @@ WITH
             e.ano,
             ----------------------------------------------------------------
             -- SCORE LOGÍSTICO
+            -- Valor já naturalmente entre 0 e 1
             (
                 1.0 
                 / 
                 (1.0 + (l.dist_base_atendimento_km  / l.dist_referencia_km))
-            ) AS score_logistico,
+            ) AS score_logistico_norm,
             ----------------------------------------------------------------
             -- SCORE ECONÔMICO
+            -- Valor já naturalmente entre 0 e 1
             (
                 0.4 * e.pib_pc_relativo_norm
                 +
                 0.35 * e.contribuicao_industria_norm
                 +
                 0.25 * e.contribuicao_servicos_norm
-            ) AS score_economico,
+            ) AS score_economico_norm,
             ----------------------------------------------------------------
             -- SCORE DEMANDA
+            - Valor já naturalmente entre 0 e 1
             (
                 0.5 * dv.vol_vendido_total_m3_norm
                 +
@@ -48,7 +51,7 @@ WITH
                 +
                 0.2 * df.diesel_por_veiculo_pesado_norm
             )
-            AS score_demanda
+            AS score_demanda_norm
         
         -- Econômicas
         FROM metricas_economicas e
@@ -75,11 +78,11 @@ WITH
             -- Calcula o score final com base nos scores anteriores e pesos
             -- Pesos inicialmente em 1; ajustar depois
             (
-                1 * score_logistico
+                1 * score_logistico_norm
                 +
-                1 * score_economico
+                1 * score_economico_norm
                 +
-                1 * score_demanda
+                1 * score_demanda_norm
             ) AS score_final
 
         FROM scores_individuais

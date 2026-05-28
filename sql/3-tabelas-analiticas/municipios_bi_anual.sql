@@ -6,27 +6,39 @@ SELECT
     s.ano,
     s.id_municipio,
 
-    s.score_logistico, -- usar a versão normalizada, depois de atualizar
-    s.score_economico, -- usar a versão normalizada, depois de atualizar
-    s.score_demanda,   -- usar a versão normalizada, depois de atualizar
+    -- Scores
+    s.score_logistico_norm, 
+    s.score_economico_norm, 
+    s.score_demanda_norm,   
     s.score_final_norm,
 
-    v.vol_vendido_total_m3_norm, -- uso a versao normalizada ou a normal?
-    v.vol_vendido_diesel_m3,     -- uso a versao normalizada ou a normal?
-    v.vol_vendido_etanol_m3,     -- uso a versao normalizada ou a normal?
-    v.vol_vendido_gasolina_m3,   -- uso a versao normalizada ou a normal?
+    -- Métricas de vendas
+    v.vol_vendido_total_m3,
+    v.vol_vendido_diesel_m3, 
+    v.vol_vendido_etanol_m3, 
+    v.vol_vendido_gasolina_m3, 
     v.pct_diesel,
     v.pct_combustivel_leve,
 
+    -- Métricas de frota
     f.frota_pesada,
     f.frota_leve,
-    f.combustivel_por_veiculo_norm,
-    f.diesel_por_veiculo_pesado_norm,
-    f.combustivel_leve_por_veiculo, -- fazer uma versão normalizada para usar aqui; atualizar o nome também
+    f.combustivel_por_veiculo,
+    f.diesel_por_veiculo_pesado,
+    f.combustivel_leve_por_veiculo,
 
-    e.pib_pc_relativo_norm,
-    e.contribuicao_industria_norm,
-    e.contribuicao_servicos_norm
+    -- Métricas e medidas econômicas
+    e.pib_per_capita_relativo,
+    e.contribuicao_agro,
+    e.contribuicao_industria,
+    e.contribuicao_servicos,
+    p.vab_total,
+    p.vab_agro,
+    p.vab_industria,
+    p.vab_servicos,
+    p.atividade_1,
+    p.atividade_2,
+    p.atividade_3
 
 FROM 
     scores s 
@@ -42,5 +54,9 @@ LEFT JOIN metricas_frota f
 LEFT JOIN metricas_economicas e 
     ON s.id_municipio = e.id_municipio 
     AND s.ano = e.ano 
+
+LEFT JOIN pib_ibge p 
+    ON s.id_municipio = p.id_municipio 
+    AND s.ano = p.ano 
 
 ORDER BY ano, id_municipio
