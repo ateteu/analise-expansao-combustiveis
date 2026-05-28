@@ -35,10 +35,10 @@ SELECT
     p.atividade_1,
     p.atividade_2,
     p.atividade_3,
-    p.populacao,
     p.pib,
     p.pib_per_capita,
     e.pib_per_capita_relativo,
+    e.populacao,
     e.contribuicao_agro,
     e.contribuicao_industria,
     e.contribuicao_servicos
@@ -61,5 +61,3 @@ LEFT JOIN metricas_economicas e
 LEFT JOIN pib_ibge p 
     ON s.id_municipio = p.id_municipio 
     AND s.ano = p.ano 
-
-ORDER BY ano, id_municipio
