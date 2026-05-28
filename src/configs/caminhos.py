@@ -19,7 +19,7 @@ CAMINHO_VENDAS_ANP   = DADOS_BRUTOS / "vendas-anp"
 
 
 ARQUIVO_BD                     = BASE_DIR / "dados" / "banco_dados.duckdb"
-ARQUIVO_MUNICIPIOS_ATENDIDOS   = DADOS_BRUTOS / "municipios_atendidos" / "municipios_atendidos.csv"
+ARQUIVO_MUNICIPIOS_ATENDIDOS   = DADOS_BRUTOS / "municipios-atendidos" / "municipios_atendidos.csv"
 ARQUIVO_CONSOLIDADO_VENDAS_ANP = DADOS_MODIFICADOS / "vendas_anp.csv"
 ARQUIVO_CONSOLIDADO_FROTA      = DADOS_MODIFICADOS / "frota_senatran.csv"
 ARQUIVO_CONSOLIDADO_PIB        = DADOS_MODIFICADOS / "pib_ibge.csv"
