@@ -164,20 +164,21 @@ analise-expansao-combustiveis/
 ├── dados/
 │   ├── 1-brutos/             # Dados originais das fontes
 │   ├── 2-intermediarios/     # Dados limpos e padronizados
+│   ├── 3-modelados/          # Dados modelados, prontos para BI
 │   └── banco_dados.duckdb    # Banco de dados local
 │
 ├── sql/
 │   ├── 1-metricas/           # Cálculo de métricas
 │   ├── 2-pontuacoes/         # Cálculo dos scores
-│   └── 3-tabelas-analiticas/ # Consolidação das tabelas finais para análise e BI
+│   └── 3-tabelas-analiticas/ # Consolidação das tabelas finais
 │
 └── src/
     ├── arquivos/             # Leitura e escrita de arquivos
     ├── bd/                   # Realiza operações ligadas ao BD
     ├── configs/              # Configurações estáticas e mapeamentos
     ├── dominios/             # Regras específicas de cada domínio
-    ├── pipelines/            # Fluxos de processamento por fonte de dados
-    ├── transformadores/      # Funções reutilizáveis de transformação
+    ├── pipelines/            # Fluxos de tratamento de dados
+    ├── transformadores/      # Funções utilitárias de transformação
     └── main.py               # Ponto de entrada da aplicação
 ```
 
