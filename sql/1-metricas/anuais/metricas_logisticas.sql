@@ -1,12 +1,14 @@
 CREATE OR REPLACE TABLE metricas_logisticas AS 
 
+----------------------------------------------------------------------------------
 -- Resumo das métricas:
 
--- dist_base_principal_km   : Distância (km) do município em questão até a base principal, em betim
--- dist_base_oliveira_km    : Distância (km) do município em questão até a base em Oliveira
--- dist_base_atendimento_km : Distância (km) do município em questão até a base responsável pelo atendimento do município
+-- dist_base_principal_km   : Distância (km) do município até a base principal, em betim
+-- dist_base_oliveira_km    : Distância (km) do município até a base em Oliveira
+-- dist_base_atendimento_km : Distância (km) do município até a base responsável pelo atendimento do município
 -- dist_referencia_km       : Limite empírico de operação aceitável (distância base-município)
 -- base_atendimento         : ID da base responsável (Betim ou Oliveira) pelo atendimento do município
+----------------------------------------------------------------------------------
 
 WITH 
     base AS (

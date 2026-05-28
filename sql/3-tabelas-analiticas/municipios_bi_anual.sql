@@ -25,11 +25,11 @@ SELECT
     f.frota_leve,
     f.combustivel_por_veiculo,
     f.diesel_por_veiculo_pesado,
-    f.combustivel_leve_por_veiculo,
+    f.combustivel_por_veiculo_leve,
 
     -- Métricas e medidas econômicas
     p.vab_total,
-    p.vab_agro,
+    p.vab_agropecuaria,
     p.vab_industria,
     p.vab_servicos,
     p.atividade_1,

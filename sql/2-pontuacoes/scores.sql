@@ -1,22 +1,13 @@
 CREATE OR REPLACE TABLE scores AS
 
+----------------------------------------------------------------------------------
 -- Resumo das métricas:
 
--- score_logistico: 
-    -- Score baseado na distância até a base mais próxima;
-    -- valores próximos de 1 indicam atendimento eficiente
-
--- score_economico:
-    -- Score de qualificação econômica do município;
-    -- combina renda relativa e perfil produtivo (indústria e serviços) em escala normalizada
-
--- score_demanda:
-    -- Score de potencial de consumo do município;
-    -- combina tamanho do mercado e intensidade de consumo de combustíveis
-
--- score_final:
-    -- Score consolidado de atratividade do município;
-    -- combina demanda, perfil econômico e viabilidade logística
+-- score_logistico_norm : Score baseado na distância até a base mais próxima
+-- score_economico_norm : Score de qualificação econômica do município
+-- score_demanda_norm   : Score de potencial de consumo do município
+-- score_final_norm     : Score consolidado de atratividade do município
+----------------------------------------------------------------------------------
 
 WITH 
     scores_individuais AS (
@@ -24,16 +15,14 @@ WITH
             l.id_municipio,
             e.ano,
             ----------------------------------------------------------------
-            -- SCORE LOGÍSTICO
-            -- Valor já naturalmente entre 0 e 1
+            -- SCORE LOGÍSTICO [0,1]
             (
                 1.0 
                 / 
                 (1.0 + (l.dist_base_atendimento_km  / l.dist_referencia_km))
             ) AS score_logistico_norm,
             ----------------------------------------------------------------
-            -- SCORE ECONÔMICO
-            -- Valor já naturalmente entre 0 e 1
+            -- SCORE ECONÔMICO [0,1]
             (
                 0.4 * e.pib_pc_relativo_norm
                 +
@@ -42,8 +31,7 @@ WITH
                 0.25 * e.contribuicao_servicos_norm
             ) AS score_economico_norm,
             ----------------------------------------------------------------
-            -- SCORE DEMANDA
-            - Valor já naturalmente entre 0 e 1
+            -- SCORE DEMANDA [0,1]
             (
                 0.5 * dv.vol_vendido_total_m3_norm
                 +

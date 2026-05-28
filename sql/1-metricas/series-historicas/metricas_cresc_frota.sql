@@ -1,10 +1,25 @@
 CREATE OR REPLACE TABLE metricas_crescimento_frota AS
 
+----------------------------------------------------------------------------------
 -- Resumo das métricas:
 
 -- cresc_linear_frota : Inclinação da regressão linear da frota total (2015 - 2024)
 -- cagr_frota_3a      : CAGR da frota total entre 2021 e 2024
 -- cagr_frota_9a      : CAGR da frota total entre 2015 e 2024
+----------------------------------------------------------------------------------
+
+-- CAGR (Compound Annual Growth Rate): 
+
+-- Representa a taxa média anual de crescimento necessária para que uma variável 
+-- evolua do valor inicial até o valor final do período, considerando crescimento 
+-- acumulado ano após ano (efeito composto).
+
+
+-- Crescimento linear: 
+
+-- Representa a variação média anual de uma variável ao longo do tempo, 
+-- estimada por regressão linear.
+----------------------------------------------------------------------------------
 
 WITH base AS (
     SELECT *

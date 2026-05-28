@@ -1,14 +1,16 @@
 CREATE OR REPLACE TABLE metricas_economicas AS
 
+----------------------------------------------------------------------------------
 -- Resumo das métricas:
 
--- pib_per_capita_relativo     : Relação entre o PIB per capita municipal e o PIB per capita médio estadual
--- pib_pc_relativo_norm        : PIB per capita relativo normalizado entre 0 e 1 (min-max normalization)
+-- pib_per_capita_relativo     : Relação entre o PIB p.c municipal e o PIB p.c médio estadual
+-- pib_pc_relativo_norm        : PIB per capita relativo normalizado [0,1]
 -- contribuicao_agro           : Participação (%) da agropecuária no VAB total do município
 -- contribuicao_industria      : Participação (%) da indústria no VAB total do município
--- contribuicao_industria_norm : Participação (%) da indústria no VAB normalizada entre 0 e 1
+-- contribuicao_industria_norm : Participação (%) da indústria no VAB normalizada entre [0,1]
 -- contribuicao_servicos       : Participação (%) dos serviços no VAB total do município
--- contribuicao_servicos_norm  : Participação (%) dos serviços no VAB normalizada entre 0 e 1
+-- contribuicao_servicos_norm  : Participação (%) dos serviços no VAB normalizada entre [0,1]
+----------------------------------------------------------------------------------
 
 WITH 
     pib_estadual AS (
@@ -35,11 +37,12 @@ WITH
         SELECT
             p.id_municipio,
             p.ano,
+            pe.populacao,
 
             (p.pib_per_capita / pe.pib_per_capita_estadual)
             AS pib_per_capita_relativo,
 
-            (p.vab_agro / p.vab_total)
+            (p.vab_agropecuaria / p.vab_total)
             AS contribuicao_agro,
 
             (p.vab_industria / p.vab_total)

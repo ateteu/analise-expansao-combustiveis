@@ -1,12 +1,14 @@
 CREATE OR REPLACE TABLE metricas_frota AS
 
+----------------------------------------------------------------------------------
 -- Resumo das métricas:
 
 -- combustivel_por_veiculo        : Volume total vendido dividido pela frota total
--- combustivel_por_veiculo_norm   : Valor de combustível por veículo (total) normalizado entre 0 e 1
+-- combustivel_por_veiculo_norm   : Valor de combustível por veículo (total) normalizado [0,1]
 -- diesel_por_veiculo_pesado      : Volume de diesel dividido pela frota pesada
--- diesel_por_veiculo_pesado_norm : Valor de diesel por veículo pesado normalizado entre 0 e 1
--- combustivel_leve_por_veiculo   : Volume de combustíveis leves dividido pela frota leve
+-- diesel_por_veiculo_pesado_norm : Valor de diesel por veículo pesado normalizado entre [0,1]
+-- combustivel_por_veiculo_leve   : Volume de combustíveis leves dividido pela frota leve
+----------------------------------------------------------------------------------
 
 WITH 
     frota AS (

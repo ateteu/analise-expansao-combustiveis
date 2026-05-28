@@ -1,11 +1,13 @@
 CREATE OR REPLACE TABLE metricas_vendas AS
 
+----------------------------------------------------------------------------------
 -- Resumo das métricas:
 
 -- vol_vendido_total_m3      : Soma anual dos volumes vendidos de diesel, etanol e gasolina C
--- vol_vendido_total_m3_norm : Volume total de combustível vendido pelo município normalizado entre 0 e 1
+-- vol_vendido_total_m3_norm : Volume total de combustível vendido pelo município, normalizado [0,1]
 -- pct_diesel                : Participação do diesel no volume total vendido
 -- pct_combustivel_leve      : Participação de etanol + gasolina no volume total
+----------------------------------------------------------------------------------
 
 WITH 
     vendas AS (
@@ -47,7 +49,8 @@ WITH
 
             (vol_vendido_diesel_m3 + vol_vendido_etanol_m3 + vol_vendido_gasolina_m3)
             AS vol_vendido_total_m3,
-
+            -----------------------------------------------------------------------------
+            -- Calcula o percentil de disel no total
             (
                 vol_vendido_diesel_m3 
                 / 
@@ -57,7 +60,8 @@ WITH
                 )
             ) 
             AS pct_diesel,
-
+            -----------------------------------------------------------------------------
+            -- Calcula o percentil de combustível leve no total
             (
                 (vol_vendido_etanol_m3 + vol_vendido_gasolina_m3) 
                 / 
