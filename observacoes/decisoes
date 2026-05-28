@@ -61,15 +61,6 @@
 
 * Utilizar apenas dados de dezembro de cada ano como proxy anual. Essa foi uma decisão pensada para evitar baixar dados de todos os meses (para todos os anos considerados), já que no site não há uma base de dados consolidada (unificada). Como a diferença na frota não varia tanto dentre os meses de um dado ano, utilizando um único mês como proxy é perfeitamente cabível
 * Usar base por município (não por estado)
-* Estrutura final desejada:
-
-  * município
-  * UF
-  * ano
-  * total_veiculos
-  * veiculos_leves
-  * veiculos_pesados
-  * veiculos_2_rodas (opcional)
 
 ## Tratamento dos tipos de veículos
 
@@ -81,9 +72,6 @@
   * CAMIONETA
   * CAMINHONETE
   * UTILITARIO
-
-  **2 rodas:**
-
   * MOTOCICLETA
   * MOTONETA
   * CICLOMOTOR

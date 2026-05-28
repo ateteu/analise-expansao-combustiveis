@@ -1,20 +1,6 @@
-Camada 1 — medidas
-
-dados brutos limpos
-
+Camada 1 — dados brutos limpos
 Camada 2 — métricas derivadas
-
-ratios
-crescimentos
-distâncias
-proporções
-
 Camada 3 — scores dimensionais
-
-score_demanda
-score_economico
-score_logistico
-
 Camada 4 — score final
 
 ------------------------------------------------------
@@ -81,7 +67,7 @@ FLAG_CORREDOR_BR                    [0, 1] — indica se o município está sobr
                                     Devem ser analisados separadamente — o critério relevante para eles
                                     é posicionamento no eixo logístico, não atratividade de mercado local.
 
-SCORE_LOGISTICO                     1 / (1 + (distancia_base_km / distancia_referencia_km))
+ok SCORE_LOGISTICO                     1 / (1 + (distancia_base_km / distancia_referencia_km))
                                     Municípios dentro do raio de referência → fator próximo de 1
                                     Municípios além do raio → fator cresce proporcionalmente
 
@@ -89,9 +75,9 @@ SCORE_LOGISTICO                     1 / (1 + (distancia_base_km / distancia_refe
 SCORE FINAL
 ══════════════════════════════════════════════════════
 
-SCORE_MUNICIPIO = (peso_demanda × SCORE_DEMANDA) + (peso_economico × SCORE_ECONOMICO) + (peso_logistico × SCORE_LOGISTICO)
+ok SCORE_FINAL = (peso_demanda × SCORE_DEMANDA) + (peso_economico × SCORE_ECONOMICO) + (peso_logistico × SCORE_LOGISTICO)
 
-SCORE_NORMALIZADO = (SCORE_MUNICIPIO - min) / (max - min)
+ok SCORE_FINAL_NORMALIZADO = (SCORE_MUNICIPIO - min) / (max - min)
                     Normalização feita apenas sobre municípios com STATUS = candidato.
 
 Pesos: não há forma puramente matemática de defini-los — refletem julgamento sobre o que importa mais.
