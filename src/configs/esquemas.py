@@ -56,3 +56,14 @@ ESQUEMA_VENDAS_ANP = {
     "PRODUTO"     : "tipo_combustivel",
     "VENDAS"      : "volume_vendido_m3"
 }
+
+ESQUEMA_TABELA_IBGE = {
+    "UF"                                   : "id_uf",
+    "Nome_UF"                              : "nome_uf",
+    "Região Geográfica Intermediária"      : "id_reg_intermediaria",
+    "Nome Região Geográfica Intermediária" : "nome_reg_intermediaria",
+    "Região Geográfica Imediata"           : "id_reg_imediata",
+    "Nome Região Geográfica Imediata"      : "nome_reg_imediata",
+    "Código Município Completo"            : "id_municipio",
+    "Nome_Município"                       : "nome_municipio"
+}
