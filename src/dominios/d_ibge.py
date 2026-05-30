@@ -1,60 +1,47 @@
 import pandas as pd
-from pathlib               import Path
-from arquivos.de_excel     import ler_excel
-from transformadores.texto import normalizar_texto
-from transformadores.tipos import (
-    colunas_para_string, 
-    colunas_para_inteiro
-)
-from configs.mapeamentos   import (
-    SIGLAS_UF,
-    CORRECOES_MUNICIPIOS
-)
-from configs.caminhos      import ARQUIVO_CODIGOS_IBGE
-from configs.esquemas      import ESQUEMA_DOMINIO_IBGE
-from configs.constantes    import INDICE_CABECALHO_IBGE
+from transformadores.tipos import colunas_para_string
+from configs.mapeamentos   import CORRECOES_MUNICIPIOS
+from configs.caminhos      import ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE
 
 
-def _carregar_codigos_ibge(caminho: Path) -> pd.DataFrame:
+def _carregar_municipios_ibge() -> pd.DataFrame:
     """
-    Carrega a base oficial de municípios do IBGE e padroniza
-    para uso como tabela de referência.
+    Carrega a tabela intermediária de municípios do IBGE.
     """
-    df = ler_excel(
-        caminho      = caminho,
-        pular_linhas = INDICE_CABECALHO_IBGE - 1,
-        usar_colunas = list(ESQUEMA_DOMINIO_IBGE.keys())
+
+    df = pd.read_csv(
+        ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE,
+        sep = ";",
+        dtype = str
     )
 
-    df = df.rename(columns = ESQUEMA_DOMINIO_IBGE)
-
-    # Troca nomes de UF por siglas correspondentes
-    df["uf"] = (
-        df["uf"]
-        .str.strip()
-        .map(SIGLAS_UF)
+    return (
+        df[
+            [
+                "id_municipio",
+                "id_uf",
+                "nome_municipio"
+            ]
+        ]
+        .rename(
+            columns={
+                "id_uf": "uf",
+                "nome_municipio": "municipio"
+            }
+        )
     )
-
-    # Normaliza e padroniza tipo dos valores da coluna municipio
-    df["municipio"] = df["municipio"].apply(normalizar_texto)
-    df = colunas_para_string(df, ["municipio"])
-
-    return df
 
 
 def _corrigir_municipios(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Corrige nomes divergentes de municípios 
-    (segundo erros da base de dados de frota SENATRAN) 
-    para compatibilização com a base oficial IBGE.
+    Corrige nomes divergentes de municípios da base SENATRAN 
+    para compatibilização com a base de referência do IBGE.
     """
-    # Para cada linha, busca correção pelo par (uf, municipio);
-    # se não houver correção mapeada, mantém o valor original
 
     df["municipio"] = df.apply(
         lambda linha: CORRECOES_MUNICIPIOS.get(
             (
-                linha["uf"], 
+                linha["uf"],
                 linha["municipio"]
             ),
             linha["municipio"]
@@ -67,28 +54,33 @@ def _corrigir_municipios(df: pd.DataFrame) -> pd.DataFrame:
 
 def adicionar_codigo_ibge(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Faz merge com a tabela de referência IBGE
-    para adicionar código do município.
+    Faz merge com a tabela de referência de municípios do IBGE 
+    para adicionar o código do município.
     """
+
     # Remove linhas sem município informado
     df = df[
         df["municipio"] != "MUNICIPIO NAO INFORMADO"
-    ]
+    ].copy()
 
+    # Corrige divergências conhecidas da SENATRAN
     df = _corrigir_municipios(df)
 
-    # Adiciona os dados do IBGE ao df solicitado
-    df_ibge = _carregar_codigos_ibge(ARQUIVO_CODIGOS_IBGE)
+    # Carrega tabela de referência
+    df_ibge = _carregar_municipios_ibge()
+
+    # Adiciona código IBGE
     df = df.merge(
         df_ibge,
         on  = ["uf", "municipio"],
         how = "left"
     )
 
-    # Garante que id_municipio é str
-    # (estava aparecendo como float, por isso a conversão para int antes)
-    df = colunas_para_inteiro(df, ["id_municipio"])
-    df = colunas_para_string(df, ["id_municipio"])
+    # Garante tipo string
+    df = colunas_para_string(
+        df,
+        ["id_municipio"]
+    )
 
     municipios_sem_codigo = (
         df[df["id_municipio"].isna()]
