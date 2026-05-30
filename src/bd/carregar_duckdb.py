@@ -1,6 +1,7 @@
 import duckdb
 from configs.caminhos import (
     ARQUIVO_BD,
+    ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE,
     ARQUIVO_MUNICIPIOS_ATENDIDOS,
     ARQUIVO_CONSOLIDADO_VENDAS_ANP,
     ARQUIVO_CONSOLIDADO_FROTA,
@@ -9,6 +10,7 @@ from configs.caminhos import (
 )
 
 TABELAS = {
+    "municipios"             : ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE,
     "municipios_atendidos"   : ARQUIVO_MUNICIPIOS_ATENDIDOS,
     "vendas_anp"             : ARQUIVO_CONSOLIDADO_VENDAS_ANP,
     "frota_senatran"         : ARQUIVO_CONSOLIDADO_FROTA,
