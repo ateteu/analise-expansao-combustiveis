@@ -3,23 +3,28 @@
 CREATE OR REPLACE TABLE dimensao_municipio AS
 
 SELECT DISTINCT
-    ibge.id_municipio,
-    ibge.nome_municipio,
+    m.*,
 
-    ibge.id_uf,
-    ibge.nome_uf,
+    c.latitude,
+    c.longitude,
 
-    ibge.id_regiao_imediata,
-    ibge.nome_regiao_imediata,
+    -- Divide os municípios em 3 categorias: 
+    -- atendidos, não atendidos e fora do escopo de análise (fora do Sudeste)
+    CASE 
+        WHEN a.id_municipio IS NOT NULL
+            THEN 'atendido'
+
+        WHEN m.id_uf IN ('31', '32', '33', '35')
+            THEN 'nao_atendido'
+
+        ELSE 'fora_do_escopo'
     
-    ibge.id_regiao_intermediaria,
-    ibge.nome_regiao_intermediaria,
+    END AS status_atendimento
 
-    coord.latitude,
-    coord.longitude
+FROM municipios m
 
-FROM
-    pib_ibge ibge
+LEFT JOIN coordenadas_municipios c
+    ON m.id_municipio = c.id_municipio
 
-LEFT JOIN coordenadas_municipios coord
-    ON ibge.cod_municipio = coord.cod_municipio;
+LEFT JOIN municipios_atendidos a
+    ON m.id_municipio = a.id_municipio;

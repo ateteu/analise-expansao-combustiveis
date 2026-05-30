@@ -19,7 +19,7 @@ def executar_queries_sql():
         "sql/1-metricas/series-historicas/metricas_cresc_frota.sql",
         "sql/1-metricas/series-historicas/metricas_cresc_vendas.sql",
         "sql/2-pontuacoes/scores.sql",
-        #"sql/3-tabelas-analiticas/dimensao_municipio.sql", # Atualizar 'dimensao_municipio.py' primeiro
+        "sql/3-tabelas-analiticas/dimensao_municipio.sql",
         "sql/3-tabelas-analiticas/municipios_bi_anual.sql",
         "sql/3-tabelas-analiticas/municipios_bi_crescimento.sql"
     ]
@@ -38,7 +38,7 @@ def executar_queries_sql():
             break
 
     exports = [
-        #"dimensao_municipio",
+        "dimensao_municipio",
         "municipios_bi_anual",
         "municipios_bi_crescimento"
     ]
