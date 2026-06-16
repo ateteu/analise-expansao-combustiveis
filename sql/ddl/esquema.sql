@@ -131,7 +131,6 @@ CREATE TABLE frota_veiculos (
 CREATE TABLE combustivel (
     nome_combustivel VARCHAR(100) NOT NULL UNIQUE,
     id_combustivel   VARCHAR(2) NOT NULL,
-    pct_biodiesel    DECIMAL(5,3) CHECK (pct_biodiesel BETWEEN 0 AND 100),
 
     PRIMARY KEY (id_combustivel)
 )
