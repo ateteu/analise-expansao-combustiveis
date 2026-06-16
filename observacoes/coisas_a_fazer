@@ -1,13 +1,21 @@
-- Lista de coisas a fazer:
+Lista de coisas a fazer:
+
+
+- atualizar metricas_logisticas.sql
+
+utilizar novas tabelas de dominio feitas, para não ser 'hardcoded' algumas coisas, como lat/lon das bases
+
+
 
 --------------------------------
-- modificar código python do pib_ibge pra deixar a tabela gerada ter o nome e id de região imediata e intermediária, além da uf (nome/id). Checar se precisa tratar os dados de alguma dessas colunas
+- reorganizar pasta dados/
 
-contexto: a tabela dimensao_municipio.sql vai servir de base geral
+por 1-brutos como brutos e 2-intermediarios como limpos dentro de dados/externos/
+atualizar os caminhos usados nos arquivos
+
+
+
 --------------------------------
-- atualizar o nome 'combustivel_leve_por_veiculo' para 'combustivel_leve_por_veiculo_leve' (ou algo assim) na tabela metricas_frota e onde mais estiver sendo usado (municipios_bi_anual e scores, imagino)
---------------------------------
-- 
---------------------------------
-- 
---------------------------------
+- atualizar os pipelines de limpeza
+
+deixar limpo e modular
