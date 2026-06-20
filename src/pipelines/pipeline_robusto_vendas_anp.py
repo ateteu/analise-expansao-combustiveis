@@ -1,7 +1,7 @@
 import pandas as pd
 import unicodedata
 from pathlib import Path
-
+from arquivos.de_csv import ler_csv
 
 # =========================================================
 # CONFIGURAÇÕES
@@ -147,57 +147,6 @@ def salvar_quarentena(df, nome_arquivo):
         caminho = PASTA_AUDITORIA / nome_arquivo
         df.to_csv(caminho, sep=";", index=False, encoding="utf-8")
         print(f"  ⚠ Quarentena: {len(df)} linhas salvas em '{caminho}'")
-
-
-def detectar_encoding(caminho):
-    """
-    Tenta detectar o encoding correto do arquivo testando as opções mais
-    comuns em arquivos de fontes governamentais brasileiras.
-    Retorna o primeiro encoding que conseguir ler o arquivo sem erro.
-    """
-    candidatos = ["utf-8-sig", "utf-8", "latin-1", "cp1252"]
-    for enc in candidatos:
-        try:
-            with open(caminho, encoding=enc) as f:
-                f.read()
-            return enc
-        except (UnicodeDecodeError, ValueError):
-            continue
-    raise ValueError(f"Não foi possível detectar o encoding de '{caminho}'.")
-
-
-# =========================================================
-# ETAPA 1 - LEITURA SEGURA
-# =========================================================
-
-def ler_csv_seguro(caminho, origem=""):
-    """
-    Lê o CSV sem inferir tipos — tudo entra como texto.
-
-    Mudanças em relação à versão anterior:
-    - Detecta encoding automaticamente em vez de assumir utf-8
-    - Remove BOM e espaços dos nomes das colunas logo na leitura,
-      antes de qualquer validação de schema
-    - keep_default_na=False mantido intencionalmente: strings como "NA"
-      serão tratadas explicitamente em limpar_textos(), não pelo pandas
-    """
-    enc = detectar_encoding(caminho)
-    print(f"  [{origem}] Encoding detectado: {enc}")
-
-    df = pd.read_csv(
-        caminho,
-        sep=";",
-        dtype=str,
-        encoding=enc,
-        keep_default_na=False,
-    )
-
-    # Limpa BOM e espaços dos nomes ANTES de qualquer validação de schema.
-    # Sem isso, "ano"(BOM) != "ano" e o schema validation quebra.
-    df.columns = df.columns.str.strip().str.replace("\ufeff", "", regex=False)
-
-    return df
-
 
 # =========================================================
 # ETAPA 2 - VALIDAÇÃO DO SCHEMA DE ORIGEM
@@ -535,7 +484,7 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_ibge):
     print(f"{'='*60}")
 
     # Leitura segura com detecção automática de encoding
-    df = ler_csv_seguro(caminho_arquivo, origem)
+    df = ler_csv(caminho_arquivo, separador=";")
     print(f"  Linhas lidas: {len(df)}")
 
     # Adiciona coluna de rastreamento de origem para facilitar auditoria
