@@ -1,5 +1,4 @@
 import pandas as pd
-from configs.constantes        import SEPARADOR_CSV
 from pathlib                   import Path
 from transformadores.dataframe import limpar_nomes_colunas
 from detectar_encoding         import detectar_encoding
@@ -7,7 +6,7 @@ from detectar_encoding         import detectar_encoding
 
 def ler_csv(
     caminho: Path,
-    separador     = SEPARADOR_CSV,
+    separador     = ";",
     cabecalho     = 0,
     pular_linhas  = 0,
     usar_colunas  = None,
@@ -26,7 +25,7 @@ def ler_csv(
       explícita do pipeline (ex: via normalizar_texto).
     - Remove BOM e espaços das bordas dos nomes das colunas.
     """
-    
+
     if encoding == "auto":
         enc = detectar_encoding(caminho)
     else:
