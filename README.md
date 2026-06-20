@@ -165,6 +165,7 @@ analise-expansao-combustiveis/
 │   ├── 1-brutos/             # Dados originais das fontes
 │   ├── 2-intermediarios/     # Dados limpos e padronizados
 │   ├── 3-modelados/          # Dados modelados, prontos para BI
+│   ├── dominio/              # Dados de domínio do projeto
 │   └── banco_dados.duckdb    # Banco de dados local
 │
 ├── sql/
