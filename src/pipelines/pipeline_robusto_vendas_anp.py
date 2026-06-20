@@ -1,54 +1,24 @@
 import pandas as pd
 import unicodedata
-from pathlib import Path
-from arquivos.de_csv import ler_csv
+from arquivos.de_csv  import ler_csv
+from configs.caminhos import (
+    ARQUIVO_CONSOLIDADO_VENDAS_ANP,
+    ARQUIVO_CODIGOS_IBGE,
+    AUDITORIA_VENDAS,
+    ARQUIVO_VENDAS_ETANOL,
+    ARQUIVO_VENDAS_DIESEL,
+    ARQUIVO_VENDAS_GASOLINA
+)
 
 # =========================================================
 # CONFIGURAÇÕES
 # =========================================================
 
-# Diretório do script
-BASE_DIR = Path(__file__).resolve().parents[2]
-
-# Diretórios de dados
-DIR_DADOS_BRUTOS = BASE_DIR / "dados" / "1-brutos"
-DIR_DADOS_INTERMEDIARIOS = BASE_DIR / "dados" / "2-intermediarios"
-
-# Arquivos ANP
-DIR_ANP = DIR_DADOS_BRUTOS / "vendas-anp"
-
 ARQUIVOS = {
-    "ETANOL": DIR_ANP / "vendas-anuais-de-etanol-hidratado-por-municipio.csv",
-    "DIESEL": DIR_ANP / "vendas-anuais-de-oleo-diesel-por-municipio.csv",
-    "GASOLINA": DIR_ANP / "vendas-anuais-de-gasolina-c-por-municipio.csv",
+    "ETANOL": ARQUIVO_VENDAS_ETANOL,
+    "DIESEL": ARQUIVO_VENDAS_DIESEL,
+    "GASOLINA": ARQUIVO_VENDAS_GASOLINA,
 }
-
-# IBGE
-ARQUIVO_IBGE = (
-    DIR_DADOS_BRUTOS
-    / "codigos-ibge"
-    / "RELATORIO_DTB_BRASIL_2024_MUNICIPIOS.xls"
-)
-
-# Saída consolidada
-ARQUIVO_SAIDA = (
-    DIR_DADOS_INTERMEDIARIOS
-    / "vendas_anp.csv"
-)
-
-PASTA_AUDITORIA = (
-    DIR_DADOS_INTERMEDIARIOS
-    / "auditoria-vendas-anp"
-)
-
-PASTA_AUDITORIA.mkdir(
-    parents=True,
-    exist_ok=True
-)
-
-# =========================================================
-# SCHEMAS
-# =========================================================
 
 SCHEMA_ORIGINAL = {
     "ANO": "ano",
@@ -144,7 +114,7 @@ def salvar_quarentena(df, nome_arquivo):
     Só grava o arquivo se houver linhas a salvar.
     """
     if not df.empty:
-        caminho = PASTA_AUDITORIA / nome_arquivo
+        caminho = AUDITORIA_VENDAS / nome_arquivo
         df.to_csv(caminho, sep=";", index=False, encoding="utf-8")
         print(f"  ⚠ Quarentena: {len(df)} linhas salvas em '{caminho}'")
 
@@ -535,7 +505,7 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_ibge):
 
 def main():
     print("Carregando tabela de referência do IBGE...")
-    df_ibge = carregar_ibge(ARQUIVO_IBGE)
+    df_ibge = carregar_ibge(ARQUIVO_CODIGOS_IBGE)
     print(f"  IBGE carregado: {len(df_ibge)} municípios de referência\n")
 
     dfs = []
@@ -578,7 +548,7 @@ def main():
 
     # ── Exportação ────────────────────────────────────────
     df_final.to_csv(
-        ARQUIVO_SAIDA,
+        ARQUIVO_CONSOLIDADO_VENDAS_ANP,
         sep=";",
         index=False,
         encoding="utf-8",
@@ -592,7 +562,7 @@ def main():
     print(f"  Combustíveis presentes : {sorted(df_final['tipo_combustivel'].unique())}")
     print(f"  Anos cobertos          : {int(df_final['ano'].min())} – {int(df_final['ano'].max())}")
     print(f"  Municípios distintos   : {df_final['id_municipio'].nunique()}")
-    print(f"  Arquivo salvo em       : {ARQUIVO_SAIDA}")
+    print(f"  Arquivo salvo em       : {ARQUIVO_CONSOLIDADO_VENDAS_ANP}")
     print(f"  Quarentena/auditoria   : {PASTA_AUDITORIA}/")
     print(f"{'='*60}")
 
