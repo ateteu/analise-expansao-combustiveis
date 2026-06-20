@@ -1,24 +1,46 @@
 import pandas as pd
-from configs.constantes import SEPARADOR_CSV
-from pathlib            import Path
+from configs.constantes        import SEPARADOR_CSV
+from pathlib                   import Path
+from transformadores.dataframe import limpar_nomes_colunas
+from detectar_encoding         import detectar_encoding
 
 
 def ler_csv(
     caminho: Path,
-    separador    = SEPARADOR_CSV,
-    cabecalho    = 0,
-    pular_linhas = 0,
-    usar_colunas = None,
-    encoding     = "utf-8-sig"
-):
+    separador     = SEPARADOR_CSV,
+    cabecalho     = 0,
+    pular_linhas  = 0,
+    usar_colunas  = None,
+    encoding      = "auto",
+    forcar_string = True,
+) -> pd.DataFrame:
     """
-    Lê um arquivo CSV e retorna um DataFrame.
+    Lê um CSV de forma conservadora.
+
+    Por padrão:
+    - encoding="auto": detecta o encoding em vez de assumir um fixo.
+    - forcar_string=True: lê tudo como string, sem inferência de tipo do
+      pandas. Conversão de tipos é responsabilidade explícita do pipeline.
+    - keep_default_na=False: strings como "NA"/"NULL"/"-" não são
+      convertidas para NaN automaticamente. Tratar isso é responsabilidade
+      explícita do pipeline (ex: via normalizar_texto).
+    - Remove BOM e espaços das bordas dos nomes das colunas.
     """
-    return pd.read_csv(
+    
+    if encoding == "auto":
+        enc = detectar_encoding(caminho)
+    else:
+        enc = encoding
+
+    df = pd.read_csv(
         caminho,
-        sep      = separador,
-        header   = cabecalho,
-        skiprows = pular_linhas,
-        usecols  = usar_colunas,
-        encoding = encoding
+        sep             = separador,
+        header          = cabecalho,
+        skiprows        = pular_linhas,
+        usecols         = usar_colunas,
+        encoding        = enc,
+        dtype           = str if forcar_string else None,
+        keep_default_na = False,
     )
+
+    return limpar_nomes_colunas(df)

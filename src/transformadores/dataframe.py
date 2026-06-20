@@ -2,6 +2,16 @@ import pandas as pd
 from collections.abc import Iterable
 
 
+def limpar_nomes_colunas(df):
+    """
+    Remove BOM e espaços nas bordas dos nomes das colunas (cabeçalhos apenas).
+    """
+    df = df.copy()
+    df.columns = df.columns.str.strip().str.replace("\ufeff", "", regex=False)
+
+    return df
+
+
 def concatenar(dfs: pd.DataFrame) -> pd.DataFrame:
     """
     Concatena múltiplos DataFrames em um só.
