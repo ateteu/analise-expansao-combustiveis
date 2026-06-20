@@ -1,5 +1,11 @@
-# Este arquivo contém esquemas do tipo:
-# [coluna original] -> [nova coluna]
+# Este arquivo contém esquemas utilizados nos códigos.
+
+# Um esquema define estrutura de dados.
+# Ele responde:
+# - quais colunas existem
+# - como elas devem ser chamadas internamente
+# - qual forma final o DataFrame deve ter
+
 
 ESQUEMA_PIB = {
     "Ano"                                                  : "ano",

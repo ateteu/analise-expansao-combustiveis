@@ -9,6 +9,15 @@ from configs.caminhos import (
     ARQUIVO_VENDAS_DIESEL,
     ARQUIVO_VENDAS_GASOLINA
 )
+from configs.esquemas import (
+    ESQUEMA_VENDAS_ANP
+)
+from configs.constantes import (
+    ANO_INICIO_ESCOPO_PROJETO,
+    ANO_FIM_ESCOPO_PROJETO,
+    UFS_ESCOPO
+)
+from configs.mapeamentos import MAPA_UF_SIGLA
 
 # =========================================================
 # CONFIGURAÇÕES
@@ -30,15 +39,6 @@ SCHEMA_ORIGINAL = {
     "VENDAS": "volume_vendas_m3",
 }
 
-# Colunas que vão para o resultado final
-COLUNAS_FINAIS = [
-    "ano",
-    "uf",
-    "id_municipio",
-    "tipo_combustivel",
-    "volume_vendas_m3",
-]
-
 # Colunas essenciais — linha sem qualquer uma dessas vai pra quarentena
 COLUNAS_CRITICAS = [
     "ano",
@@ -48,30 +48,13 @@ COLUNAS_CRITICAS = [
     "volume_vendas_m3",
 ]
 
-# Relação nome uf - código uf
-MAPA_UF_SIGLA_PARA_CODIGO = {
-    "RO": "11", "AC": "12", "AM": "13", "RR": "14", "PA": "15", "AP": "16", "TO": "17",
-    "MA": "21", "PI": "22", "CE": "23", "RN": "24", "PB": "25", "PE": "26", "AL": "27","SE": "28","BA": "29",
-    "MG": "31", "ES": "32", "RJ": "33", "SP": "35",
-    "PR": "41", "SC": "42", "RS": "43",
-    "MS": "50", "MT": "51", "GO": "52", "DF": "53",
-}
-
 # Valores válidos para controle de domínio
-UFS_VALIDAS = set(MAPA_UF_SIGLA_PARA_CODIGO.values())
-
-# UFs do escopo do projeto
-UFS_ESCOPO = {"31", "32", "33", "35"}
+UFS_VALIDAS = set(MAPA_UF_SIGLA.values())
 
 COMBUSTIVEIS_VALIDOS = {"ETANOL", "DIESEL", "GASOLINA"}
 
-# Faixa de anos plausível para dados da ANP
-ANO_MIN = 2010
-ANO_MAX = 2025
-
 # Strings que devem ser tratadas como ausência de valor
 STRINGS_NULAS = {"", "NA", "N/A", "NAN", "NULL", "NONE", "-", "--", "?"}
-
 
 # =========================================================
 # FUNÇÕES AUXILIARES
@@ -189,7 +172,7 @@ def converter_tipos(df):
     df["ano"] = pd.to_numeric(df["ano"], errors="coerce").astype("Int64")
 
     # uf -> código IBGE
-    df["uf"] = df["uf"].map(MAPA_UF_SIGLA_PARA_CODIGO)
+    df["uf"] = df["uf"].map(MAPA_UF_SIGLA)
 
     # Código IBGE do município: mantido como string, 7 dígitos, zero à esquerda
     df["id_municipio"] = (
@@ -261,7 +244,7 @@ def aplicar_regras_de_dominio(df, origem=""):
     n_antes = len(df)
 
     # Ano plausível
-    mask_ano = df["ano"].between(ANO_MIN, ANO_MAX)
+    mask_ano = df["ano"].between(ANO_INICIO_ESCOPO_PROJETO, ANO_FIM_ESCOPO_PROJETO)
     salvar_quarentena(df[~mask_ano].copy(), f"dominio_ano_invalido_{origem}.csv")
     df = df[mask_ano].copy()
 
@@ -525,7 +508,8 @@ def main():
     df_final = df_final.drop(columns=["_ARQUIVO_ORIGEM"], errors="ignore")
 
     # Mantém apenas as colunas finais desejadas
-    df_final = df_final[COLUNAS_FINAIS].copy()
+    df_final = df_final.rename(columns=ESQUEMA_VENDAS_ANP)
+    df_final = df_final[list(ESQUEMA_VENDAS_ANP.values())].copy()
 
     # Ordenação determinística
     df_final = df_final.sort_values(
