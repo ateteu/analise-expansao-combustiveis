@@ -3,77 +3,21 @@ import unicodedata
 from pathlib                   import Path
 from arquivos.ler_arquivo      import ler_csv
 from arquivos.salvar_arquivo   import salvar_quarentena
-
-# =========================================================
-# CONFIG
-# =========================================================
-
-# Diretório do script
-BASE_DIR = Path(__file__).resolve().parents[2]
-
-# Diretórios de dados
-DIR_DADOS_BRUTOS = BASE_DIR / "dados" / "1-brutos"
-DIR_DADOS_INTERMEDIARIOS = BASE_DIR / "dados" / "2-intermediarios"
-
-# Arquivo de coordenadas
-DIR_COORD = DIR_DADOS_BRUTOS / "lat-lon-github"
-ARQUIVO_ENTRADA = DIR_COORD / "municipios.csv"
-
-# IBGE
-ARQUIVO_IBGE = (
-    DIR_DADOS_BRUTOS
-    / "codigos-ibge"
-    / "RELATORIO_DTB_BRASIL_2024_MUNICIPIOS.xls"
+from configs.constantes        import (
+    STRINGS_NULAS,
 )
-
-ARQUIVO_SAIDA = (
-    DIR_DADOS_INTERMEDIARIOS
-    / "coordenadas_municipios.csv"
+from configs.esquemas          import (
+    ESQUEMA_ORIGINAL_COORD_MUNICIPIOS
 )
-
-PASTA_AUDITORIA = DIR_DADOS_INTERMEDIARIOS / "auditoria-coord-municipios"
-PASTA_AUDITORIA.mkdir(exist_ok=True)
-
-# =========================================================
-# SCHEMAS
-# =========================================================
-
-SCHEMA_ORIGINAL = {
-    "codigo_ibge",
-    "nome",
-    "latitude",
-    "longitude",
-    "capital",
-    "codigo_uf",
-    "siafi_id",
-    "ddd",
-    "fuso_horario",
-}
-
-COLUNAS_FINAIS = [
-    "id_municipio",
-    "latitude",
-    "longitude",
-]
-
-COLUNAS_CRITICAS = [
-    "id_municipio",
-    "latitude",
-    "longitude",
-]
-
-MAPA_UF_CODIGO = {
-    "11", "12", "13", "14", "15", "16", "17",
-    "21", "22", "23", "24", "25", "26", "27",
-    "28", "29",
-    "31", "32", "33", "35",
-    "41", "42", "43",
-    "50", "51", "52", "53",
-}
-
-STRINGS_NULAS = {
-    "", "NA", "N/A", "NULL", "NONE", "-", "--", "?"
-}
+from configs.colunas           import (
+    COLUNAS_CRITICAS_COORD_MUNICIPIOS
+)
+from configs.caminhos          import (
+    AUDITORIA_COORD_MUNICIPIOS,
+    ARQUIVO_CONSOLIDADO_COORD,
+    ARQUIVO_CODIGOS_IBGE,
+    ARQUIVO_COORD_MUNICIPIOS
+)
 
 # =========================================================
 # HELPERS
@@ -112,10 +56,10 @@ def validar_schema(df):
 
     recebidas = set(df.columns)
 
-    if recebidas != SCHEMA_ORIGINAL:
+    if recebidas != ESQUEMA_ORIGINAL_COORD_MUNICIPIOS:
 
-        faltando = SCHEMA_ORIGINAL - recebidas
-        sobrando = recebidas - SCHEMA_ORIGINAL
+        faltando = ESQUEMA_ORIGINAL_COORD_MUNICIPIOS - recebidas
+        sobrando = recebidas - ESQUEMA_ORIGINAL_COORD_MUNICIPIOS
 
         raise ValueError(
             f"""
@@ -182,13 +126,13 @@ def converter_tipos(df):
 
 def remover_nulos(df):
 
-    mask = df[COLUNAS_CRITICAS].isnull().any(axis=1)
+    mask = df[COLUNAS_CRITICAS_COORD_MUNICIPIOS].isnull().any(axis=1)
 
     invalidas = df[mask].copy()
 
     salvar_quarentena(
         invalidas,
-        PASTA_AUDITORIA,
+        AUDITORIA_COORD_MUNICIPIOS,
         "nulos_criticos.csv"
     )
 
@@ -221,7 +165,7 @@ def validar_formatos(df):
 
     salvar_quarentena(
         invalidas,
-        PASTA_AUDITORIA,
+        AUDITORIA_COORD_MUNICIPIOS,
         "formato_invalido.csv"
     )
 
@@ -244,7 +188,7 @@ def tratar_duplicidades(df):
 
     salvar_quarentena(
         duplicatas_exatas,
-        PASTA_AUDITORIA,
+        AUDITORIA_COORD_MUNICIPIOS,
         "duplicatas_exatas.csv"
     )
 
@@ -260,7 +204,7 @@ def tratar_duplicidades(df):
 
     salvar_quarentena(
         duplicatas_logicas,
-        PASTA_AUDITORIA,
+        AUDITORIA_COORD_MUNICIPIOS,
         "duplicatas_logicas.csv"
     )
 
@@ -333,7 +277,7 @@ def validar_com_ibge(df, df_ibge):
 
     salvar_quarentena(
         invalidas,
-        PASTA_AUDITORIA,
+        AUDITORIA_COORD_MUNICIPIOS,
         "fora_referencia_ibge.csv"
     )
 
@@ -350,7 +294,7 @@ def validar_com_ibge(df, df_ibge):
 def exportar(df):
 
     df = (
-        df[COLUNAS_FINAIS]
+        df[COLUNAS_CRITICAS_COORD_MUNICIPIOS]
         .sort_values(
             by=["id_municipio"]
         )
@@ -358,13 +302,13 @@ def exportar(df):
     )
 
     df.to_csv(
-        ARQUIVO_SAIDA,
+        ARQUIVO_CONSOLIDADO_COORD,
         sep=";",
         index=False,
         encoding="utf-8",
     )
 
-    print(f"\nArquivo salvo em: {ARQUIVO_SAIDA}")
+    print(f"\nArquivo salvo em: {ARQUIVO_CONSOLIDADO_COORD}")
 
 # =========================================================
 # MAIN
@@ -373,10 +317,10 @@ def exportar(df):
 def main():
 
     print("Carregando referência IBGE...")
-    df_ibge = carregar_ibge(ARQUIVO_IBGE)
+    df_ibge = carregar_ibge(ARQUIVO_CODIGOS_IBGE)
 
     print("Lendo CSV...")
-    df = ler_csv(ARQUIVO_ENTRADA)
+    df = ler_csv(ARQUIVO_COORD_MUNICIPIOS)
 
     validar_schema(df)
 

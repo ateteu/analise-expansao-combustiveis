@@ -76,5 +76,12 @@ COLUNAS_STR_PIB = [
     "id_municipio",
     "atividade_1",
     "atividade_2",
-    "atividade_3",
+    "atividade_3"
+]
+
+
+COLUNAS_CRITICAS_COORD_MUNICIPIOS = [
+    "id_municipio",
+    "latitude",
+    "longitude"
 ]

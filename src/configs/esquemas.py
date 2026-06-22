@@ -73,3 +73,15 @@ ESQUEMA_TABELA_IBGE = {
     "Código Município Completo"            : "id_municipio",
     "Nome_Município"                       : "nome_municipio"
 }
+
+ESQUEMA_ORIGINAL_COORD_MUNICIPIOS = {
+    "codigo_ibge",
+    "nome",
+    "latitude",
+    "longitude",
+    "capital",
+    "codigo_uf",
+    "siafi_id",
+    "ddd",
+    "fuso_horario"
+}
