@@ -1,4 +1,4 @@
-from pathlib            import Path
+from pathlib import Path
 
 ENCODINGS_CANDIDATOS = [
     "utf-8-sig",
