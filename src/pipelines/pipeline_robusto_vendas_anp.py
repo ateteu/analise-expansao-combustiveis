@@ -27,6 +27,7 @@ from utils.log               import log_etapa
 from configs.colunas         import (
     COLUNAS_CRITICAS_VENDAS
 )
+from utils.validacoes        import validar_esquema
 
 
 # =========================================================
@@ -52,7 +53,7 @@ def padronizar_colunas(df):
     """
     Renomeia as colunas para o schema interno padronizado.
     """
-    return df.rename(columns=SCHEMA_ORIGINAL)
+    return df.rename(columns=ESQUEMA_ORIGINAL_VENDAS)
 
 
 # =========================================================
@@ -401,7 +402,7 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_ibge):
 
     # Validação estrutural do arquivo bruto
     # (após remover BOM dos nomes na leitura)
-    validar_schema_origem(
+    validar_esquema(
         df.drop(columns=["_ARQUIVO_ORIGEM"]), 
         ESQUEMA_ORIGINAL_VENDAS,
         origem
