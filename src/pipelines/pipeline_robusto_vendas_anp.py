@@ -20,6 +20,8 @@ from configs.constantes      import (
 )
 from configs.mapeamentos     import MAPA_UF_SIGLA
 from transformadores.texto   import normalizar_texto
+from utils.log               import log_etapa
+
 
 # =========================================================
 # CONFIGURAÇÕES
@@ -54,18 +56,6 @@ COLUNAS_CRITICAS = [
 UFS_VALIDAS = set(MAPA_UF_SIGLA.values())
 
 COMBUSTIVEIS_VALIDOS = {"ETANOL", "DIESEL", "GASOLINA"}
-
-# =========================================================
-# FUNÇÕES AUXILIARES
-# =========================================================
-
-def log_etapa(nome_etapa, df_antes, df_depois, origem=""):
-    """
-    Imprime quantas linhas foram descartadas em cada etapa.
-    """
-    descartadas = len(df_antes) - len(df_depois)
-    prefixo = f"[{origem}] " if origem else ""
-    print(f"  {prefixo}{nome_etapa}: {len(df_antes)} → {len(df_depois)} linhas ({descartadas} descartadas)")
 
 # =========================================================
 # ETAPA 2 - VALIDAÇÃO DO SCHEMA DE ORIGEM
@@ -181,7 +171,13 @@ def separar_linhas_invalidas(df, origem=""):
     invalidas = df[mask_nulos].copy()
     salvar_quarentena(invalidas, AUDITORIA_VENDAS, f"linhas_com_nulos_{origem}.csv")
     df = df[~mask_nulos].copy()
-    log_etapa("Remoção de nulos críticos", df.iloc[:0].pipe(lambda _: pd.concat([invalidas, df])), df, origem)
+    log_etapa(
+        "Remoção de nulos críticos", 
+        len(df.iloc[:0].pipe(lambda _: pd.concat([invalidas, df]))), 
+        len(df), 
+        origem
+    )
+    
     return df
 
 
@@ -199,7 +195,12 @@ def validar_formato_id_municipio(df, origem=""):
     invalidos = df[~mask_valido].copy()
     salvar_quarentena(invalidos, AUDITORIA_VENDAS, f"id_municipio_formato_invalido_{origem}.csv")
     df = df[mask_valido].copy()
-    log_etapa("Validação formato id_municipio", pd.concat([invalidos, df]), df, origem)
+    log_etapa(
+        "Validação formato id_municipio", 
+        len(pd.concat([invalidos, df])), 
+        len(df), 
+        origem
+    )
     return df
 
 
@@ -242,7 +243,12 @@ def aplicar_regras_de_dominio(df, origem=""):
     salvar_quarentena(df[~mask_vol].copy(), AUDITORIA_VENDAS, f"dominio_volume_negativo_{origem}.csv")
     df = df[mask_vol].copy()
 
-    log_etapa("Regras de domínio", pd.DataFrame(index=range(n_antes)), df, origem)
+    log_etapa(
+        "Regras de domínio", 
+        len(pd.DataFrame(index=range(n_antes))), 
+        len(df), 
+        origem
+    )
     return df
 
 
@@ -279,7 +285,12 @@ def tratar_duplicidades(df, origem=""):
     salvar_quarentena(duplicatas_logicas, AUDITORIA_VENDAS, f"duplicatas_logicas_{origem}.csv")
     df = df[~mask_logicas].copy()
 
-    log_etapa("Deduplicação", pd.DataFrame(index=range(n_antes)), df, origem)
+    log_etapa(
+        "Deduplicação", 
+        len(pd.DataFrame(index=range(n_antes))), 
+        len(df), 
+        origem
+    )
     return df
 
 
@@ -347,7 +358,12 @@ def validar_com_ibge(df, df_ibge, origem=""):
     salvar_quarentena(invalidas, AUDITORIA_VENDAS, f"linhas_fora_do_ibge_{origem}.csv")
     df = df[mask_valida].copy()
 
-    log_etapa("Validação IBGE", pd.DataFrame(index=range(n_antes)), df, origem)
+    log_etapa(
+        "Validação IBGE", 
+        len(pd.DataFrame(index=range(n_antes))), 
+        len(df), 
+        origem
+    )
     return df
 
 

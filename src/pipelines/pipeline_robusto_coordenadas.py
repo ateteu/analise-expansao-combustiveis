@@ -17,20 +17,7 @@ from configs.caminhos          import (
     ARQUIVO_COORD_MUNICIPIOS
 )
 from transformadores.texto     import normalizar_texto
-
-# =========================================================
-# HELPERS
-# =========================================================
-
-def log_etapa(nome, antes, depois):
-
-    descartadas = len(antes) - len(depois)
-
-    print(
-        f"{nome}: "
-        f"{len(antes)} -> {len(depois)} "
-        f"({descartadas} descartadas)"
-    )
+from utils.log                 import log_etapa
 
 # =========================================================
 # ETAPA 2 - VALIDAR SCHEMA
@@ -129,7 +116,7 @@ def remover_nulos(df):
 
     df_ok = df[~mask].copy()
 
-    log_etapa("Nulos críticos", df, df_ok)
+    log_etapa("Nulos críticos", len(df), len(df_ok))
 
     return df_ok
 
@@ -162,7 +149,7 @@ def validar_formatos(df):
 
     df_ok = df[mask_final].copy()
 
-    log_etapa("Validação formato", df, df_ok)
+    log_etapa("Validação formato", len(df), len(df_ok))
 
     return df_ok
 
@@ -274,7 +261,7 @@ def validar_com_ibge(df, df_ibge):
 
     df_ok = df[mask].copy()
 
-    log_etapa("Validação IBGE", df, df_ok)
+    log_etapa("Validação IBGE", len(df), len(df_ok))
 
     return df_ok
 
