@@ -1,5 +1,5 @@
 from arquivos.de_excel         import ler_excel
-from arquivos.para_csv         import salvar_csv
+from arquivos.salvar_arquivo   import salvar_csv
 from configs.caminhos          import (
     DADOS_MODIFICADOS,
     ARQUIVO_PIB

@@ -1,5 +1,6 @@
 import pandas as pd
 from arquivos.de_csv  import ler_csv
+from arquivos.salvar_arquivo import salvar_quarentena
 from configs.caminhos import (
     ARQUIVO_CONSOLIDADO_VENDAS_ANP,
     ARQUIVO_CODIGOS_IBGE,
@@ -58,7 +59,6 @@ COMBUSTIVEIS_VALIDOS = {"ETANOL", "DIESEL", "GASOLINA"}
 # FUNÇÕES AUXILIARES
 # =========================================================
 
-
 def log_etapa(nome_etapa, df_antes, df_depois, origem=""):
     """
     Imprime quantas linhas foram descartadas em cada etapa.
@@ -66,17 +66,6 @@ def log_etapa(nome_etapa, df_antes, df_depois, origem=""):
     descartadas = len(df_antes) - len(df_depois)
     prefixo = f"[{origem}] " if origem else ""
     print(f"  {prefixo}{nome_etapa}: {len(df_antes)} → {len(df_depois)} linhas ({descartadas} descartadas)")
-
-
-def salvar_quarentena(df, nome_arquivo):
-    """
-    Salva linhas problemáticas para auditoria posterior.
-    Só grava o arquivo se houver linhas a salvar.
-    """
-    if not df.empty:
-        caminho = AUDITORIA_VENDAS / nome_arquivo
-        df.to_csv(caminho, sep=";", index=False, encoding="utf-8")
-        print(f"  ⚠ Quarentena: {len(df)} linhas salvas em '{caminho}'")
 
 # =========================================================
 # ETAPA 2 - VALIDAÇÃO DO SCHEMA DE ORIGEM
@@ -190,7 +179,7 @@ def separar_linhas_invalidas(df, origem=""):
     n_antes = len(df)
     mask_nulos = df[COLUNAS_CRITICAS].isnull().any(axis=1)
     invalidas = df[mask_nulos].copy()
-    salvar_quarentena(invalidas, f"linhas_com_nulos_{origem}.csv")
+    salvar_quarentena(invalidas, AUDITORIA_VENDAS, f"linhas_com_nulos_{origem}.csv")
     df = df[~mask_nulos].copy()
     log_etapa("Remoção de nulos críticos", df.iloc[:0].pipe(lambda _: pd.concat([invalidas, df])), df, origem)
     return df
@@ -208,7 +197,7 @@ def validar_formato_id_municipio(df, origem=""):
     n_antes = len(df)
     mask_valido = df["id_municipio"].str.match(r"^\d{7}$", na=False)
     invalidos = df[~mask_valido].copy()
-    salvar_quarentena(invalidos, f"id_municipio_formato_invalido_{origem}.csv")
+    salvar_quarentena(invalidos, AUDITORIA_VENDAS, f"id_municipio_formato_invalido_{origem}.csv")
     df = df[mask_valido].copy()
     log_etapa("Validação formato id_municipio", pd.concat([invalidos, df]), df, origem)
     return df
@@ -230,27 +219,27 @@ def aplicar_regras_de_dominio(df, origem=""):
 
     # Ano plausível
     mask_ano = df["ano"].between(ANO_INICIO_ESCOPO_PROJETO, ANO_FIM_ESCOPO_PROJETO)
-    salvar_quarentena(df[~mask_ano].copy(), f"dominio_ano_invalido_{origem}.csv")
+    salvar_quarentena(df[~mask_ano].copy(), AUDITORIA_VENDAS, f"dominio_ano_invalido_{origem}.csv")
     df = df[mask_ano].copy()
 
     # uf válida
     mask_uf = df["uf"].isin(UFS_VALIDAS)
-    salvar_quarentena(df[~mask_uf].copy(), f"dominio_uf_invalida_{origem}.csv")
+    salvar_quarentena(df[~mask_uf].copy(), AUDITORIA_VENDAS, f"dominio_uf_invalida_{origem}.csv")
     df = df[mask_uf].copy()
 
     # uf dentro do escopo
     mask_escopo = df["uf"].isin(UFS_ESCOPO)
-    salvar_quarentena(df[~mask_escopo].copy(), f"dominio_uf_fora_escopo_{origem}.csv")
+    salvar_quarentena(df[~mask_escopo].copy(), AUDITORIA_VENDAS, f"dominio_uf_fora_escopo_{origem}.csv")
     df = df[mask_escopo].copy()
 
     # Combustível válido
     mask_comb = df["tipo_combustivel"].isin(COMBUSTIVEIS_VALIDOS)
-    salvar_quarentena(df[~mask_comb].copy(), f"dominio_combustivel_invalido_{origem}.csv")
+    salvar_quarentena(df[~mask_comb].copy(), AUDITORIA_VENDAS, f"dominio_combustivel_invalido_{origem}.csv")
     df = df[mask_comb].copy()
 
     # Volume não pode ser negativo
     mask_vol = df["volume_vendas_m3"] >= 0
-    salvar_quarentena(df[~mask_vol].copy(), f"dominio_volume_negativo_{origem}.csv")
+    salvar_quarentena(df[~mask_vol].copy(), AUDITORIA_VENDAS, f"dominio_volume_negativo_{origem}.csv")
     df = df[mask_vol].copy()
 
     log_etapa("Regras de domínio", pd.DataFrame(index=range(n_antes)), df, origem)
@@ -280,14 +269,14 @@ def tratar_duplicidades(df, origem=""):
 
     # Duplicatas exatas: salva para auditoria, mantém apenas uma ocorrência
     mask_exatas = df.duplicated(keep=False)
-    salvar_quarentena(df[mask_exatas].copy(), f"duplicatas_exatas_{origem}.csv")
+    salvar_quarentena(df[mask_exatas].copy(), AUDITORIA_VENDAS, f"duplicatas_exatas_{origem}.csv")
     df = df.drop_duplicates(keep="first").copy()
 
     # Duplicatas lógicas: mesma chave de negócio, mas linhas distintas
     # (valores de volume_vendas_m3 diferentes, por exemplo)
     mask_logicas = df.duplicated(subset=chave_logica, keep=False)
     duplicatas_logicas = df[mask_logicas].copy()
-    salvar_quarentena(duplicatas_logicas, f"duplicatas_logicas_{origem}.csv")
+    salvar_quarentena(duplicatas_logicas, AUDITORIA_VENDAS, f"duplicatas_logicas_{origem}.csv")
     df = df[~mask_logicas].copy()
 
     log_etapa("Deduplicação", pd.DataFrame(index=range(n_antes)), df, origem)
@@ -355,7 +344,7 @@ def validar_com_ibge(df, df_ibge, origem=""):
     mask_valida = pd.Series([c in chaves_validas for c in chaves_df], index=df.index)
 
     invalidas = df[~mask_valida].copy()
-    salvar_quarentena(invalidas, f"linhas_fora_do_ibge_{origem}.csv")
+    salvar_quarentena(invalidas, AUDITORIA_VENDAS, f"linhas_fora_do_ibge_{origem}.csv")
     df = df[mask_valida].copy()
 
     log_etapa("Validação IBGE", pd.DataFrame(index=range(n_antes)), df, origem)
@@ -380,7 +369,7 @@ def validar_consistencia_interna(df, origem=""):
     if not ids_inconsistentes.empty:
         inconsistencias = df[df["id_municipio"].isin(ids_inconsistentes)].copy()
         print(f"  ⚠ [{origem}] {len(ids_inconsistentes)} IDs de município com uf inconsistente.")
-        salvar_quarentena(inconsistencias, f"inconsistencia_municipio_uf_{origem}.csv")
+        salvar_quarentena(inconsistencias, AUDITORIA_VENDAS, f"inconsistencia_municipio_uf_{origem}.csv")
     else:
         print(f"  ✓ [{origem}] Consistência uf x id_municipio: OK")
 
@@ -403,7 +392,7 @@ def identificar_outliers(df, sufixo=""):
 
     q99 = df["volume_vendas_m3"].quantile(0.99)
     suspeitos = df[df["volume_vendas_m3"] > q99].copy()
-    salvar_quarentena(suspeitos, f"outliers_acima_p99{sufixo}.csv")
+    salvar_quarentena(suspeitos, AUDITORIA_VENDAS, f"outliers_acima_p99{sufixo}.csv")
     print(f"  P99 volume_vendas_m3: {q99:,.2f} — {len(suspeitos)} linhas acima desse limiar")
 
 

@@ -1,4 +1,4 @@
-from arquivos.para_csv         import salvar_csv
+from arquivos.salvar_arquivo   import salvar_csv
 from configs.caminhos          import (
     DADOS_MODIFICADOS,
     CAMINHO_VENDAS_ANP

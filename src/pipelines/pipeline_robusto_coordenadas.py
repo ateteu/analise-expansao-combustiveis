@@ -1,6 +1,7 @@
 import pandas as pd
 import unicodedata
 from pathlib import Path
+from arquivos.salvar_arquivo import salvar_quarentena
 
 # =========================================================
 # CONFIG
@@ -90,21 +91,6 @@ def normalizar_texto(valor):
         return pd.NA
 
     return valor
-
-
-def salvar_quarentena(df, nome):
-
-    if not df.empty:
-        caminho = PASTA_AUDITORIA / nome
-
-        df.to_csv(
-            caminho,
-            sep=";",
-            index=False,
-            encoding="utf-8",
-        )
-
-        print(f"⚠ Quarentena: {len(df)} linhas -> {caminho}")
 
 
 def log_etapa(nome, antes, depois):
@@ -221,6 +207,7 @@ def remover_nulos(df):
 
     salvar_quarentena(
         invalidas,
+        PASTA_AUDITORIA,
         "nulos_criticos.csv"
     )
 
@@ -253,6 +240,7 @@ def validar_formatos(df):
 
     salvar_quarentena(
         invalidas,
+        PASTA_AUDITORIA,
         "formato_invalido.csv"
     )
 
@@ -275,6 +263,7 @@ def tratar_duplicidades(df):
 
     salvar_quarentena(
         duplicatas_exatas,
+        PASTA_AUDITORIA,
         "duplicatas_exatas.csv"
     )
 
@@ -290,6 +279,7 @@ def tratar_duplicidades(df):
 
     salvar_quarentena(
         duplicatas_logicas,
+        PASTA_AUDITORIA,
         "duplicatas_logicas.csv"
     )
 
@@ -362,6 +352,7 @@ def validar_com_ibge(df, df_ibge):
 
     salvar_quarentena(
         invalidas,
+        PASTA_AUDITORIA,
         "fora_referencia_ibge.csv"
     )
 
