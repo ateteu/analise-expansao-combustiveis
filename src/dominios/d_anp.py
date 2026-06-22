@@ -1,6 +1,6 @@
 import pandas as pd
 from pathlib                   import Path
-from arquivos.de_csv           import ler_csv
+from arquivos.ler_arquivo      import ler_csv
 from transformadores.texto     import normalizar_texto
 from configs.esquemas          import ESQUEMA_VENDAS_ANP
 from transformadores.tipos     import (

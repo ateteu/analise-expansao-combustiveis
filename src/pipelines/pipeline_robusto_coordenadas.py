@@ -1,7 +1,8 @@
 import pandas as pd
 import unicodedata
-from pathlib import Path
-from arquivos.salvar_arquivo import salvar_quarentena
+from pathlib                   import Path
+from arquivos.ler_arquivo      import ler_csv
+from arquivos.salvar_arquivo   import salvar_quarentena
 
 # =========================================================
 # CONFIG
@@ -102,26 +103,6 @@ def log_etapa(nome, antes, depois):
         f"{len(antes)} -> {len(depois)} "
         f"({descartadas} descartadas)"
     )
-
-# =========================================================
-# ETAPA 1 - LEITURA
-# =========================================================
-
-def ler_csv_seguro(caminho):
-
-    df = pd.read_csv(
-        caminho,
-        dtype=str,
-        keep_default_na=False,
-    )
-
-    df.columns = (
-        df.columns
-        .str.strip()
-        .str.replace("\ufeff", "", regex=False)
-    )
-
-    return df
 
 # =========================================================
 # ETAPA 2 - VALIDAR SCHEMA
@@ -395,7 +376,7 @@ def main():
     df_ibge = carregar_ibge(ARQUIVO_IBGE)
 
     print("Lendo CSV...")
-    df = ler_csv_seguro(ARQUIVO_ENTRADA)
+    df = ler_csv(ARQUIVO_ENTRADA)
 
     validar_schema(df)
 

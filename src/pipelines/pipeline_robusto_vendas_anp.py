@@ -1,7 +1,7 @@
 import pandas as pd
-from arquivos.de_csv  import ler_csv
+from arquivos.ler_arquivo    import ler_csv
 from arquivos.salvar_arquivo import salvar_quarentena
-from configs.caminhos import (
+from configs.caminhos        import (
     ARQUIVO_CONSOLIDADO_VENDAS_ANP,
     ARQUIVO_CODIGOS_IBGE,
     AUDITORIA_VENDAS,
@@ -9,17 +9,17 @@ from configs.caminhos import (
     ARQUIVO_VENDAS_DIESEL,
     ARQUIVO_VENDAS_GASOLINA
 )
-from configs.esquemas import (
+from configs.esquemas        import (
     ESQUEMA_VENDAS_ANP
 )
-from configs.constantes import (
+from configs.constantes      import (
     ANO_INICIO_ESCOPO_PROJETO,
     ANO_FIM_ESCOPO_PROJETO,
     UFS_ESCOPO,
     STRINGS_NULAS
 )
-from configs.mapeamentos import MAPA_UF_SIGLA
-from transformadores.texto import normalizar_texto
+from configs.mapeamentos     import MAPA_UF_SIGLA
+from transformadores.texto   import normalizar_texto
 
 # =========================================================
 # CONFIGURAÇÕES
@@ -521,7 +521,6 @@ def main():
     print(f"  Anos cobertos          : {int(df_final['ano'].min())} – {int(df_final['ano'].max())}")
     print(f"  Municípios distintos   : {df_final['id_municipio'].nunique()}")
     print(f"  Arquivo salvo em       : {ARQUIVO_CONSOLIDADO_VENDAS_ANP}")
-    print(f"  Quarentena/auditoria   : {PASTA_AUDITORIA}/")
     print(f"{'='*60}")
 
 
