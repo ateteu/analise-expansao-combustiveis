@@ -17,6 +17,7 @@ ORDEM_COL_VENDAS_ANP = [
     "tipo_combustivel",
     "volume_vendido_m3"
 ]
+COLUNAS_CRITICAS_VENDAS = ORDEM_COL_VENDAS_ANP
 
 
 ORDEM_COL_PIB = [

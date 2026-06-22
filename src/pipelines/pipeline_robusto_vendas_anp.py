@@ -10,7 +10,8 @@ from configs.caminhos        import (
     ARQUIVO_VENDAS_GASOLINA
 )
 from configs.esquemas        import (
-    ESQUEMA_VENDAS_ANP
+    ESQUEMA_VENDAS_ANP,
+    ESQUEMA_ORIGINAL_VENDAS
 )
 from configs.constantes      import (
     ANO_INICIO_ESCOPO_PROJETO,
@@ -18,9 +19,14 @@ from configs.constantes      import (
     UFS_ESCOPO,
     STRINGS_NULAS
 )
-from configs.mapeamentos     import MAPA_UF_SIGLA
+from configs.mapeamentos     import (
+    MAPA_UF_SIGLA
+)
 from transformadores.texto   import normalizar_texto
 from utils.log               import log_etapa
+from configs.colunas         import (
+    COLUNAS_CRITICAS_VENDAS
+)
 
 
 # =========================================================
@@ -33,51 +39,10 @@ ARQUIVOS = {
     "GASOLINA": ARQUIVO_VENDAS_GASOLINA,
 }
 
-SCHEMA_ORIGINAL = {
-    "ANO": "ano",
-    "UF": "uf",
-    "GRANDE REGIÃO": "REGIAO",
-    "PRODUTO": "tipo_combustivel",
-    "CÓDIGO IBGE": "id_municipio",
-    "MUNICÍPIO": "municipio",
-    "VENDAS": "volume_vendas_m3",
-}
-
-# Colunas essenciais — linha sem qualquer uma dessas vai pra quarentena
-COLUNAS_CRITICAS = [
-    "ano",
-    "uf",
-    "id_municipio",
-    "tipo_combustivel",
-    "volume_vendas_m3",
-]
-
 # Valores válidos para controle de domínio
 UFS_VALIDAS = set(MAPA_UF_SIGLA.values())
 
 COMBUSTIVEIS_VALIDOS = {"ETANOL", "DIESEL", "GASOLINA"}
-
-# =========================================================
-# ETAPA 2 - VALIDAÇÃO DO SCHEMA DE ORIGEM
-# =========================================================
-
-def validar_schema_origem(df, origem=""):
-    """
-    Garante que o arquivo de entrada possui exatamente as colunas esperadas.
-    Se a origem mudar de formato, o processo falha cedo e de forma explícita.
-    """
-    colunas_recebidas = set(df.columns)
-    colunas_esperadas = set(SCHEMA_ORIGINAL.keys())
-
-    if colunas_recebidas != colunas_esperadas:
-        faltando = colunas_esperadas - colunas_recebidas
-        sobrando = colunas_recebidas - colunas_esperadas
-        raise ValueError(
-            f"[{origem}] Schema de origem inválido.\n"
-            f"  Faltando: {sorted(faltando)}\n"
-            f"  Sobrando: {sorted(sobrando)}"
-        )
-
 
 # =========================================================
 # ETAPA 3 - RENOMEAÇÃO DAS COLUNAS
@@ -167,7 +132,7 @@ def separar_linhas_invalidas(df, origem=""):
     Elas vão para quarentena antes de serem removidas do fluxo principal.
     """
     n_antes = len(df)
-    mask_nulos = df[COLUNAS_CRITICAS].isnull().any(axis=1)
+    mask_nulos = df[COLUNAS_CRITICAS_VENDAS].isnull().any(axis=1)
     invalidas = df[mask_nulos].copy()
     salvar_quarentena(invalidas, AUDITORIA_VENDAS, f"linhas_com_nulos_{origem}.csv")
     df = df[~mask_nulos].copy()
@@ -436,7 +401,11 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_ibge):
 
     # Validação estrutural do arquivo bruto
     # (após remover BOM dos nomes na leitura)
-    validar_schema_origem(df.drop(columns=["_ARQUIVO_ORIGEM"]), origem)
+    validar_schema_origem(
+        df.drop(columns=["_ARQUIVO_ORIGEM"]), 
+        ESQUEMA_ORIGINAL_VENDAS,
+        origem
+    )
 
     # Padronização de nomes de colunas
     df = padronizar_colunas(df)

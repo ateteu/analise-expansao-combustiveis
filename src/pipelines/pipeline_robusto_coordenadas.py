@@ -18,28 +18,8 @@ from configs.caminhos          import (
 )
 from transformadores.texto     import normalizar_texto
 from utils.log                 import log_etapa
+from utils.validacoes          import validar_esquema
 
-# =========================================================
-# ETAPA 2 - VALIDAR SCHEMA
-# =========================================================
-
-def validar_schema(df):
-
-    recebidas = set(df.columns)
-
-    if recebidas != ESQUEMA_ORIGINAL_COORD_MUNICIPIOS:
-
-        faltando = ESQUEMA_ORIGINAL_COORD_MUNICIPIOS - recebidas
-        sobrando = recebidas - ESQUEMA_ORIGINAL_COORD_MUNICIPIOS
-
-        raise ValueError(
-            f"""
-Schema inválido.
-
-Faltando: {sorted(faltando)}
-Sobrando: {sorted(sobrando)}
-"""
-        )
 
 # =========================================================
 # ETAPA 3 - PADRONIZAÇÃO
@@ -300,7 +280,10 @@ def main():
     print("Lendo CSV...")
     df = ler_csv(ARQUIVO_COORD_MUNICIPIOS)
 
-    validar_schema(df)
+    validar_esquema(
+        df, 
+        esperado=ESQUEMA_ORIGINAL_COORD_MUNICIPIOS
+    )
 
     df = padronizar_colunas(df)
 

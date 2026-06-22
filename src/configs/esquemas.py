@@ -63,6 +63,7 @@ ESQUEMA_VENDAS_ANP = {
     "VENDAS"      : "volume_vendido_m3"
 }
 
+
 ESQUEMA_TABELA_IBGE = {
     "UF"                                   : "id_uf",
     "Nome_UF"                              : "nome_uf",
@@ -74,6 +75,7 @@ ESQUEMA_TABELA_IBGE = {
     "Nome_Município"                       : "nome_municipio"
 }
 
+
 ESQUEMA_ORIGINAL_COORD_MUNICIPIOS = {
     "codigo_ibge",
     "nome",
@@ -84,4 +86,15 @@ ESQUEMA_ORIGINAL_COORD_MUNICIPIOS = {
     "siafi_id",
     "ddd",
     "fuso_horario"
+}
+
+
+ESQUEMA_ORIGINAL_VENDAS = {
+    "ANO",
+    "UF",
+    "GRANDE REGIÃO",
+    "PRODUTO",
+    "CÓDIGO IBGE",
+    "MUNICÍPIO",
+    "VENDAS"
 }
