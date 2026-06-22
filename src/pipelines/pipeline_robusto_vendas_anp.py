@@ -1,5 +1,4 @@
 import pandas as pd
-import unicodedata
 from arquivos.de_csv  import ler_csv
 from configs.caminhos import (
     ARQUIVO_CONSOLIDADO_VENDAS_ANP,
@@ -15,9 +14,11 @@ from configs.esquemas import (
 from configs.constantes import (
     ANO_INICIO_ESCOPO_PROJETO,
     ANO_FIM_ESCOPO_PROJETO,
-    UFS_ESCOPO
+    UFS_ESCOPO,
+    STRINGS_NULAS
 )
 from configs.mapeamentos import MAPA_UF_SIGLA
+from transformadores.texto import normalizar_texto
 
 # =========================================================
 # CONFIGURAÇÕES
@@ -53,33 +54,9 @@ UFS_VALIDAS = set(MAPA_UF_SIGLA.values())
 
 COMBUSTIVEIS_VALIDOS = {"ETANOL", "DIESEL", "GASOLINA"}
 
-# Strings que devem ser tratadas como ausência de valor
-STRINGS_NULAS = {"", "NA", "N/A", "NAN", "NULL", "NONE", "-", "--", "?"}
-
 # =========================================================
 # FUNÇÕES AUXILIARES
 # =========================================================
-
-def normalizar_texto(valor):
-    """
-    Normaliza campos de texto:
-    - remove espaços extras nas bordas e internos duplicados
-    - padroniza para caixa alta
-    - normaliza caracteres unicode (NFKC preserva acentos de forma canônica)
-    Retorna pd.NA para ausentes ou strings que representam nulo.
-    """
-    if pd.isna(valor):
-        return pd.NA
-
-    valor = str(valor).strip()
-    valor = " ".join(valor.split())
-    valor = unicodedata.normalize("NFKC", valor)
-    valor = valor.upper()
-
-    if valor in STRINGS_NULAS:
-        return pd.NA
-
-    return valor
 
 
 def log_etapa(nome_etapa, df_antes, df_depois, origem=""):
@@ -149,7 +126,15 @@ def limpar_textos(df):
       entram como texto e precisam ser convertidas explicitamente aqui.
     """
     for coluna in ["uf", "tipo_combustivel", "municipio"]:
-        df[coluna] = df[coluna].apply(normalizar_texto)
+        df[coluna] = df[coluna].apply(
+            lambda x: normalizar_texto(
+                x,
+                remover_acentos=False,
+                remover_pontuacao=False,
+                strings_nulas=STRINGS_NULAS,
+            )
+        )
+    
     return df
 
 

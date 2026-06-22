@@ -19,4 +19,18 @@ LISTA_ARQUIVOS_ANP_VENDAS  = [
 ]
 
 
+# Strings que devem ser tratadas como ausência de valor
+STRINGS_NULAS = {
+    "",
+    "NA",
+    "N/A",
+    "NAN",
+    "NULL",
+    "NONE",
+    "-",
+    "--",
+    "?",
+}
+
+
 SEPARADOR_CSV              = ";"
