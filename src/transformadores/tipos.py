@@ -57,3 +57,25 @@ def colunas_para_numero(df: pd.DataFrame, colunas: Iterable[str]) -> pd.DataFram
             )
 
     return df
+
+
+def converter_decimal_br(df, colunas):
+    """
+    Converte colunas com valores numéricos no formato decimal brasileiro
+    (ponto como separador de milhar, vírgula como separador decimal) para float.
+ 
+    Aplica strip() antes da conversão para remover espaços residuais.
+    Valores inválidos viram NaN (via errors="coerce").
+ 
+    Exemplo de entrada:  "1.234,56"
+    Exemplo de saída:    1234.56
+    """
+    for coluna in colunas:
+        df[coluna] = (
+            df[coluna]
+            .str.strip()
+            .str.replace(".", "", regex=False)   # remove separador de milhar
+            .str.replace(",", ".", regex=False)  # decimal BR → ponto
+        )
+        df[coluna] = pd.to_numeric(df[coluna], errors="coerce")
+    return df
