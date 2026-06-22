@@ -1,6 +1,4 @@
 import pandas as pd
-import unicodedata
-from pathlib                   import Path
 from arquivos.ler_arquivo      import ler_csv
 from arquivos.salvar_arquivo   import salvar_quarentena
 from configs.constantes        import (
@@ -18,25 +16,11 @@ from configs.caminhos          import (
     ARQUIVO_CODIGOS_IBGE,
     ARQUIVO_COORD_MUNICIPIOS
 )
+from transformadores.texto     import normalizar_texto
 
 # =========================================================
 # HELPERS
 # =========================================================
-
-def normalizar_texto(valor):
-
-    if pd.isna(valor):
-        return pd.NA
-
-    valor = str(valor).strip()
-    valor = " ".join(valor.split())
-    valor = unicodedata.normalize("NFKC", valor)
-
-    if valor.upper() in STRINGS_NULAS:
-        return pd.NA
-
-    return valor
-
 
 def log_etapa(nome, antes, depois):
 
@@ -89,7 +73,14 @@ def padronizar_colunas(df):
 def limpar(df):
 
     for col in df.columns:
-        df[col] = df[col].apply(normalizar_texto)
+        df[col] = df[col].apply(
+            lambda x: normalizar_texto(
+                x,
+                remover_acentos=False,
+                remover_pontuacao=False,
+                strings_nulas=STRINGS_NULAS,
+            )
+        )
 
     return df
 

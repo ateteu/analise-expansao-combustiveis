@@ -5,11 +5,11 @@ import unicodedata
 
 def normalizar_texto(
     texto,
-    separador=" ",
-    maiusculo=True,
-    remover_acentos=True,
-    remover_pontuacao=True,
-    strings_nulas=None,
+    separador         = " ",
+    maiusculo         = True,
+    remover_acentos   = True,
+    remover_pontuacao = True,
+    strings_nulas     = None,
 ):
     """
     Padroniza texto para comparação e limpeza.
