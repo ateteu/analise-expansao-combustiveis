@@ -1,0 +1,63 @@
+"""
+RESUMO DOS MÓDULOS UTILIZADOS
+
+TIPOS.PY
+- colunas_para_string(df, colunas): converte colunas para string e remove espaços nas extremidades.
+- colunas_para_inteiro(df, colunas): converte colunas para Int64, tratando inválidos como nulos.
+- colunas_para_float(df, colunas): converte colunas para float.
+- colunas_para_numero(df, colunas): converte colunas para numérico (int ou float conforme possível).
+
+VALIDACOES.PY
+- validar_esquema(df, esperado, origem=None): valida se o DataFrame possui exatamente o esquema esperado,
+  indicando colunas faltantes e excedentes.
+- validar_existencia_em_referencia(df, df_ref, chaves_df, chaves_df_ref, diretorio_quarentena, nome_arquivo, origem=None):
+  valida se combinações de chaves do DataFrame principal existem no DataFrame de referência.
+  - usa tuplas compostas de chaves (multi-coluna)
+  - registros não encontrados são enviados para quarentena
+  - retorna apenas registros válidos
+
+TEXTO.PY
+- normalizar_texto(...): normaliza textos para comparação e limpeza (acentos, pontuação, caixa, nulos).
+
+DATAFRAME.PY
+- limpar_nomes_colunas(df): remove espaços e caracteres BOM dos nomes das colunas.
+- concatenar(dfs): concatena múltiplos DataFrames.
+- ordenar_linhas(df, colunas): ordena o DataFrame pelas colunas informadas.
+- reordenar_colunas(df, primeiras): move colunas para o início do DataFrame.
+- renomear_colunas(df, mapeamento): renomeia colunas segundo um dicionário.
+- selecionar_colunas(df, col_mantidas): mantém apenas as colunas informadas.
+
+ARQUIVOS.PY
+- extrair_ano(nome_arquivo): extrai e valida ano a partir do nome do arquivo conforme regras do projeto.
+
+AUDITORIA.PY
+- separar_nulos(df, colunas, pasta_auditoria, prefixo=""): remove linhas com nulos nas colunas críticas e envia para quarentena.
+- validar_regex(df, coluna, regex, pasta_auditoria, prefixo=""): mantém apenas linhas que respeitam o padrão regex; inválidas vão para quarentena.
+- validar_dominio(df, coluna, valores_validos, pasta_auditoria, prefixo=""): mantém apenas valores dentro de um domínio permitido.
+- validar_intervalo(df, coluna, minimo, maximo, pasta_auditoria, prefixo=""): mantém valores dentro de um intervalo numérico.
+- validar_minimo(df, coluna, minimo, pasta_auditoria, prefixo=""): mantém valores >= mínimo.
+- tratar_duplicidades(df, chave_logica, pasta_auditoria, prefixo=""): remove duplicatas e envia casos exatos e lógicos para quarentena.
+- validar_consistencia_grupo(df, coluna_id, coluna_grupo, pasta_auditoria, prefixo=""): verifica consistência entre chave e grupo (ex: município × UF).
+- identificar_outliers(df, coluna, pasta_auditoria, sufixo="", percentil=0.99): detecta valores extremos e envia para quarentena.
+
+LOG.PY
+- log_etapa(nome, antes, depois, origem=None): registra a variação de linhas entre etapas do pipeline.
+
+SALVAR_ARQUIVO.PY
+- salvar_csv(df, pasta_saida, nome_arquivo, sep=";", encoding="utf-8"): salva DataFrame em CSV e retorna o caminho gerado.
+- salvar_quarentena(df, diretorio, nome_arquivo): salva registros descartados para auditoria (se não estiver vazio).
+
+LER_ARQUIVO.PY
+- ler_excel(caminho, aba=0, pular_linhas=0, cabecalho=0, usar_colunas=None): lê arquivos Excel (.xls, .xlsx, .xlsb) com engine adequado.
+- _definir_engine(caminho): define engine do pandas com base na extensão do Excel.
+- ler_csv(caminho, separador=";", cabecalho=0, pular_linhas=0, usar_colunas=None, encoding="auto", forcar_string=True):
+  leitura conservadora de CSV com detecção de encoding, leitura como string por padrão e limpeza de colunas.
+
+LISTAGEM.PY
+- listar_arquivos(caminho, padrao="*.xls*", ignorar_prefixos=(".~lock",)): lista arquivos de um diretório por padrão glob,
+  ignorando arquivos temporários ou com prefixos indesejados.
+
+DETECTAR_ENCODING.PY
+- detectar_encoding(caminho, candidatos): tenta múltiplos encodings comuns (utf-8-sig, latin-1, cp1252) e retorna o primeiro válido.
+  levanta erro se nenhum encoding funcionar.
+"""
