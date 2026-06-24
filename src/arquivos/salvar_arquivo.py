@@ -1,11 +1,12 @@
+import pandas as pd
 from pathlib import Path
 
 
 def salvar_csv(
-    df,
+    df: pd.Dataframe,
     pasta_saida: Path,
     nome_arquivo: str,
-    sep=";",
+    separador=";",
     encoding="utf-8",
 ):
     """
@@ -19,32 +20,29 @@ def salvar_csv(
     df.to_csv(
         caminho,
         index=False,
-        sep=sep,
+        sep=separador,
         encoding=encoding,
     )
 
-    print(f"\nArquivo salvo em: {caminho}")
     return caminho
 
 
 def salvar_quarentena(
-    df,
+    df: pd.Dataframe,
     diretorio: Path,
     nome_arquivo: str,
 ):
     """
     Salva registros descartados para auditoria.
+    Nome do arquivo é obrigatório para garantir rastreabilidade.
     """
     if df.empty:
-        return
+        return None
 
-    caminho = salvar_csv(
-        df,
-        diretorio,
-        nome_arquivo,
-    )
+    if not nome_arquivo:
+        raise ValueError("'nome_arquivo' é obrigatório!")
 
-    print(
-        f"Quarentena: "
-        f"{len(df)} linhas salvas em '{caminho}'"
-    )
+    caminho = salvar_csv(df, diretorio, nome_arquivo)
+    print(f"Quarentena: {len(df)} linhas salvas em '{caminho}'")
+
+    return caminho
