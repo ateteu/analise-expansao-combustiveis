@@ -1,5 +1,11 @@
+import pandas as pd
+
+from arquivos.salvar_arquivo import salvar_quarentena
+from utils.log               import log_etapa
+
+
 def validar_esquema(
-        df, 
+        df: pd.DataFrame, 
         esperado,
         origem = None
     ):
@@ -17,7 +23,67 @@ def validar_esquema(
         prefixo = f"[{origem}] " if origem else ""
 
         raise ValueError(
-            f"{prefixo}Schema inválido.\n"
+            f"{prefixo}Esquema inválido.\n"
             f"Faltando: {sorted(faltando)}\n"
             f"Sobrando: {sorted(sobrando)}"
         )
+
+
+def validar_existencia_em_referencia(
+    df: pd.DataFrame,
+    df_ref: pd.DataFrame,
+    chaves_df: list[str],
+    chaves_df_ref: list[str],
+    diretorio_quarentena: str,
+    nome_arquivo: str,
+    origem: str | None = None
+):
+    """
+    Valida, por comparação de tuplas de chaves compostas, 
+    se combinações de colunas do df existem no df_ref.
+
+    A variável nome_arquivo é obrigatória.
+    """
+
+    if len(chaves_df) != len(chaves_df_ref):
+        raise ValueError("chaves_df e chaves_df_ref devem ter o mesmo tamanho")
+
+    if not nome_arquivo:
+        raise ValueError("nome_arquivo é obrigatório para quarentena")
+
+    n_antes = len(df)
+
+    # Conjunto de chaves válidas da referência
+    ref_set = set(
+        zip(*(df_ref[col] for col in chaves_df_ref))
+    )
+
+    # Chaves do df principal
+    chaves_df = list(
+        zip(*(df[col] for col in chaves_df))
+    )
+
+    mask = pd.Series(
+        [chave in ref_set for chave in chaves_df],
+        index=df.index
+    )
+
+    df_invalidos = df[~mask]
+
+    if not df_invalidos.empty:
+        salvar_quarentena(
+            df_invalidos,
+            diretorio_quarentena,
+            nome_arquivo
+        )
+
+    df_validos = df[mask]
+
+    log_etapa(
+        "Validação referência",
+        n_antes,
+        len(df_validos),
+        origem
+    )
+
+    return df_validos
