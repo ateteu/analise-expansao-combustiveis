@@ -3,32 +3,14 @@
 
 ORDEM_LINHAS = [
     "ano",
-    "id_municipio"
+    "id_municipio",
 ]
 
+# =================================================
+# FROTA - SENATRAN
+# =================================================
 
 PRIMEIRAS_COL_SENATRAN = ORDEM_LINHAS
-
-
-ORDEM_COL_VENDAS_ANP = [
-    "ano",
-    "uf",
-    "id_municipio",
-    "tipo_combustivel",
-    "volume_vendido_m3"
-]
-COLUNAS_CRITICAS_VENDAS = ORDEM_COL_VENDAS_ANP
-
-
-ORDEM_COL_PIB = [
-    "ano",
-    "id_municipio",
-    "pib",
-    "pib_per_capita",
-    "vab_total"
-]
-
-
 COLUNAS_INT_SENATRAN = [
     "total",
     "automovel",
@@ -51,17 +33,47 @@ COLUNAS_INT_SENATRAN = [
     "trator_estei",
     "trator_rodas",
     "triciclo",
-    "utilitario"
+    "utilitario",
 ]
-
-
 COLUNAS_STR_SENATRAN = [
     "uf",
     "id_municipio",
-    "municipio"
+    "municipio",
 ]
 
+# =================================================
+# VENDAS COMBUSTÍVEIS - ANP
+# =================================================
 
+COLUNAS_CRITICAS_VENDAS = [
+    "ano",
+    "id_municipio",
+    "tipo_combustivel",
+    "volume_vendido_m3",
+]
+COLUNAS_IDENTIFICADORAS = [
+    "ano",
+    "id_municipio",
+    "tipo_combustivel",
+]
+COLUNAS_SAIDA_VENDAS = [
+    "ano", 
+    "id_municipio", 
+    "id_combustivel", 
+    "volume_vendas_m3",
+]
+
+# =================================================
+# DADOS ECONÔMICOS - IBGE
+# =================================================
+
+ORDEM_COL_PIB = [
+    "ano",
+    "id_municipio",
+    "pib",
+    "pib_per_capita",
+    "vab_total",
+]
 COLUNAS_NUM_PIB = [
     "vab_agropecuaria",
     "vab_industria",
@@ -69,20 +81,21 @@ COLUNAS_NUM_PIB = [
     "vab_adm_publica",
     "vab_total",
     "pib",
-    "pib_per_capita"
+    "pib_per_capita",
 ]
-
-
 COLUNAS_STR_PIB = [
     "id_municipio",
     "atividade_1",
     "atividade_2",
-    "atividade_3"
+    "atividade_3",
 ]
 
+# =================================================
+# COORD. MUNICÍPIOS - GITHUB/KELVINS
+# =================================================
 
 COLUNAS_CRITICAS_COORD_MUNICIPIOS = [
     "id_municipio",
     "latitude",
-    "longitude"
+    "longitude",
 ]
