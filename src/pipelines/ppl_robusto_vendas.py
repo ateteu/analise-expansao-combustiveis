@@ -192,7 +192,7 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_municipios):
 # ETAPA 6 - EXECUÇÃO PRINCIPAL
 # =========================================================
 
-def main():
+def executar_ppl_vendas():
     print("Carregando base de referência de municípios...")
     df_municipios = ler_csv(ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE)
     print(f"  {len(df_municipios)} municípios carregados\n")
@@ -213,7 +213,12 @@ def main():
     df_final = ordenar_linhas(df_final, ["ano", "uf", "id_municipio", "tipo_combustivel"])
 
     # Outliers calculados no consolidado para comparar os 3 combustíveis juntos
-    identificar_outliers(df_final, "volume_vendas_m3", AUDITORIA_VENDAS, sufixo="_consolidado")
+    identificar_outliers(
+        df_final, 
+        coluna="volume_vendas_m3", 
+        pasta_auditoria=AUDITORIA_VENDAS, 
+        sufixo="_consolidado"
+    )
 
     # Verificação final: nenhuma duplicidade lógica pode sobrar
     n_dupl = df_final.duplicated(subset=CHAVE_LOGICA).sum()
@@ -230,7 +235,7 @@ def main():
     print(f"{'='*60}")
     print(f"  Total de linhas finais : {len(df_final)}")
     print(f"  Combustíveis presentes : {sorted(df_final['tipo_combustivel'].unique())}")
-    print(f"  Anos cobertos          : {int(df_final['ano'].min())} – {int(df_final['ano'].max())}")
+    print(f"  Anos cobertos          : {int(df_final['ano'].min())} - {int(df_final['ano'].max())}")
     print(f"  Municípios distintos   : {df_final['id_municipio'].nunique()}")
     print(f"  Arquivo salvo em       : {ARQUIVO_CONSOLIDADO_VENDAS_ANP}")
     print(f"  Quarentena/auditoria   : {AUDITORIA_VENDAS}/")
@@ -238,4 +243,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    executar_ppl_vendas()
