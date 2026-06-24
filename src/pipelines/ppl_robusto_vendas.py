@@ -134,7 +134,11 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_municipios):
     print(f"\n{'='*60}")
     print(f"Processando: {caminho_arquivo}  [{origem}]")
 
-    df = ler_csv(caminho_arquivo)
+    try:
+        df = ler_csv(caminho_arquivo)
+    except Exception as e:
+        raise RuntimeError(f"Erro ao ler arquivo de vendas {caminho_arquivo}: {e}")
+    
     print(f"  Linhas lidas: {len(df)}")
 
     # Coluna temporária de rastreamento p/ identificar a origem nas quarentenas
@@ -190,8 +194,12 @@ def executar_ppl_vendas():
     a limpeza dos arquivos de vendas.
     """
     # Carrega base de referência de municípios e a tabela domínio de combustíveis
-    df_municipios   = ler_csv(ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE)
-    df_combustiveis = ler_csv(ARQUIVO_TIPOS_COMBUSTIVEL)
+    try:
+        df_municipios = ler_csv(ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE)
+        df_combustiveis = ler_csv(ARQUIVO_TIPOS_COMBUSTIVEL)
+    
+    except Exception as e:
+        raise RuntimeError(f"Falha ao carregar bases de referência: {e}")
 
     # Cria um mapa nome-id dos combustíveis existentes
     mapa_combustivel_id = dict(zip(
@@ -230,7 +238,11 @@ def executar_ppl_vendas():
             f"Verifique os arquivos em {AUDITORIA_VENDAS}."
         )
 
-    salvar_csv(df_final, ARQUIVO_CONSOLIDADO_VENDAS_ANP)
+    try:
+        salvar_csv(df_final, ARQUIVO_CONSOLIDADO_VENDAS_ANP)
+
+    except Exception as e:
+        raise RuntimeError(f"Falha ao salvar output final: {e}")
 
     print(f"\n{'='*60}")
     print("PROCESSAMENTO FINALIZADO")
