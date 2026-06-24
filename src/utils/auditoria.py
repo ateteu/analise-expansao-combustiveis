@@ -1,3 +1,7 @@
+import pandas as pd
+
+from typing                  import Sequence
+from re                      import Pattern
 from arquivos.salvar_arquivo import salvar_quarentena
 from utils.log               import log_etapa
 
@@ -9,8 +13,14 @@ from utils.log               import log_etapa
 # - Linhas descartadas são salvas em quarentena antes da remoção.
 # - Logam o número de linhas descartadas em cada etapa.
 
+# ============================================================
 
-def separar_nulos(df, colunas, pasta_auditoria, prefixo=""):
+def separar_nulos(
+    df              : pd.DataFrame,
+    colunas         : Sequence[str],
+    pasta_auditoria : str,
+    prefixo         : str = "",
+) -> pd.DataFrame:
     """
     Separa e envia à quarentena linhas com ausências nas colunas informadas.
     Retorna apenas as linhas válidas.
@@ -30,7 +40,15 @@ def separar_nulos(df, colunas, pasta_auditoria, prefixo=""):
     return df
 
 
-def validar_regex(df, coluna, regex, pasta_auditoria, prefixo=""):
+# ============================================================
+
+def validar_regex(
+    df              : pd.DataFrame,
+    coluna          : str,
+    regex           : str | Pattern[str],
+    pasta_auditoria : str,
+    prefixo         : str = "",
+) -> pd.DataFrame:
     """
     Mantém apenas linhas onde a coluna corresponde ao padrão regex
     (padrão regex esperado (ex: r'^\d{7}$')).
@@ -52,7 +70,15 @@ def validar_regex(df, coluna, regex, pasta_auditoria, prefixo=""):
     return df
 
 
-def validar_dominio(df, coluna, valores_validos, pasta_auditoria, prefixo=""):
+# ============================================================
+
+def validar_dominio(
+    df              : pd.DataFrame,
+    coluna          : str,
+    valores_validos : set[str],
+    pasta_auditoria : str,
+    prefixo         : str = "",
+) -> pd.DataFrame:
     """
     Mantém apenas linhas cujo valor da coluna está no conjunto informado.
     Linhas fora do domínio vão para quarentena.
@@ -72,7 +98,16 @@ def validar_dominio(df, coluna, valores_validos, pasta_auditoria, prefixo=""):
     return df
 
 
-def validar_intervalo(df, coluna, minimo, maximo, pasta_auditoria, prefixo=""):
+# ============================================================
+
+def validar_intervalo(
+    df              : pd.DataFrame,
+    coluna          : str,
+    minimo          : int | float,
+    maximo          : int | float,
+    pasta_auditoria : str,
+    prefixo         : str = "",
+) -> pd.DataFrame:
     """
     Mantém apenas linhas cujo valor da coluna está dentro de [minimo, maximo].
     Linhas fora do intervalo vão para quarentena.
@@ -92,7 +127,15 @@ def validar_intervalo(df, coluna, minimo, maximo, pasta_auditoria, prefixo=""):
     return df
 
 
-def validar_minimo(df, coluna, minimo, pasta_auditoria, prefixo=""):
+# ============================================================
+
+def validar_minimo(
+    df              : pd.DataFrame,
+    coluna          : str,
+    minimo          : int | float,
+    pasta_auditoria : str,
+    prefixo         : str = "",
+) -> pd.DataFrame:
     """
     Mantém apenas linhas cujo valor da coluna é >= minimo.
     Linhas abaixo do mínimo vão para quarentena.
@@ -112,7 +155,14 @@ def validar_minimo(df, coluna, minimo, pasta_auditoria, prefixo=""):
     return df
 
 
-def tratar_duplicidades(df, chave_logica, pasta_auditoria, prefixo=""):
+# ============================================================
+
+def tratar_duplicidades(
+    df              : pd.DataFrame,
+    chave_logica    : Sequence[str],
+    pasta_auditoria : str,
+    prefixo         : str = "",
+) -> pd.DataFrame:
     """
     Trata duplicidades de forma conservadora.
 
@@ -147,9 +197,15 @@ def tratar_duplicidades(df, chave_logica, pasta_auditoria, prefixo=""):
     return df
 
 
+# ============================================================
+
 def validar_consistencia_grupo(
-    df, coluna_id, coluna_grupo, pasta_auditoria, prefixo=""
-):
+    df              : pd.DataFrame,
+    coluna_id       : str,
+    coluna_grupo    : str,
+    pasta_auditoria : str,
+    prefixo         : str = "",
+) -> None:
     """
     Valida se cada valor de coluna_id está associado a apenas um valor de coluna_grupo.
     Casos inconsistentes vão para quarentena (mas não são removidos do fluxo principal).
@@ -173,10 +229,18 @@ def validar_consistencia_grupo(
         print(f"  ✓  [{prefixo}] Consistência {coluna_grupo} × {coluna_id}: OK")
 
 
-def identificar_outliers(df, coluna, pasta_auditoria, sufixo="", percentil=0.99):
+# ============================================================
+
+def identificar_outliers(
+    df              : pd.DataFrame,
+    coluna          : str,
+    pasta_auditoria : str,
+    sufixo          : str = "",
+    percentil       : float = 0.99,
+) -> None:
     """
     Identifica e salva em quarentena valores acima do percentil informado.
-    Não remove automaticamente — apenas para auditoria e revisão manual.
+    Não remove automaticamente, apenas para auditoria e revisão manual.
     """
     if df.empty:
         return
