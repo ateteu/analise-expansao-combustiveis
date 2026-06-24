@@ -1,5 +1,6 @@
 import pandas as pd
-from arquivos.de_excel     import ler_excel
+
+from arquivos.ler_arquivo  import ler_excel
 from transformadores.tipos import (
     colunas_para_string
 )
@@ -7,24 +8,17 @@ from configs.caminhos      import (
     ARQUIVO_CODIGOS_IBGE,
     ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE
 )
-
-
-# =========================================================
-# CONFIGURAÇÕES
-# =========================================================
-
-INDICE_CABECALHO_IBGE = 7
-
-ESQUEMA_TABELA_IBGE = {
-    "UF": "id_uf",
-    "Nome_UF": "nome_uf",
-    "Região Geográfica Intermediária": "id_regiao_intermediaria",
-    "Nome Região Geográfica Intermediária": "nome_regiao_intermediaria",
-    "Região Geográfica Imediata": "id_regiao_imediata",
-    "Nome Região Geográfica Imediata": "nome_regiao_imediata",
-    "Código Município Completo": "id_municipio",
-    "Nome_Município": "nome_municipio"
-}
+from utils.validacoes      import validar_esquema
+from configs.esquemas      import (
+    ESQUEMA_TABELA_IBGE
+)
+from configs.constantes    import (
+    INDICE_CABECALHO_IBGE
+)
+from transformadores.dataframe import (
+    renomear_colunas,
+    selecionar_colunas
+)
 
 COLUNAS_FINAIS = [
     "id_municipio",
@@ -52,42 +46,14 @@ def carregar_dados() -> pd.DataFrame:
 
 
 # =========================================================
-# ETAPA 2 - VALIDAÇÃO DE SCHEMA
-# =========================================================
-
-def validar_schema(df: pd.DataFrame) -> None:
-
-    colunas_recebidas = set(df.columns)
-    colunas_esperadas = set(ESQUEMA_TABELA_IBGE.keys())
-
-    if colunas_recebidas != colunas_esperadas:
-
-        faltando = sorted(
-            colunas_esperadas - colunas_recebidas
-        )
-
-        sobrando = sorted(
-            colunas_recebidas - colunas_esperadas
-        )
-
-        raise ValueError(
-            "Schema IBGE inválido.\n"
-            f"Faltando: {faltando}\n"
-            f"Sobrando: {sobrando}"
-        )
-
-
-# =========================================================
 # ETAPA 3 - PADRONIZAÇÃO DE COLUNAS
 # =========================================================
 
 def padronizar_colunas(df: pd.DataFrame) -> pd.DataFrame:
 
-    df = df.rename(
-        columns=ESQUEMA_TABELA_IBGE
-    )
-
-    return df[COLUNAS_FINAIS].copy()
+    df = renomear_colunas(df, ESQUEMA_TABELA_IBGE)
+    df = selecionar_colunas(df, ESQUEMA_TABELA_IBGE.values())
+    return df
 
 
 # =========================================================
@@ -274,11 +240,9 @@ def processar_municipios_ibge() -> pd.DataFrame:
     print("Carregando base do IBGE...")
 
     df = carregar_dados()
-    print(
-        f"Registros lidos: {len(df)}"
-    )
+    print(f"Registros lidos: {len(df)}")
 
-    validar_schema(df)
+    validar_esquema(df, ESQUEMA_TABELA_IBGE.keys())
     df = padronizar_colunas(df)
     df = limpar_textos(df)
     df = converter_tipos(df)
@@ -290,9 +254,7 @@ def processar_municipios_ibge() -> pd.DataFrame:
     validar_quantidade_municipios(df)
     df = ordenar(df)
 
-    print(
-        f"Municípios válidos: {len(df)}"
-    )
+    print(f"Municípios válidos: {len(df)}")
 
     return df
 
