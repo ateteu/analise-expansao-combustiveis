@@ -2,6 +2,20 @@ import pandas as pd
 from collections.abc import Iterable
 
 
+def renomear_colunas(df: pd.DataFrame, mapeamento: dict) -> pd.DataFrame:
+    """
+    Renomeia colunas segundo um dicionário.
+    """
+    return df.rename(columns=mapeamento)
+
+
+def selecionar_colunas(df: pd.DataFrame, col_mantidas: Iterable[str]) -> pd.DataFrame:
+    """
+    Mantém apenas as colunas informadas.
+    """
+    return df[list(col_mantidas)].copy()
+
+
 def limpar_nomes_colunas(df):
     """
     Remove BOM e espaços nas bordas dos nomes das colunas (cabeçalhos apenas).
