@@ -1,35 +1,20 @@
 import pandas as pd
 
-from arquivos.ler_arquivo  import ler_excel
-from transformadores.tipos import (
-    colunas_para_string
-)
-from configs.caminhos      import (
+from arquivos.ler_arquivo      import ler_excel
+from transformadores.tipos     import colunas_para_string
+from configs.caminhos          import (
     ARQUIVO_CODIGOS_IBGE,
-    ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE
+    ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE,
 )
-from utils.validacoes      import validar_esquema
-from configs.esquemas      import (
-    ESQUEMA_TABELA_IBGE
-)
-from configs.constantes    import (
-    INDICE_CABECALHO_IBGE
-)
+from utils.validacoes          import validar_esquema
+from configs.mapeamentos       import MAPA_CODIGOS_IBGE
+from configs.esquemas          import ESQUEMA_CODIGOS_IBGE
+from configs.constantes        import INDICE_CABECALHO_IBGE
 from transformadores.dataframe import (
     renomear_colunas,
-    selecionar_colunas
+    selecionar_colunas,
 )
-
-COLUNAS_FINAIS = [
-    "id_municipio",
-    "nome_municipio",
-    "id_uf",
-    "nome_uf",
-    "id_regiao_imediata",
-    "nome_regiao_imediata",
-    "id_regiao_intermediaria",
-    "nome_regiao_intermediaria"
-]
+from configs.colunas           import COLUNAS_FINAIS_MUNICIPIOS
 
 
 # =========================================================
@@ -41,7 +26,7 @@ def carregar_dados() -> pd.DataFrame:
     return ler_excel(
         caminho=ARQUIVO_CODIGOS_IBGE,
         pular_linhas=INDICE_CABECALHO_IBGE - 1,
-        usar_colunas=list(ESQUEMA_TABELA_IBGE.keys())
+        usar_colunas=list(ESQUEMA_CODIGOS_IBGE)
     )
 
 
@@ -51,8 +36,8 @@ def carregar_dados() -> pd.DataFrame:
 
 def padronizar_colunas(df: pd.DataFrame) -> pd.DataFrame:
 
-    df = renomear_colunas(df, ESQUEMA_TABELA_IBGE)
-    df = selecionar_colunas(df, ESQUEMA_TABELA_IBGE.values())
+    df = renomear_colunas(df, MAPA_CODIGOS_IBGE)
+    df = selecionar_colunas(df, MAPA_CODIGOS_IBGE.values())
     return df
 
 
@@ -143,7 +128,7 @@ def remover_duplicatas_exatas(
 def validar_nulos(df: pd.DataFrame) -> None:
 
     linhas_invalidas = df[
-        df[COLUNAS_FINAIS]
+        df[COLUNAS_FINAIS_MUNICIPIOS]
         .isnull()
         .any(axis=1)
     ]
@@ -242,7 +227,7 @@ def processar_municipios_ibge() -> pd.DataFrame:
     df = carregar_dados()
     print(f"Registros lidos: {len(df)}")
 
-    validar_esquema(df, ESQUEMA_TABELA_IBGE.keys())
+    validar_esquema(df, MAPA_CODIGOS_IBGE.keys())
     df = padronizar_colunas(df)
     df = limpar_textos(df)
     df = converter_tipos(df)
