@@ -15,6 +15,11 @@ VALIDACOES.PY
   - usa tuplas compostas de chaves (multi-coluna)
   - registros não encontrados são enviados para quarentena
   - retorna apenas registros válidos
+- validar_unicidade(df, coluna): garante que a coluna possua valores únicos,
+  levantando erro caso existam duplicidades.
+- validar_prefixo(df, coluna_completa, coluna_prefixo, tamanho):
+  garante que o prefixo dos valores de uma coluna corresponda aos valores
+  de outra coluna, levantando erro em caso de inconsistências.
 
 TEXTO.PY
 - normalizar_texto(...): normaliza textos para comparação e limpeza (acentos, pontuação, caixa, nulos).

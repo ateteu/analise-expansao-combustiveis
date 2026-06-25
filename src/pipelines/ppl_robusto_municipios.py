@@ -117,9 +117,9 @@ def validar_nulos(df: pd.DataFrame) -> pd.DataFrame:
     n_antes = len(df)
     df_valido = separar_nulos(
         df, 
-        list(MAPA_CODIGOS_IBGE.values()), 
-        AUDITORIA_MUNICIPIOS, 
-        "municipios"
+        colunas=list(MAPA_CODIGOS_IBGE.values()), 
+        pasta_auditoria=AUDITORIA_MUNICIPIOS, 
+        prefixo="municipios"
     )
 
     if len(df_valido) < n_antes:
@@ -136,7 +136,13 @@ def validar_id_municipio(df: pd.DataFrame) -> pd.DataFrame:
     Levanta erro se algum id_municipio não tiver exatamente 7 dígitos.
     """
     n_antes = len(df)
-    df_valido = validar_regex(df, "id_municipio", r"^\d{7}$", AUDITORIA_MUNICIPIOS, "municipios")
+    df_valido = validar_regex(
+        df, 
+        coluna="id_municipio", 
+        regex=r"^\d{7}$", 
+        pasta_auditoria=AUDITORIA_MUNICIPIOS, 
+        prefixo="municipios"
+    )
 
     if len(df_valido) < n_antes:
         raise ValueError(
@@ -162,6 +168,7 @@ def executar_ppl_municipios() -> None:
     """
     Executa o pipeline de municípios e salva o resultado consolidado.
     """
+    # Leitura da planilha bruta do IBGE
     try:
         print("Carregando base do IBGE...")
         df = carregar_dados()
@@ -171,28 +178,43 @@ def executar_ppl_municipios() -> None:
 
     print(f"Registros lidos: {len(df)}")
 
+    # Garante que o arquivo de origem não mudou de formato
     validar_esquema(df, MAPA_CODIGOS_IBGE.keys())
+
+    # Padronização estrutural: nomes de coluna, texto e tipos
     df = padronizar_colunas(df)
     df = limpar_textos(df)
     df = converter_tipos(df)
+
+    # Remoção de duplicatas exatas (linha inteira repetida)
     df = tratar_duplicatas_exatas(df)
+
+    # Validações de integridade; qualquer falha aqui interrompe o pipeline
     df = validar_nulos(df)
     df = validar_id_municipio(df)
-
     validar_unicidade(df, "id_municipio")
     validar_prefixo(df, "id_municipio", "id_uf", tamanho=2)
     validar_quantidade_municipios(df)
 
+    # Ordenação determinística do resultado final
     df = ordenar_linhas(df, ["id_uf", "nome_municipio"])
-    print(f"Municípios válidos: {len(df)}")
 
     try:
         salvar_csv(df, DADOS_MODIFICADOS, "municipios_ibge.csv")
-    
+
     except Exception as e:
         raise RuntimeError(f"Falha ao salvar output final: {e}")
 
-    print(f"Arquivo salvo em: {ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE}")
+    print(f"\n{'='*60}")
+    print("PROCESSAMENTO FINALIZADO")
+    print(f"{'='*60}")
+    print(f"  Total de municípios    : {len(df)}")
+    print(f"  UFs presentes          : {sorted(df['id_uf'].unique())}")
+    print(f"  Regiões intermediárias : {df['id_regiao_intermediaria'].nunique()}")
+    print(f"  Regiões imediatas      : {df['id_regiao_imediata'].nunique()}")
+    print(f"  Arquivo salvo em       : {ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE}")
+    print(f"  Quarentena/auditoria   : {AUDITORIA_MUNICIPIOS}/")
+    print(f"{'='*60}")
 
 
 if __name__ == "__main__":
