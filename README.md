@@ -177,9 +177,9 @@ analise-expansao-combustiveis/
     ├── arquivos/             # Leitura e escrita de arquivos
     ├── bd/                   # Realiza operações ligadas ao BD
     ├── configs/              # Configurações estáticas e mapeamentos
-    ├── dominios/             # Regras específicas de cada domínio
     ├── pipelines/            # Fluxos de tratamento de dados
     ├── transformadores/      # Funções utilitárias de transformação
+    ├── utils/                # Funções utilitárias gerais
     └── main.py               # Ponto de entrada da aplicação
 ```
 
