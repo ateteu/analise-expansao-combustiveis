@@ -5,7 +5,7 @@ from utils.log               import log_etapa
 
 
 def validar_esquema(
-        df: pd.DataFrame, 
+        df        : pd.DataFrame, 
         esperado,
         origem = None
     ):
@@ -29,13 +29,13 @@ def validar_esquema(
 
 
 def validar_existencia_em_referencia(
-    df: pd.DataFrame,
-    df_ref: pd.DataFrame,
-    chaves_df: list[str],
-    chaves_df_ref: list[str],
-    diretorio_quarentena: str,
-    nome_arquivo: str,
-    origem: str | None = None
+    df                   : pd.DataFrame,
+    df_ref               : pd.DataFrame,
+    chaves_df            : list[str],
+    chaves_df_ref        : list[str],
+    diretorio_quarentena : str,
+    nome_arquivo         : str,
+    origem               : str | None = None
 ):
     """
     Valida, por comparação de tuplas de chaves compostas, 
@@ -99,10 +99,10 @@ def validar_unicidade(df: pd.DataFrame, coluna: str) -> None:
 
 
 def validar_prefixo(
-    df: pd.DataFrame,
-    coluna_completa: str,
-    coluna_prefixo: str,
-    tamanho: int,
+    df              : pd.DataFrame,
+    coluna_completa : str,
+    coluna_prefixo  : str,
+    tamanho         : int,
 ) -> None:
     """
     Levanta erro se o prefixo de coluna_completa não bater com coluna_prefixo.

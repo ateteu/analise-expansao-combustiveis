@@ -55,35 +55,4 @@ ESQUEMA_CODIGOS_IBGE = {
 # DADOS ECONÔMICOS - IBGE
 # =========================================================
 
-ESQUEMA_DADOS_ECONOMICOS = {
-    "Ano",
-    "Código do Município",
 
-    "Valor adicionado bruto da Agropecuária, " \
-    "\na preços correntes\n(R$ 1.000)",
-
-    "Valor adicionado bruto da Indústria,"     \
-    "\na preços correntes\n(R$ 1.000)",
-
-    "Valor adicionado bruto dos Serviços,"              \
-    "\na preços correntes \n"                           \
-    "- exceto Administração, defesa, educação e saúde " \
-    "públicas e seguridade social\n(R$ 1.000)",
-
-    "Valor adicionado bruto da Administração, " \
-    "defesa, educação e saúde públicas e "      \
-    "seguridade social, \na preços correntes\n(R$ 1.000)",
-
-    "Valor adicionado bruto total, "     \
-    "\na preços correntes\n(R$ 1.000)",
-
-    "Produto Interno Bruto, "            \
-    "\na preços correntes\n(R$ 1.000)",
-
-    "Produto Interno Bruto per capita, " \
-    "\na preços correntes\n(R$ 1,00)",
-
-    "Atividade com maior valor adicionado bruto",
-    "Atividade com segundo maior valor adicionado bruto",
-    "Atividade com terceiro maior valor adicionado bruto",
-}

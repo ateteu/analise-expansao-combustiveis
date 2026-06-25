@@ -20,7 +20,7 @@ CAMINHO_COORD_MUNICIPIOS = DADOS_BRUTOS / "lat-lon-github"
 
 
 # Arquivos brutos
-ARQUIVO_PIB              = CAMINHO_PIB / "PIB dos Municipios - base de dados 2010-2023.xlsx"
+ARQUIVO_DADOS_ECONOMICOS = CAMINHO_PIB / "PIB dos Municipios - base de dados 2010-2023.xlsx"
 ARQUIVO_CODIGOS_IBGE     = CAMINHO_CODIGOS_IBGE / "RELATORIO_DTB_BRASIL_2024_MUNICIPIOS.xls"
 ARQUIVO_COORD_MUNICIPIOS = CAMINHO_COORD_MUNICIPIOS / "municipios.csv"
 ARQUIVO_VENDAS_ETANOL    = CAMINHO_VENDAS_ANP / "vendas-anuais-de-etanol-hidratado-por-municipio.csv"
@@ -50,3 +50,4 @@ AUDITORIA                  = DADOS_MODIFICADOS / "auditoria-dados"
 AUDITORIA_VENDAS           = AUDITORIA / "aud-vendas"
 AUDITORIA_COORD_MUNICIPIOS = AUDITORIA / "aud-coord-municipios"
 AUDITORIA_MUNICIPIOS       = AUDITORIA / "aud-municipios-ibge"
+AUDITORIA_DADOS_ECONOMICOS = AUDITORIA / "aud-dados-economicos"

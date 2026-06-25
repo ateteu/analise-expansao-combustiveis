@@ -37,14 +37,14 @@ COLUNAS_SAIDA_VENDAS = [
 # DADOS ECONÔMICOS - IBGE
 # =================================================
 
-ORDEM_COL_PIB = [
+ORDEM_COL_DADOS_ECONOMICOS = [
     "ano",
     "id_municipio",
     "pib",
     "pib_per_capita",
     "vab_total",
 ]
-COLUNAS_NUM_PIB = [
+COLUNAS_NUM_DADOS_ECONOMICOS = [
     "vab_agropecuaria",
     "vab_industria",
     "vab_servicos",
@@ -53,11 +53,18 @@ COLUNAS_NUM_PIB = [
     "pib",
     "pib_per_capita",
 ]
-COLUNAS_STR_PIB = [
-    "id_municipio",
-    "atividade_1",
-    "atividade_2",
-    "atividade_3",
+COLUNAS_VAB_COMPONENTES = [
+    "vab_agropecuaria", 
+    "vab_industria", 
+    "vab_servicos", 
+    "vab_adm_publica",
+]
+COLUNAS_CRITICAS_DADOS_ECONOMICOS = [
+    "ano", 
+    "id_municipio", 
+    "vab_total", 
+    "pib", 
+    "pib_per_capita",
 ]
 
 # =================================================

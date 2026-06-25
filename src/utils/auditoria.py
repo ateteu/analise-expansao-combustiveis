@@ -257,3 +257,36 @@ def identificar_outliers(
     print(
         f"P{int(percentil * 100)} {coluna}: {limiar:,.2f} - {len(suspeitos)} linhas acima do limiar"
     )
+
+# ============================================================
+
+def validar_soma_componentes(
+    df                  : pd.DataFrame,
+    coluna_total        : str,
+    colunas_componentes : Sequence[str],
+    pasta_auditoria     : str,
+    prefixo             : str = "",
+    tolerancia          : float = 0.01,
+) -> None:
+    """
+    Audita (sem remover) se coluna_total diverge da soma de colunas_componentes.
+    Só avalia linhas onde total e todos os componentes estão presentes —
+    dados suprimidos/ausentes não geram falso positivo.
+    """
+    linhas_completas = df.dropna(subset=[coluna_total, *colunas_componentes])
+    if linhas_completas.empty:
+        return
+
+    soma = linhas_completas[list(colunas_componentes)].sum(axis=1)
+    diferenca_relativa = (
+        (linhas_completas[coluna_total] - soma).abs()
+        / linhas_completas[coluna_total].replace(0, pd.NA)
+    )
+
+    divergentes = linhas_completas[diferenca_relativa.fillna(0) > tolerancia].copy()
+    salvar_quarentena(divergentes, pasta_auditoria, f"soma_divergente_{prefixo}.csv")
+
+    print(
+        f"[{prefixo}] {len(divergentes)} linhas com soma de componentes "
+        f"divergente do total (tolerância {tolerancia:.0%})"
+    )
