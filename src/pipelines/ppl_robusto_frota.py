@@ -19,16 +19,16 @@ from configs.constantes        import (
 )
 from configs.mapeamentos       import (
     MAPA_UF_SIGLA,
-    CORRECOES_MUNICIPIOS_FROTA,   # dict {(sigla_uf, nome_errado): nome_correto}
+    CORRECOES_MUNICIPIOS
 )
 from configs.colunas           import (
-    COLUNAS_CRITICAS_FROTA,       # ["ano", "uf", "municipio"]
-    COLUNAS_INT_FROTA,            # ["total", "automovel", ...]
-    COMPONENTES_FROTA,            # COLUNAS_INT_FROTA sem "total"
-    COLUNAS_IDENTIFICADORAS_FROTA,# ["ano", "id_municipio"]
-    COLUNAS_SAIDA_FROTA,          # ["ano", "id_municipio"] + COLUNAS_INT_FROTA
+    COLUNAS_CRITICAS_FROTA, 
+    COLUNAS_INT_FROTA,
+    COMPONENTES_FROTA,
+    COLUNAS_IDENTIFICADORAS_FROTA,
+    COLUNAS_SAIDA_FROTA,
 )
-from configs.esquemas          import ESQUEMA_FROTA  # set esperado após normalização do header
+from configs.esquemas          import ESQUEMA_FROTA
 from transformadores.arquivos  import extrair_ano
 from transformadores.texto     import normalizar_texto
 from transformadores.tipos     import (
@@ -96,13 +96,13 @@ def _remover_linhas_invalidas(df: pd.DataFrame) -> pd.DataFrame:
 
 def _corrigir_municipios(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Aplica o dicionário CORRECOES_MUNICIPIOS_FROTA para padronizar nomes de
+    Aplica o dicionário CORRECOES_MUNICIPIOS para padronizar nomes de
     municípios grafados de forma errada ou inconsistente na fonte.
     A correção usa como chave o par (sigla_uf, nome_normalizado).
     """
     chaves = list(zip(df["uf"], df["municipio"]))
     df["municipio"] = [
-        CORRECOES_MUNICIPIOS_FROTA.get(chave, nome)
+        CORRECOES_MUNICIPIOS.get(chave, nome)
         for chave, nome in zip(chaves, df["municipio"])
     ]
     return df

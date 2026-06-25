@@ -130,3 +130,28 @@ COLUNAS_SAIDA_FROTA = [
     "ano", 
     "id_municipio"
 ] + COLUNAS_INT_FROTA
+
+# COMPONENTES_FROTA = COLUNAS_INT_FROTA exceto "total"
+COMPONENTES_FROTA = [
+    "automovel",
+    "bonde",
+    "caminhao",
+    "caminhao_trator",
+    "caminhonete",
+    "camioneta",
+    "chassi_plataf",
+    "ciclomotor",
+    "micro_onibus",
+    "motocicleta",
+    "motoneta",
+    "onibus",
+    "quadriciclo",
+    "reboque",
+    "semi_reboque",
+    "side_car",
+    "outros",
+    "trator_estei",
+    "trator_rodas",
+    "triciclo",
+    "utilitario",
+]
