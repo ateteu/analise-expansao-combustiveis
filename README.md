@@ -165,13 +165,16 @@ analise-expansao-combustiveis/
 │   ├── 1-brutos/             # Dados originais das fontes
 │   ├── 2-intermediarios/     # Dados limpos e padronizados
 │   ├── 3-modelados/          # Dados modelados, prontos para BI
+│   ├── 4-analises/           # Dados investigativos e gráficos
 │   ├── dominio/              # Dados de domínio do projeto
 │   └── banco_dados.duckdb    # Banco de dados local
 │
 ├── sql/
 │   ├── 1-metricas/           # Cálculo de métricas
 │   ├── 2-pontuacoes/         # Cálculo dos scores
-│   └── 3-tabelas-analiticas/ # Consolidação das tabelas finais
+│   ├── 3-tabelas-analiticas/ # Consolidação das tabelas finais
+│   ├── 4-analises/           # Queries investigativas
+│   └── ddl                   # Esquema SQL
 │
 └── src/
     ├── arquivos/             # Leitura e escrita de arquivos

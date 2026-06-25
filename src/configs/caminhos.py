@@ -4,11 +4,13 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
-# Diretórios das bases de dados
+# Diretórios base
 DADOS_BRUTOS      = BASE_DIR / "dados" / "1-brutos"
 DADOS_MODIFICADOS = BASE_DIR / "dados" / "2-intermediarios"
 DADOS_MODELADOS   = BASE_DIR / "dados" / "3-modelados"
+DADOS_ANALISES    = BASE_DIR / "dados" / "4-analises"
 DADOS_DOMINIO     = BASE_DIR / "dados" / "dominio"
+DIR_SQL           = BASE_DIR / "sql"
 
 
 # Diretórios das bases de dados brutos
@@ -29,7 +31,6 @@ ARQUIVO_VENDAS_GASOLINA  = CAMINHO_VENDAS_ANP / "vendas-anuais-de-gasolina-c-por
 
 
 # Arquivos limpos/tratados
-ARQUIVO_BD                          = BASE_DIR / "dados" / "banco_dados.duckdb"
 ARQUIVO_CONSOLIDADO_VENDAS_ANP      = DADOS_MODIFICADOS / "vendas_anp.csv"
 ARQUIVO_CONSOLIDADO_FROTA           = DADOS_MODIFICADOS / "frota_senatran.csv"
 ARQUIVO_CONSOLIDADO_PIB             = DADOS_MODIFICADOS / "pib_ibge.csv"
@@ -43,6 +44,14 @@ ARQUIVO_BASES_LOGISTICAS     = DADOS_DOMINIO / "bases_logisticas.csv"
 ARQUIVO_REFINARIAS           = DADOS_DOMINIO / "refinarias.csv"
 ARQUIVO_TIPOS_COMBUSTIVEL    = DADOS_DOMINIO / "tipos_combustivel.csv"
 ARQUIVO_UFS_ESCOPO           = DADOS_DOMINIO / "ufs_em_escopo.csv"
+
+
+# Arquivo do banco de dados DuckDB
+ARQUIVO_BD      = BASE_DIR / "dados" / "banco_dados.duckdb"
+
+
+# Arquivos SQL
+ARQUIVO_EDA_SQL = DIR_SQL / "4-analise" / "perguntas_investigativas.sql"
 
 
 # Diretórios das pastas de auditoria (quarentenas/limpezas)

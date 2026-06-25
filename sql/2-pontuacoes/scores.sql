@@ -24,11 +24,22 @@ WITH
             ----------------------------------------------------------------
             -- SCORE ECONÔMICO [0,1]
             (
-                0.4 * e.pib_pc_relativo_norm
-                +
-                0.35 * e.contribuicao_industria_norm
-                +
-                0.25 * e.contribuicao_servicos_norm
+                (
+                    COALESCE(0.40 * e.pib_pc_relativo_norm, 0)
+                    +
+                    COALESCE(0.35 * e.contribuicao_industria_norm, 0)
+                    +
+                    COALESCE(0.25 * e.contribuicao_servicos_norm, 0)
+                )
+                /
+                NULLIF(
+                    (CASE WHEN e.pib_pc_relativo_norm IS NOT NULL THEN 0.40 ELSE 0 END)
+                    +
+                    (CASE WHEN e.contribuicao_industria_norm IS NOT NULL THEN 0.35 ELSE 0 END)
+                    +
+                    (CASE WHEN e.contribuicao_servicos_norm IS NOT NULL THEN 0.25 ELSE 0 END),
+                    0
+                )
             ) AS score_economico_norm,
             ----------------------------------------------------------------
             -- SCORE DEMANDA [0,1]

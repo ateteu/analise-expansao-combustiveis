@@ -39,6 +39,11 @@ WITH
             p.ano,
             pe.populacao,
 
+            CASE
+                WHEN p.vab_total IS NULL THEN 0
+                ELSE 1
+            END AS possui_vab,
+
             (p.pib_per_capita / pe.pib_per_capita_estadual)
             AS pib_per_capita_relativo,
 

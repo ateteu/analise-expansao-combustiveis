@@ -1,9 +1,11 @@
 import duckdb
-from pathlib import Path
+
+from pathlib          import Path
 from configs.caminhos import (
     ARQUIVO_BD,
     DADOS_MODELADOS
 )
+
 
 def executar_queries_sql():
     """
@@ -21,7 +23,8 @@ def executar_queries_sql():
         "sql/2-pontuacoes/scores.sql",
         "sql/3-tabelas-analiticas/dimensao_municipio.sql",
         "sql/3-tabelas-analiticas/municipios_bi_anual.sql",
-        "sql/3-tabelas-analiticas/municipios_bi_crescimento.sql"
+        "sql/3-tabelas-analiticas/municipios_bi_crescimento.sql",
+        "sql/teste.sql"
     ]
 
     for arquivo in arquivos_sql:
@@ -40,7 +43,8 @@ def executar_queries_sql():
     exports = [
         "dimensao_municipio",
         "municipios_bi_anual",
-        "municipios_bi_crescimento"
+        "municipios_bi_crescimento",
+        "teste"
     ]
 
     DADOS_MODELADOS.mkdir(parents = True, exist_ok = True)

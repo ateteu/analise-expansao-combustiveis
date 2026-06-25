@@ -7,6 +7,7 @@ from pipelines.ppl_robusto_vendas           import executar_ppl_vendas
 from pipelines.ppl_robusto_municipios       import executar_ppl_municipios
 from bd.carregar_duckdb                     import carregar_bd
 from bd.executar_sql                        import executar_queries_sql
+from pipelines.ppl_eda_sql                  import executar_ppl_eda
 
 
 # Ignorar avisos sobre headers e footers
@@ -19,11 +20,12 @@ def main():
     """
     passos = [
         #("Pipeline de limpeza [municipios]", executar_ppl_municipios),
-        ("Pipeline de limpeza [frota]", executar_ppl_frota),
+        #("Pipeline de limpeza [frota]", executar_ppl_frota),
         #("Pipeline de limpeza [dados econômicos]", executar_ppl_dados_economicos),
         #("Pipeline de limpeza [vendas]", executar_ppl_vendas),
         #("Pipeline do banco de dados", carregar_bd),
-        #("Queries SQL", executar_queries_sql)
+        ("Queries SQL", executar_queries_sql),
+        ("Análise exploratória", executar_ppl_eda)
     ]
 
     # Se um processo falhar, tenta o próximo
