@@ -88,7 +88,16 @@ COLUNAS_CRITICAS_COORD_MUNICIPIOS = [
 # =================================================
 
 PRIMEIRAS_COL_SENATRAN = ORDEM_LINHAS
-COLUNAS_INT_SENATRAN = [
+COLUNAS_CRITICAS_FROTA = [
+    "ano", 
+    "uf", 
+    "municipio"
+]
+COLUNAS_IDENTIFICADORAS_FROTA = [
+    "ano", 
+    "id_municipio"
+]
+COLUNAS_INT_FROTA = [
     "total",
     "automovel",
     "bonde",
@@ -117,3 +126,7 @@ COLUNAS_STR_SENATRAN = [
     "id_municipio",
     "municipio",
 ]
+COLUNAS_SAIDA_FROTA = [
+    "ano", 
+    "id_municipio"
+] + COLUNAS_INT_FROTA

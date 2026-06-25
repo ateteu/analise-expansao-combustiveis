@@ -1,3 +1,5 @@
+from configs.colunas import COLUNAS_INT_FROTA
+
 # Este arquivo contém esquemas utilizados nos códigos.
 
 # Um esquema define estrutura de dados.
@@ -52,7 +54,7 @@ ESQUEMA_CODIGOS_IBGE = {
 }
 
 # =========================================================
-# DADOS ECONÔMICOS - IBGE
+# DADOS DE FROTA - SENATRAN
 # =========================================================
 
-
+ESQUEMA_FROTA = {"uf", "municipio"} | set(COLUNAS_INT_FROTA)

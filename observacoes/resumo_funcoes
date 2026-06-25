@@ -44,6 +44,19 @@ AUDITORIA.PY
 - tratar_duplicidades(df, chave_logica, pasta_auditoria, prefixo=""): remove duplicatas e envia casos exatos e lógicos para quarentena.
 - validar_consistencia_grupo(df, coluna_id, coluna_grupo, pasta_auditoria, prefixo=""): verifica consistência entre chave e grupo (ex: município × UF).
 - identificar_outliers(df, coluna, pasta_auditoria, sufixo="", percentil=0.99): detecta valores extremos e envia para quarentena.
+- validar_soma_componentes(
+    df                  : pd.DataFrame,
+    coluna_total        : str,
+    colunas_componentes : Sequence[str],
+    pasta_auditoria     : str,
+    prefixo             : str = "",
+    tolerancia          : float = 0.01,
+) -> None:
+"""
+    Audita (sem remover) se coluna_total diverge da soma de colunas_componentes.
+    Só avalia linhas onde total e todos os componentes estão presentes —
+    dados suprimidos/ausentes não geram falso positivo.
+    """
 
 LOG.PY
 - log_etapa(nome, antes, depois, origem=None): registra a variação de linhas entre etapas do pipeline.

@@ -12,7 +12,7 @@ DADOS_DOMINIO     = BASE_DIR / "dados" / "dominio"
 
 
 # Diretórios das bases de dados brutos
-CAMINHO_SENATRAN         = DADOS_BRUTOS / "frota-senatran"
+CAMINHO_FROTA_SENATRAN   = DADOS_BRUTOS / "frota-senatran"
 CAMINHO_VENDAS_ANP       = DADOS_BRUTOS / "vendas-anp"
 CAMINHO_PIB              = DADOS_BRUTOS / "pib-ibge"
 CAMINHO_CODIGOS_IBGE     = DADOS_BRUTOS / "codigos-ibge"
@@ -51,3 +51,4 @@ AUDITORIA_VENDAS           = AUDITORIA / "aud-vendas"
 AUDITORIA_COORD_MUNICIPIOS = AUDITORIA / "aud-coord-municipios"
 AUDITORIA_MUNICIPIOS       = AUDITORIA / "aud-municipios-ibge"
 AUDITORIA_DADOS_ECONOMICOS = AUDITORIA / "aud-dados-economicos"
+AUDITORIA_FROTA            = AUDITORIA / "aud-frota"
