@@ -1,3 +1,7 @@
+# Locais
+observacoes/
+dados/2-intermediarios/auditoria-dados/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
