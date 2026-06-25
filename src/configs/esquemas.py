@@ -40,7 +40,7 @@ ESQUEMA_ORIGINAL_VENDAS = {
 # CODIGOS DE MUNICIPIOS, UFS E REGIÕES - IBGE
 # =========================================================
 
-ESQUEMA_TABELA_IBGE = {
+ESQUEMA_CODIGOS_IBGE = {
     "UF",
     "Nome_UF",
     "Região Geográfica Intermediária",

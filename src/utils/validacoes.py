@@ -86,3 +86,30 @@ def validar_existencia_em_referencia(
     )
 
     return df_validos
+
+def validar_unicidade(df: pd.DataFrame, coluna: str) -> None:
+    """
+    Levanta erro se a coluna tiver valores duplicados.
+    """
+    duplicados = df[df[coluna].duplicated(keep=False)]
+    if not duplicados.empty:
+        raise ValueError(
+            f"Encontrados {duplicados[coluna].nunique()} valores duplicados em '{coluna}'."
+        )
+
+
+def validar_prefixo(
+    df: pd.DataFrame,
+    coluna_completa: str,
+    coluna_prefixo: str,
+    tamanho: int,
+) -> None:
+    """
+    Levanta erro se o prefixo de coluna_completa não bater com coluna_prefixo.
+    """
+    inconsistentes = df[df[coluna_completa].str[:tamanho] != df[coluna_prefixo]]
+    if not inconsistentes.empty:
+        raise ValueError(
+            f"Encontrados {len(inconsistentes)} registros com prefixo inconsistente "
+            f"entre '{coluna_completa}' e '{coluna_prefixo}'."
+        )

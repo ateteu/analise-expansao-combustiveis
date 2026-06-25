@@ -1,11 +1,12 @@
 import warnings
 import traceback
 
-from pipelines.senatran            import executar as executar_ppl_senatran
-from pipelines.pib                 import executar as executar_ppl_pib
-from pipelines.ppl_robusto_vendas  import executar_ppl_vendas
-from bd.carregar_duckdb            import carregar_bd
-from bd.executar_sql               import executar_queries_sql
+from pipelines.senatran               import executar as executar_ppl_senatran
+from pipelines.pib                    import executar as executar_ppl_pib
+from pipelines.ppl_robusto_vendas     import executar_ppl_vendas
+from pipelines.ppl_robusto_municipios import executar_ppl_municipios
+from bd.carregar_duckdb               import carregar_bd
+from bd.executar_sql                  import executar_queries_sql
 
 
 # Ignorar avisos sobre headers e footers
@@ -17,9 +18,10 @@ def main():
     carrega o BD e executa as queries SQL.
     """
     passos = [
+        ("Pipeline de limpeza [municipios]", executar_ppl_municipios),
         #("Pipeline de limpeza [frota]", executar_ppl_senatran),
         #("Pipeline de limpeza [dados econômicos]", executar_ppl_pib),
-        ("Pipeline de limpeza [vendas]", executar_ppl_vendas),
+        #("Pipeline de limpeza [vendas]", executar_ppl_vendas),
         #("Pipeline do banco de dados", carregar_bd),
         #("Queries SQL", executar_queries_sql)
     ]

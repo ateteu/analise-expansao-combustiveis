@@ -64,16 +64,7 @@ COLUNAS_STR_PIB = [
 # MUNICÍPIOS - IBGE
 # =================================================
 
-COLUNAS_FINAIS_MUNICIPIOS = [
-    "id_municipio",
-    "nome_municipio",
-    "id_uf",
-    "nome_uf",
-    "id_regiao_imediata",
-    "nome_regiao_imediata",
-    "id_regiao_intermediaria",
-    "nome_regiao_intermediaria",
-]
+
 
 # =================================================
 # COORD. MUNICÍPIOS - GITHUB/KELVINS
