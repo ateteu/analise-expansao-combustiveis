@@ -12,7 +12,6 @@ def validar_esquema(
     """
     Valida se o DataFrame possui exatamente as colunas esperadas.
     """
-
     recebidas = set(df.columns)
     esperado  = set(esperado)
 

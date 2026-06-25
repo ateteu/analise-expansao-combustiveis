@@ -1,5 +1,4 @@
 import pandas as pd
-
 from arquivos.ler_arquivo      import ler_csv
 from arquivos.salvar_arquivo   import salvar_csv
 from configs.caminhos          import (
@@ -10,6 +9,7 @@ from configs.caminhos          import (
     ARQUIVO_VENDAS_DIESEL,
     ARQUIVO_VENDAS_GASOLINA,
     ARQUIVO_TIPOS_COMBUSTIVEL,
+    DADOS_MODIFICADOS,
 )
 from configs.esquemas          import ESQUEMA_ORIGINAL_VENDAS
 from configs.constantes        import (
@@ -18,11 +18,15 @@ from configs.constantes        import (
     UFS_ESCOPO,
     STRINGS_NULAS,
 )
-from configs.mapeamentos       import MAPA_UF_SIGLA
+from configs.mapeamentos       import (
+    MAPA_UF_SIGLA,
+    MAPA_VENDAS,
+)
 from configs.colunas           import (
     COLUNAS_CRITICAS_VENDAS,
     COLUNAS_SAIDA_VENDAS,
     COLUNAS_IDENTIFICADORAS,
+    COLUNAS_IDENTIFICADORAS_FINAIS,
 )
 from transformadores.texto     import normalizar_texto
 from transformadores.tipos     import (
@@ -56,11 +60,11 @@ from utils.auditoria           import (
 # CONFIGURAÇÕES E FUNÇÕES
 # =========================================================
 
-COMBUSTIVEIS_VALIDOS = {"etanol", "diesel", "gasolina"}
+COMBUSTIVEIS_VALIDOS = {"Etanol", "Diesel", "Gasolina C"}
 ARQUIVOS = {
-    "etanol"   : ARQUIVO_VENDAS_ETANOL,
-    "diesel"   : ARQUIVO_VENDAS_DIESEL,
-    "gasolina" : ARQUIVO_VENDAS_GASOLINA,
+    "Etanol"   : ARQUIVO_VENDAS_ETANOL,
+    "Diesel"   : ARQUIVO_VENDAS_DIESEL,
+    "Gasolina C" : ARQUIVO_VENDAS_GASOLINA,
 }
 
 def validar_com_municipios(df, df_municipios, origem=""):
@@ -79,7 +83,7 @@ def validar_com_municipios(df, df_municipios, origem=""):
 
 def limpar_textos(df):
     """Normaliza colunas textuais e converte strings nulas em pd.NA."""
-    for coluna in ["uf", "tipo_combustivel", "municipio"]:
+    for coluna in ["uf", "tipo_combustivel", "id_municipio"]:
         df[coluna] = df[coluna].apply(
             lambda x: normalizar_texto(
                 x,
@@ -104,7 +108,7 @@ def converter_tipos(df):
         lambda x: x.zfill(7) if pd.notna(x) and x != "" else pd.NA
     )
 
-    df = converter_decimal_br(df, ["volume_vendas_m3"])
+    df = converter_decimal_br(df, ["vol_vendido_m3"])
 
     return df
 
@@ -113,11 +117,46 @@ def aplicar_regras_de_dominio(df, origem=""):
     Aplica regras de plausibilidade por coluna.
     Linhas reprovadas em cada regra vão para quarentena separada.
     """
-    df = validar_intervalo(df, "ano", ANO_INICIO_ESCOPO_PROJETO, ANO_FIM_ESCOPO_PROJETO, AUDITORIA_VENDAS, origem)
-    df = validar_dominio(df, "uf", MAPA_UF_SIGLA.values(), AUDITORIA_VENDAS, origem)
-    df = validar_dominio(df, "uf", UFS_ESCOPO,  AUDITORIA_VENDAS, f"{origem}_escopo")
-    df = validar_dominio(df, "tipo_combustivel", COMBUSTIVEIS_VALIDOS, AUDITORIA_VENDAS, origem)
-    df = validar_minimo(df, "volume_vendas_m3", 0, AUDITORIA_VENDAS, origem)
+    df = validar_intervalo(
+        df, 
+        coluna="ano", 
+        minimo=ANO_INICIO_ESCOPO_PROJETO, 
+        maximo=ANO_FIM_ESCOPO_PROJETO, 
+        pasta_auditoria=AUDITORIA_VENDAS, 
+        prefixo=origem
+    )
+
+    df = validar_dominio(
+        df, 
+        coluna="uf", 
+        valores_validos=MAPA_UF_SIGLA.values(), 
+        pasta_auditoria=AUDITORIA_VENDAS, 
+        prefixo=origem
+    )
+
+    df = validar_dominio(
+        df, 
+        coluna="uf", 
+        valores_validos=UFS_ESCOPO,  
+        pasta_auditoria=AUDITORIA_VENDAS, 
+        prefixo=f"{origem}_escopo"
+    )
+
+    df = validar_dominio(
+        df, 
+        coluna="tipo_combustivel", 
+        valores_validos=COMBUSTIVEIS_VALIDOS, 
+        pasta_auditoria=AUDITORIA_VENDAS, 
+        prefixo=origem
+    )
+    
+    df = validar_minimo(
+        df, 
+        coluna="vol_vendido_m3", 
+        minimo=0, 
+        pasta_auditoria=AUDITORIA_VENDAS, 
+        prefixo=origem
+    )
     
     return df
 
@@ -131,15 +170,17 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_municipios):
     Cada etapa loga quantas linhas sobreviveram e salva os descartados em quarentena.
     """
     origem = combustivel_fixo
+
     print(f"\n{'='*60}")
-    print(f"Processando: {caminho_arquivo}  [{origem}]")
+    print(f"Processando: Arquivo [{origem}]")
 
     try:
         df = ler_csv(caminho_arquivo)
+    
     except Exception as e:
         raise RuntimeError(f"Erro ao ler arquivo de vendas {caminho_arquivo}: {e}")
     
-    print(f"  Linhas lidas: {len(df)}")
+    print(f"Linhas lidas: {len(df)}")
 
     # Coluna temporária de rastreamento p/ identificar a origem nas quarentenas
     df["_arquivo_origem"] = combustivel_fixo
@@ -149,15 +190,18 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_municipios):
         esperado=ESQUEMA_ORIGINAL_VENDAS, 
         origem=origem
     )
-    df = renomear_colunas(df, ESQUEMA_ORIGINAL_VENDAS)
+
+    df = renomear_colunas(df, MAPA_VENDAS)
     df = limpar_textos(df)
     df = converter_tipos(df)
+
     df = separar_nulos(
         df, 
         colunas=COLUNAS_CRITICAS_VENDAS, 
         pasta_auditoria=AUDITORIA_VENDAS, 
         prefixo=origem
     )
+
     df = validar_regex(
         df, 
         coluna="id_municipio", 
@@ -168,7 +212,7 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_municipios):
 
     # Força o combustível fixo após validação de nulos
     df["tipo_combustivel"] = combustivel_fixo
-
+ 
     df = aplicar_regras_de_dominio(df, origem)
     df = validar_com_municipios(df, df_municipios, origem)
     df = tratar_duplicidades(df, COLUNAS_IDENTIFICADORAS, AUDITORIA_VENDAS, origem)
@@ -181,7 +225,7 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_municipios):
         prefixo=origem
     )
 
-    print(f"  ✓ [{origem}] Linhas aprovadas: {len(df)}")
+    print(f"✓ [{origem}] Linhas aprovadas: {len(df)}")
     return df
 
 # =========================================================
@@ -219,19 +263,22 @@ def executar_ppl_vendas():
     # Mapeia o nome do combustível para o ID da tabela domínio
     df_final["id_combustivel"] = df_final["tipo_combustivel"].map(mapa_combustivel_id)
 
+    if df_final["id_combustivel"].isna().any():
+        raise ValueError("Combustível sem ID correspondente.")
+    
     df_final = selecionar_colunas(df_final, COLUNAS_SAIDA_VENDAS)
     df_final = ordenar_linhas(df_final, COLUNAS_IDENTIFICADORAS)
 
     # Outliers calculados no consolidado para comparar os 3 combustíveis juntos
     identificar_outliers(
         df_final, 
-        coluna="volume_vendas_m3", 
+        coluna="vol_vendido_m3", 
         pasta_auditoria=AUDITORIA_VENDAS, 
         sufixo="_consolidado"
     )
 
     # Verificação final: nenhuma duplicidade lógica pode sobrar
-    n_dupl = df_final.duplicated(subset=COLUNAS_IDENTIFICADORAS).sum()
+    n_dupl = df_final.duplicated(subset=COLUNAS_IDENTIFICADORAS_FINAIS).sum()
     if n_dupl > 0:
         raise ValueError(
             f"Duplicidade lógica no dataset final: {n_dupl} linhas. "
@@ -239,7 +286,7 @@ def executar_ppl_vendas():
         )
 
     try:
-        salvar_csv(df_final, ARQUIVO_CONSOLIDADO_VENDAS_ANP)
+        salvar_csv(df_final, DADOS_MODIFICADOS, "vendas_anp.csv")
 
     except Exception as e:
         raise RuntimeError(f"Falha ao salvar output final: {e}")

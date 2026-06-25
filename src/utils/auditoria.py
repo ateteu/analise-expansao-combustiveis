@@ -226,7 +226,7 @@ def validar_consistencia_grupo(
             f"inconsistencia_{coluna_id}_{coluna_grupo}_{prefixo}.csv",
         )
     else:
-        print(f"  ✓  [{prefixo}] Consistência {coluna_grupo} × {coluna_id}: OK")
+        print(f"✓ [{prefixo}] Consistência [{coluna_grupo}] x [{coluna_id}]: OK")
 
 
 # ============================================================
@@ -255,5 +255,5 @@ def identificar_outliers(
     )
 
     print(
-        f"  P{int(percentil * 100)} {coluna}: {limiar:,.2f} - {len(suspeitos)} linhas acima do limiar"
+        f"P{int(percentil * 100)} {coluna}: {limiar:,.2f} - {len(suspeitos)} linhas acima do limiar"
     )

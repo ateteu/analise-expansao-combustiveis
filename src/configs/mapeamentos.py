@@ -53,9 +53,9 @@ SIGLAS_UF = {
 
 MAPA_VENDAS = {
     "ANO"           : "ano",
-    "UF"            : "id_uf",
+    "UF"            : "uf",
     "GRANDE REGIÃO" : "nome_grande_regiao",
-    "PRODUTO"       : "nome_combustivel",
+    "PRODUTO"       : "tipo_combustivel",
     "CÓDIGO IBGE"   : "id_municipio",
     "MUNICÍPIO"     : "nome_municipio", 
     "VENDAS"        : "vol_vendido_m3",

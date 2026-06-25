@@ -1,7 +1,8 @@
 import pandas as pd
-from pathlib                   import Path
-from transformadores.dataframe import limpar_nomes_colunas
-from detectar_encoding         import detectar_encoding
+
+from pathlib                     import Path
+from transformadores.dataframe   import limpar_nomes_colunas
+from arquivos.detectar_encoding  import detectar_encoding
 
 
 def ler_excel(

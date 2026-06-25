@@ -1,4 +1,6 @@
 import warnings
+import traceback
+
 from pipelines.senatran            import executar as executar_ppl_senatran
 from pipelines.pib                 import executar as executar_ppl_pib
 from pipelines.ppl_robusto_vendas  import executar_ppl_vendas
@@ -15,11 +17,11 @@ def main():
     carrega o BD e executa as queries SQL.
     """
     passos = [
-        #("SENATRAN"     , executar_ppl_senatran),
-        #("PIB"          , executar_ppl_pib),
-        ("VENDAS ANP"    , executar_ppl_vendas),
-        ("BANCO DE DADOS", carregar_bd),
-        ("QUERIES SQL"   , executar_queries_sql)
+        #("Pipeline de limpeza [frota]", executar_ppl_senatran),
+        #("Pipeline de limpeza [dados econômicos]", executar_ppl_pib),
+        ("Pipeline de limpeza [vendas]", executar_ppl_vendas),
+        #("Pipeline do banco de dados", carregar_bd),
+        #("Queries SQL", executar_queries_sql)
     ]
 
     # Se um processo falhar, tenta o próximo
@@ -27,8 +29,9 @@ def main():
         try:
             passo()
 
-        except Exception as erro:
-            print(f"\nFalha em {nome}: {erro}")
+        except Exception:
+            print(f"\nFalha em: {nome}")
+            traceback.print_exc()
 
 
 if __name__ == "__main__":
