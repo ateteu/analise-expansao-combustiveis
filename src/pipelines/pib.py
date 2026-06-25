@@ -15,7 +15,8 @@ from configs.colunas           import (
     COLUNAS_NUM_PIB,
     COLUNAS_STR_PIB
 )
-from configs.esquemas          import ESQUEMA_PIB
+from configs.mapeamentos       import MAPA_DADOS_ECONOMICOS
+from configs.esquemas          import ESQUEMA_DADOS_ECONOMICOS
 from transformadores.tipos     import (
     colunas_para_string,
     colunas_para_inteiro,
@@ -37,7 +38,7 @@ def executar():
     try:
         df = ler_excel(
             ARQUIVO_PIB, 
-            usar_colunas = ESQUEMA_PIB.keys()
+            usar_colunas = ESQUEMA_DADOS_ECONOMICOS
         )
         print(f"✓ Processado:  [{ARQUIVO_PIB.name}]")
     
@@ -45,7 +46,7 @@ def executar():
         print(f"✗ Erro em:     [{ARQUIVO_PIB.name}]:  {erro}")
 
     # Renomeia as colunas segundo o esquema
-    df = df.rename(columns = ESQUEMA_PIB)
+    df = df.rename(columns = MAPA_DADOS_ECONOMICOS)
 
     # Padroniza os tipos dos dados
     df = colunas_para_string(df, COLUNAS_STR_PIB)
