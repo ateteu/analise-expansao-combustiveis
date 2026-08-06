@@ -161,3 +161,14 @@ CORRECOES_MUNICIPIOS = {
     ("TO", "FORTALEZA DO TABOCAO")           : "TABOCAO",
     ("TO", "SAO VALERIO DA NATIVIDADE")      : "SAO VALERIO",
 }
+
+
+# =========================================================
+# COORDENADAS - GITHUB/KELVINS
+# =========================================================
+
+MAPA_COORD_MUNICIPIOS = {
+    "codigo_ibge" : "id_municipio",
+    "latitude"    : "latitude",
+    "longitude"   : "longitude",
+}
