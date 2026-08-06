@@ -8,21 +8,6 @@ from configs.colunas import COLUNAS_INT_FROTA
 # - como elas devem ser chamadas internamente
 # - qual forma final o DataFrame deve ter
 
-# =========================================================
-# COORD MUNICÍPIOS - GITHUB/KELVINS
-# =========================================================
-
-ESQUEMA_ORIGINAL_COORD_MUNICIPIOS = {
-    "codigo_ibge",
-    "nome",
-    "latitude",
-    "longitude",
-    "capital",
-    "codigo_uf",
-    "siafi_id",
-    "ddd",
-    "fuso_horario"
-}
 
 # =========================================================
 # VENDAS DE COMBUSTÍVEIS - ANP

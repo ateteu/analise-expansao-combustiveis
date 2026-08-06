@@ -168,7 +168,13 @@ CORRECOES_MUNICIPIOS = {
 # =========================================================
 
 MAPA_COORD_MUNICIPIOS = {
-    "codigo_ibge" : "id_municipio",
-    "latitude"    : "latitude",
-    "longitude"   : "longitude",
+    "codigo_ibge"  : "id_municipio",
+    "nome"         : "nome_municipio",
+    "latitude"     : "latitude",
+    "longitude"    : "longitude",
+    "capital"      : "capital",
+    "codigo_uf"    : "id_uf",
+    "siafi_id"     : "id_siafi",
+    "ddd"          : "ddd",
+    "fuso_horario" : "fuso_horario",
 }

@@ -8,9 +8,6 @@ from configs.caminhos          import (
     DADOS_MODIFICADOS,
 )
 from configs.constantes        import STRINGS_NULAS
-from configs.esquemas          import (
-    ESQUEMA_ORIGINAL_COORD_MUNICIPIOS,
-)
 from configs.mapeamentos       import (
     MAPA_COORD_MUNICIPIOS,
 )
@@ -128,7 +125,8 @@ def executar_ppl_coordenadas():
     try:
 
         df = ler_csv(
-            ARQUIVO_COORD_MUNICIPIOS
+            ARQUIVO_COORD_MUNICIPIOS,
+            separador=","
         )
         df_municipios = ler_csv(
             ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE
@@ -141,7 +139,7 @@ def executar_ppl_coordenadas():
 
     validar_esquema(
         df,
-        ESQUEMA_ORIGINAL_COORD_MUNICIPIOS,
+        MAPA_COORD_MUNICIPIOS.keys(),
     )
 
     origem = "coordenadas"
