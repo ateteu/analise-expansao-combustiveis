@@ -1,13 +1,14 @@
 import warnings
 import traceback
 
-from pipelines.ppl_robusto_frota            import executar_ppl_frota
-from pipelines.ppl_robusto_dados_economicos import executar_ppl_dados_economicos
-from pipelines.ppl_robusto_vendas           import executar_ppl_vendas
-from pipelines.ppl_robusto_municipios       import executar_ppl_municipios
-from bd.carregar_duckdb                     import carregar_bd
-from bd.executar_sql                        import executar_queries_sql
-from pipelines.ppl_eda_sql                  import executar_ppl_eda
+from pipelines.ppl_frota            import executar_ppl_frota
+from pipelines.ppl_dados_economicos import executar_ppl_dados_economicos
+from pipelines.ppl_vendas           import executar_ppl_vendas
+from pipelines.ppl_coordenadas      import executar_ppl_coordenadas
+from pipelines.ppl_municipios       import executar_ppl_municipios
+from bd.carregar_duckdb             import carregar_bd
+from bd.executar_sql                import executar_queries_sql
+from pipelines.ppl_eda_sql          import executar_ppl_eda
 
 
 # Ignorar avisos sobre headers e footers
@@ -19,13 +20,14 @@ def main():
     carrega o BD e executa as queries SQL.
     """
     passos = [
+        ("Pipeline de limpeza [coord. municípios]", executar_ppl_coordenadas)
         #("Pipeline de limpeza [municipios]", executar_ppl_municipios),
         #("Pipeline de limpeza [frota]", executar_ppl_frota),
         #("Pipeline de limpeza [dados econômicos]", executar_ppl_dados_economicos),
         #("Pipeline de limpeza [vendas]", executar_ppl_vendas),
         #("Pipeline do banco de dados", carregar_bd),
-        ("Queries SQL", executar_queries_sql),
-        ("Análise exploratória", executar_ppl_eda)
+        #("Queries SQL", executar_queries_sql),
+        #("Análise exploratória", executar_ppl_eda)
     ]
 
     # Se um processo falhar, tenta o próximo
