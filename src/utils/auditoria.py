@@ -24,12 +24,12 @@ def separar_nulos(
 
     salvar_quarentena(
         df[linhas_com_nulos].copy(),
-        pasta_auditoria,
-        f"nulos_{prefixo}.csv"
+        diretorio=pasta_auditoria,
+        nome_arquivo=f"nulos_{prefixo}.csv"
     )
 
     df = df[~linhas_com_nulos].copy()
-    log_etapa("Nulos críticos", n_antes, len(df), prefixo)
+    log_etapa("Nulos críticos", n_antes, len(df))
 
     return df
 
@@ -54,12 +54,12 @@ def validar_regex(
 
     salvar_quarentena(
         df[~linhas_validas].copy(),
-        pasta_auditoria,
-        f"formato_{coluna}_{prefixo}.csv"
+        diretorio=pasta_auditoria,
+        nome_arquivo=f"formato_{coluna}_{prefixo}.csv"
     )
 
     df = df[linhas_validas].copy()
-    log_etapa(f"Formato {coluna}", n_antes, len(df), prefixo)
+    log_etapa(f"Formato {coluna}", n_antes, len(df))
 
     return df
 
@@ -82,12 +82,12 @@ def validar_dominio(
 
     salvar_quarentena(
         df[~linhas_validas].copy(),
-        pasta_auditoria,
-        f"dominio_{coluna}_{prefixo}.csv"
+        diretorio=pasta_auditoria,
+        nome_arquivo=f"dominio_{coluna}_{prefixo}.csv"
     )
 
     df = df[linhas_validas].copy()
-    log_etapa(f"Domínio {coluna}", n_antes, len(df), prefixo)
+    log_etapa(f"Domínio {coluna}", n_antes, len(df))
 
     return df
 
@@ -111,12 +111,12 @@ def validar_intervalo(
 
     salvar_quarentena(
         df[~linhas_validas].copy(),
-        pasta_auditoria,
-        f"fora_intervalo_{coluna}_{prefixo}.csv"
+        diretorio=pasta_auditoria,
+        nome_arquivo=f"fora_intervalo_{coluna}_{prefixo}.csv"
     )
 
     df = df[linhas_validas].copy()
-    log_etapa(f"Intervalo {coluna}", n_antes, len(df), prefixo)
+    log_etapa(f"Intervalo {coluna}", n_antes, len(df))
 
     return df
 
@@ -139,12 +139,12 @@ def validar_minimo(
 
     salvar_quarentena(
         df[~linhas_validas].copy(),
-        pasta_auditoria,
-        f"abaixo_minimo_{coluna}_{prefixo}.csv"
+        diretorio=pasta_auditoria,
+        nome_arquivo=f"abaixo_minimo_{coluna}_{prefixo}.csv"
     )
 
     df = df[linhas_validas].copy()
-    log_etapa(f"Mínimo {coluna}", n_antes, len(df), prefixo)
+    log_etapa(f"Mínimo {coluna}", n_antes, len(df))
 
     return df
 
@@ -172,21 +172,25 @@ def tratar_duplicidades(
 
     salvar_quarentena(
         df[linhas_duplicadas_exatas].copy(),
-        pasta_auditoria,
-        f"duplicatas_exatas_{prefixo}.csv"
+        diretorio=pasta_auditoria,
+        nome_arquivo=f"duplicatas_exatas_{prefixo}.csv"
     )
 
     df = df.drop_duplicates(keep="first").copy()
-    linhas_duplicadas_logicas = df.duplicated(subset=chave_logica, keep=False)
+
+    linhas_duplicadas_logicas = df.duplicated(
+        subset=chave_logica, 
+        keep=False
+    )
 
     salvar_quarentena(
         df[linhas_duplicadas_logicas].copy(),
-        pasta_auditoria,
-        f"duplicatas_logicas_{prefixo}.csv"
+        diretorio=pasta_auditoria,
+        nome_arquivo=f"duplicatas_logicas_{prefixo}.csv"
     )
 
     df = df[~linhas_duplicadas_logicas].copy()
-    log_etapa("Deduplicação", n_antes, len(df), prefixo)
+    log_etapa("Deduplicação", n_antes, len(df))
 
     return df
 
@@ -220,9 +224,10 @@ def validar_consistencia_grupo(
 
         salvar_quarentena(
             inconsistencias,
-            pasta_auditoria,
-            f"inconsistencia_{coluna_id}_{coluna_grupo}_{prefixo}.csv",
+            diretorio=pasta_auditoria,
+            nome_arquivo=f"inconsistencia_{coluna_id}_{coluna_grupo}_{prefixo}.csv",
         )
+    
     else:
         log(
             f"[{prefixo}] Consistência "
@@ -252,8 +257,8 @@ def identificar_outliers(
 
     salvar_quarentena(
         suspeitos,
-        pasta_auditoria,
-        f"outliers_p{int(percentil * 100)}{sufixo}.csv"
+        diretorio=pasta_auditoria,
+        nome_arquivo=f"outliers_p{int(percentil * 100)}{sufixo}.csv"
     )
 
     log(
@@ -282,9 +287,8 @@ def validar_soma_componentes(
     linhas_completas = df.dropna(
         subset=[coluna_total, *colunas_componentes]
     )
-
-    if linhas_completas.empty:
-        return
+    
+    if linhas_completas.empty: return
 
     soma = linhas_completas[list(colunas_componentes)].sum(axis=1)
 
@@ -299,8 +303,8 @@ def validar_soma_componentes(
 
     salvar_quarentena(
         divergentes,
-        pasta_auditoria,
-        f"soma_divergente_{prefixo}.csv"
+        diretorio=pasta_auditoria,
+        nome_arquivo=f"soma_divergente_{prefixo}.csv"
     )
 
     log(

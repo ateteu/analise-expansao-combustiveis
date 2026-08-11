@@ -35,7 +35,6 @@ def validar_existencia_em_referencia(
     chaves_df_ref        : list[str],
     diretorio_quarentena : str,
     nome_arquivo         : str,
-    origem               : str | None = None
 ):
     """
     Valida, por comparação de tuplas de chaves compostas, 
@@ -82,7 +81,6 @@ def validar_existencia_em_referencia(
         "Validação referência",
         n_antes,
         len(df_validos),
-        origem
     )
 
     return df_validos

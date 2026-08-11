@@ -1,3 +1,10 @@
+from pathlib import Path
+
+
+# =========================================================
+# CONFIGURAÇÕES
+# =========================================================
+
 SEPARADOR = "=" * 60
 SIMBOLOS = {
     "sucesso" : "✓",
@@ -6,9 +13,13 @@ SIMBOLOS = {
     "nenhum"  : "",
 }
 
+# =========================================================
+# FUNÇÕES
+# =========================================================
 
 def log(
-    mensagem: str,
+    rotulo: str,
+    mensagem: str | Path = None,
     tipo: str = "nenhum",
     separador_antes: bool = False,
     separador_depois: bool = False,
@@ -16,26 +27,31 @@ def log(
     """
     Exibe uma mensagem padronizada no console.
 
-    O argumento 'tipo' ("sucesso", "erro", "aviso" e "nenhum" (padrão)) 
+    - O argumento 'tipo' ("sucesso", "erro", "aviso" e "nenhum" (padrão))
     determina o símbolo utilizado.
-
-    Os separadores antes e depois são opcionais.
+    - Quando 'rotulo' é informado, ele é alinhado à esquerda antes
+    do separador ':'.
+    - Os separadores antes e depois são opcionais.
     """
     if tipo not in SIMBOLOS:
         raise ValueError(
             f"Tipo de log inválido: '{tipo}'. "
-            f"Use: {list(SIMBOLOS.keys())}"
+            f"Use um destes: {list(SIMBOLOS.keys())}"
         )
 
     if separador_antes:
         print(SEPARADOR)
 
     simbolo = SIMBOLOS[tipo]
+    prefixo = f"{simbolo} " if simbolo else ""
 
-    if simbolo:
-        print(f"{simbolo} {mensagem}")
+    # Printa "rotulo : mensagem"
+    if mensagem is not None:
+        print(f"{prefixo}{rotulo:<25}: {mensagem}")
+
+    # Printa "rotulo"
     else:
-        print(mensagem)
+        print(f"{prefixo}{rotulo}")
 
     if separador_depois:
         print(SEPARADOR)
@@ -45,31 +61,15 @@ def log_etapa(
     nome: str,
     antes: int,
     depois: int,
-    origem: str | None = None,
 ) -> None:
     """
     Registra uma etapa de processamento mostrando a variação
     no número de registros e a quantidade descartada.
     """
     descartadas = antes - depois
-    prefixo = f"[{origem}] " if origem else ""
 
     log(
-        f"{prefixo}{nome}: "
-        f"{antes} → {depois} "
-        f"({descartadas} descartadas)",
+        rotulo=f"{nome}",
+        mensagem=f"{antes} → {depois} ({descartadas} descartadas)",
         tipo="sucesso",
     )
-
-
-def log_resumo_item(
-    rotulo: str,
-    valor,
-    separador_final: bool = False,
-) -> None:
-    """
-    Exibe um item do resumo final de um pipeline.
-    """
-    print(f"  {rotulo:<22}: {valor}") # Deixa os ":" alinhados
-    if separador_final:
-        print(SEPARADOR)
