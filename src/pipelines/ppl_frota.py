@@ -49,6 +49,10 @@ from utils.auditoria           import (
     identificar_outliers,
     validar_soma_componentes,
 )
+from utils.log                 import (
+    log,
+    log_resumo_item,
+)
 
 
 # =========================================================
@@ -57,14 +61,14 @@ from utils.auditoria           import (
 
 UFS_VALIDAS = set(MAPA_UF_SIGLA.values())
 
-# Nomes das colunas na tabela de referência de municípios usados para o join.
-# Ajustar aqui se o output do pipeline de municípios usar nomes diferentes.
+# Nomes das colunas na tabela de referência de municípios usados para o join
+# Ajustar se o output do pipeline de municípios usar nomes diferentes
 COL_REF_SIGLA_UF  = "sigla_uf"
 COL_REF_NOME_MUN  = "nome_municipio"
 
 
 # =========================================================
-# FUNÇÕES DE APOIO
+# FUNÇÕES AUXILIARES
 # =========================================================
 
 def _encontrar_linha_cabecalho(df_bruto: pd.DataFrame) -> int:
@@ -80,6 +84,7 @@ def _encontrar_linha_cabecalho(df_bruto: pd.DataFrame) -> int:
             and valores.str.contains("TOTAL", na=False).any()
         ):
             return indice
+    
     raise ValueError("Cabeçalho não encontrado no arquivo.")
 
 
@@ -91,6 +96,7 @@ def _remover_linhas_invalidas(df: pd.DataFrame) -> pd.DataFrame:
     df = df[df["uf"].notna()]
     df = df[df["uf"].astype(str).str.upper() != "UF"]
     df = df[df["uf"].astype(str).str.len() == 2]
+
     return df.copy()
 
 
@@ -115,11 +121,20 @@ def _preparar_referencia_municipios(df_municipios: pd.DataFrame) -> pd.DataFrame
     garantindo que ambos os lados do merge sejam comparáveis.
     """
     ref = df_municipios[[COL_REF_SIGLA_UF, COL_REF_NOME_MUN, "id_municipio"]].copy()
+
     ref[COL_REF_NOME_MUN] = ref[COL_REF_NOME_MUN].apply(
-        lambda x: normalizar_texto(x, remover_acentos=True, maiusculo=True)
+        lambda x: normalizar_texto(
+            x,
+            remover_acentos=True,
+            maiusculo=True
+        )
     )
     ref[COL_REF_SIGLA_UF] = ref[COL_REF_SIGLA_UF].apply(
-        lambda x: normalizar_texto(x, remover_acentos=False, maiusculo=True)
+        lambda x: normalizar_texto(
+            x,
+            remover_acentos=False,
+            maiusculo=True
+        )
     )
     return ref
 
@@ -163,11 +178,13 @@ def processar_arquivo(
     ano = extrair_ano(caminho.name)
     aba = NOME_ABA_FROTA_2015 if ano == 2015 else 0
 
-    # Leitura em dois passos: primeiro para localizar o cabeçalho, depois para ler os dados
+    # Primeiro localizar o cabeçalho, depois para ler os dados
     try:
         df_bruto = ler_excel(caminho, aba=aba, cabecalho=None)
         linha_cab = _encontrar_linha_cabecalho(df_bruto)
+        
         df = ler_excel(caminho, aba=aba, pular_linhas=linha_cab)
+
     except Exception as e:
         raise RuntimeError(f"Erro ao ler [{caminho.name}]: {e}")
 
@@ -175,44 +192,92 @@ def processar_arquivo(
 
     # Normaliza nomes das colunas para snake_case sem acentos
     df.columns = df.columns.map(
-        lambda col: normalizar_texto(col, separador="_", maiusculo=False)
+        lambda col: normalizar_texto(
+            col, 
+            separador="_",
+            maiusculo=False
+        )
     )
 
     df = _remover_linhas_invalidas(df)
-
-    validar_esquema(df.drop(columns=["ano"]), esperado=ESQUEMA_FROTA, origem=origem)
-
-    # Normaliza uf e municipio para comparação — mesma lógica usada na referência do IBGE
+    validar_esquema(
+        df.drop(columns=["ano"]),
+        esperado=ESQUEMA_FROTA,
+        origem=origem
+    )
+    
+    # Normaliza uf e municipio para comparação
     df = colunas_para_string(df, ["uf", "municipio"])
+
     df["uf"] = df["uf"].apply(
-        lambda x: normalizar_texto(x, remover_acentos=False, maiusculo=True, strings_nulas=STRINGS_NULAS)
+        lambda x: normalizar_texto(
+            x,
+            remover_acentos=False,
+            maiusculo=True,
+            strings_nulas=STRINGS_NULAS
+        )
     )
     df["municipio"] = df["municipio"].apply(
-        lambda x: normalizar_texto(x, remover_acentos=True, maiusculo=True, strings_nulas=STRINGS_NULAS)
+        lambda x: normalizar_texto(
+            x,
+            remover_acentos=True,
+            maiusculo=True,
+            strings_nulas=STRINGS_NULAS
+        )
     )
 
     df = colunas_para_inteiro(df, COLUNAS_INT_FROTA)
 
-    # Remove linhas sem as informações mínimas de localização e tempo
-    df = separar_nulos(df, colunas=COLUNAS_CRITICAS_FROTA, pasta_auditoria=AUDITORIA_FROTA, prefixo=origem)
-
-    df = validar_dominio(df, coluna="uf", valores_validos=UFS_VALIDAS, pasta_auditoria=AUDITORIA_FROTA, prefixo=origem)
-    df = validar_dominio(df, coluna="uf", valores_validos=UFS_ESCOPO,  pasta_auditoria=AUDITORIA_FROTA, prefixo=f"{origem}_escopo")
-    df = validar_intervalo(df, coluna="ano", minimo=ANO_INICIO_ESCOPO_PROJETO, maximo=ANO_FIM_ESCOPO_PROJETO, pasta_auditoria=AUDITORIA_FROTA, prefixo=origem)
+    df = separar_nulos(
+        df,
+        colunas=COLUNAS_CRITICAS_FROTA,
+        pasta_auditoria=AUDITORIA_FROTA,
+        prefixo=origem
+    )
+    df = validar_dominio(
+        df,
+        coluna="uf",
+        valores_validos=UFS_VALIDAS,
+        pasta_auditoria=AUDITORIA_FROTA,
+        prefixo=origem
+    )
+    df = validar_dominio(
+        df,
+        coluna="uf",
+        valores_validos=UFS_ESCOPO,
+        pasta_auditoria=AUDITORIA_FROTA,
+        prefixo=f"{origem}_escopo"
+    )
+    df = validar_intervalo(
+        df,
+        coluna="ano",
+        minimo=ANO_INICIO_ESCOPO_PROJETO,
+        maximo=ANO_FIM_ESCOPO_PROJETO,
+        pasta_auditoria=AUDITORIA_FROTA,
+        prefixo=origem
+    )
 
     # Corrige grafias erradas antes do join com o IBGE
     df = _corrigir_municipios(df)
     df = _mapear_id_municipio(df, ref_municipios)
 
     # Linhas sem correspondência no IBGE vão para quarentena
-    df = separar_nulos(df, colunas=["id_municipio"], pasta_auditoria=AUDITORIA_FROTA, prefixo=f"{origem}_sem_ibge")
-
-    # UF e municipio não são mais necessários: id_municipio é a chave final
+    df = separar_nulos(
+        df,
+        colunas=["id_municipio"],
+        pasta_auditoria=AUDITORIA_FROTA,
+        prefixo=f"{origem}_sem_ibge"
+    )
+    
+    # UF e municipio não são mais necessários
     df = selecionar_colunas(df, COLUNAS_SAIDA_FROTA)
 
-    df = tratar_duplicidades(df, COLUNAS_IDENTIFICADORAS_FROTA, AUDITORIA_FROTA, origem)
-
-    print(f"  ✓ [{origem}] Linhas aprovadas: {len(df)}")
+    df = tratar_duplicidades(
+        df,
+        COLUNAS_IDENTIFICADORAS_FROTA,
+        AUDITORIA_FROTA,
+        origem
+    )
     return df
 
 
@@ -222,36 +287,40 @@ def processar_arquivo(
 
 def executar_ppl_frota() -> None:
     """
-    Pipeline completo de frota: lê os arquivos anuais do DENATRAN/SENATRAN,
-    padroniza, consolida e salva o CSV final com uma linha por ano × município.
+    Executa o pipeline completo de limpeza dos dados de frota.
     """
-    # Carrega e prepara a referência de municípios uma única vez
+    log("PIPELINE FROTA", separador_depois=True)
+
     try:
         df_municipios = ler_csv(ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE)
+    
     except Exception as e:
-        raise RuntimeError(f"Falha ao carregar base de referência de municípios: {e}")
+        raise RuntimeError(
+            f"Falha ao carregar base de referência de municípios: {e}"
+        )
 
     ref_municipios = _preparar_referencia_municipios(df_municipios)
 
     # Lista e processa cada arquivo de frota individualmente
     arquivos = listar_arquivos(CAMINHO_FROTA_SENATRAN)
     if not arquivos:
-        raise FileNotFoundError(f"Nenhum arquivo de frota encontrado em: {CAMINHO_FROTA_SENATRAN}")
-
-    print(f"\n{'='*60}")
-    print(f"PIPELINE DE FROTA — {len(arquivos)} arquivo(s) encontrado(s)")
-    print(f"{'='*60}")
+        raise FileNotFoundError(
+            f"Nenhum arquivo de frota encontrado em: {CAMINHO_FROTA_SENATRAN}"
+        )
 
     dfs = []
     for arquivo in arquivos:
         try:
             df = processar_arquivo(arquivo, ref_municipios)
             dfs.append(df)
+        
         except Exception as e:
-            print(f"  ✗ Erro em [{arquivo.name}]: {e}")
+            log(f"Erro em [{arquivo.name}]: {e}", tipo="erro")
 
     if not dfs:
-        raise RuntimeError("Nenhum arquivo de frota foi processado com sucesso.")
+        raise RuntimeError(
+            "Nenhum arquivo de frota foi processado com sucesso."
+        )
 
     # Consolida todos os anos em um único DataFrame
     df_final = concatenar(dfs)
@@ -266,7 +335,12 @@ def executar_ppl_frota() -> None:
         prefixo="consolidado",
     )
 
-    identificar_outliers(df_final, coluna="total", pasta_auditoria=AUDITORIA_FROTA, sufixo="_consolidado")
+    identificar_outliers(
+        df_final,
+        coluna="total",
+        pasta_auditoria=AUDITORIA_FROTA,
+        sufixo="_consolidado"
+    )
 
     # Verificação final de unicidade da chave de negócio
     n_dupl = df_final.duplicated(subset=COLUNAS_IDENTIFICADORAS_FROTA).sum()
@@ -278,18 +352,16 @@ def executar_ppl_frota() -> None:
 
     try:
         salvar_csv(df_final, DADOS_MODIFICADOS, "frota.csv")
+    
     except Exception as e:
         raise RuntimeError(f"Falha ao salvar output final: {e}")
 
-    print(f"\n{'='*60}")
-    print("PROCESSAMENTO FINALIZADO")
-    print(f"{'='*60}")
-    print(f"  Total de linhas finais : {len(df_final)}")
-    print(f"  Anos cobertos          : {int(df_final['ano'].min())} – {int(df_final['ano'].max())}")
-    print(f"  Municípios distintos   : {df_final['id_municipio'].nunique()}")
-    print(f"  Arquivo salvo em       : {DADOS_MODIFICADOS / 'frota.csv'}")
-    print(f"  Quarentena/auditoria   : {AUDITORIA_FROTA}/")
-    print(f"{'='*60}")
+    log("PROCESSAMENTO FINALIZADO", separador_depois=True)
+    log_resumo_item("Total de linhas finais", len(df_final))
+    log_resumo_item("Anos cobertos", int(df_final['ano'].min()) - int(df_final['ano'].max()))
+    log_resumo_item("Municípios distintos", df_final['id_municipio'].nunique())
+    log_resumo_item("Arquivo salvo em", DADOS_MODIFICADOS / "frota.csv")
+    log_resumo_item("Quarentena/auditoria", AUDITORIA_FROTA / "", separador_final=True)
 
 
 if __name__ == "__main__":

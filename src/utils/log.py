@@ -1,44 +1,41 @@
 SEPARADOR = "=" * 60
+SIMBOLOS = {
+    "sucesso" : "✓",
+    "erro"    : "✗",
+    "aviso"   : "⚠",
+    "nenhum"  : "",
+}
 
 
 def log(
     mensagem: str,
-    valor=None,
-    simbolo: str | None = None,
+    tipo: str = "nenhum",
     separador_antes: bool = False,
     separador_depois: bool = False,
 ) -> None:
     """
-    Exibe uma mensagem padronizada.
+    Exibe uma mensagem padronizada no console.
 
-    Parâmetros
-    ----------
-    mensagem:
-        Texto principal.
+    O argumento 'tipo' ("sucesso", "erro", "aviso" e "nenhum" (padrão)) 
+    determina o símbolo utilizado.
 
-    valor:
-        Valor opcional exibido após ':'.
-
-    simbolo:
-        Símbolo opcional exibido antes da mensagem
-        (ex.: '✓', '⚠', '✗').
-
-    separador_antes:
-        Exibe uma linha separadora antes da mensagem.
-
-    separador_depois:
-        Exibe uma linha separadora após a mensagem.
+    Os separadores antes e depois são opcionais.
     """
+    if tipo not in SIMBOLOS:
+        raise ValueError(
+            f"Tipo de log inválido: '{tipo}'. "
+            f"Use: {list(SIMBOLOS.keys())}"
+        )
 
     if separador_antes:
-        print(f"\n{SEPARADOR}")
+        print(SEPARADOR)
 
-    prefixo = f"{simbolo} " if simbolo else ""
+    simbolo = SIMBOLOS[tipo]
 
-    if valor is None:
-        print(f"{prefixo}{mensagem}")
+    if simbolo:
+        print(f"{simbolo} {mensagem}")
     else:
-        print(f"{prefixo}{mensagem}: {valor}")
+        print(mensagem)
 
     if separador_depois:
         print(SEPARADOR)
@@ -48,25 +45,31 @@ def log_etapa(
     nome: str,
     antes: int,
     depois: int,
-    origem: str = "",
-    descricao: str = "descartadas",
+    origem: str | None = None,
 ) -> None:
     """
-    Exibe o resultado de uma etapa que altera a quantidade de registros.
+    Registra uma etapa de processamento mostrando a variação
+    no número de registros e a quantidade descartada.
     """
-
+    descartadas = antes - depois
     prefixo = f"[{origem}] " if origem else ""
 
-    print(
-        f"✓ {prefixo}{nome}: "
+    log(
+        f"{prefixo}{nome}: "
         f"{antes} → {depois} "
-        f"({antes - depois} {descricao})"
+        f"({descartadas} descartadas)",
+        tipo="sucesso",
     )
 
 
-def log_resumo_item(rotulo: str, valor) -> None:
+def log_resumo_item(
+    rotulo: str,
+    valor,
+    separador_final: bool = False,
+) -> None:
     """
-    Exibe um item alinhado do resumo final.
+    Exibe um item do resumo final de um pipeline.
     """
-
-    print(f"  {rotulo:<22}: {valor}")
+    print(f"  {rotulo:<22}: {valor}") # Deixa os ":" alinhados
+    if separador_final:
+        print(SEPARADOR)

@@ -30,6 +30,10 @@ from configs.constantes        import (
     INDICE_CABECALHO_IBGE, 
     STRINGS_NULAS,
 )
+from utils.log                 import (
+    log,
+    log_resumo_item,
+)
 
 
 # =========================================================
@@ -205,16 +209,13 @@ def executar_ppl_municipios() -> None:
     except Exception as e:
         raise RuntimeError(f"Falha ao salvar output final: {e}")
 
-    print(f"\n{'='*60}")
-    print("PROCESSAMENTO FINALIZADO")
-    print(f"{'='*60}")
+    log("PROCESSAMENTO FINALIZADO", separador_depois=True)
     print(f"  Total de municípios    : {len(df)}")
     print(f"  UFs presentes          : {sorted(df['id_uf'].unique())}")
     print(f"  Regiões intermediárias : {df['id_regiao_intermediaria'].nunique()}")
     print(f"  Regiões imediatas      : {df['id_regiao_imediata'].nunique()}")
     print(f"  Arquivo salvo em       : {ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE}")
-    print(f"  Quarentena/auditoria   : {AUDITORIA_MUNICIPIOS}/")
-    print(f"{'='*60}")
+    log_resumo_item("Quarentena/auditoria", AUDITORIA_MUNICIPIOS / "", separador_final=True)
 
 
 if __name__ == "__main__":

@@ -45,10 +45,14 @@ from utils.auditoria           import (
     validar_soma_componentes,
     identificar_outliers,
 )
+from utils.log                 import (
+    log,
+    log_resumo_item,
+)
 
 
 # =========================================================
-# FUNÇÕES DE APOIO
+# FUNÇÕES AUXILIARES
 # =========================================================
 
 def carregar_dados() -> pd.DataFrame:
@@ -147,6 +151,7 @@ def executar_ppl_dados_economicos() -> None:
     """
     Executa o pipeline completo de limpeza dos dados econômicos do IBGE.
     """
+    log("PIPELINE DADOS ECONÔMICOS", separador_depois=True)
     try:
         df_municipios = ler_csv(ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE)
         df = carregar_dados()
@@ -154,7 +159,7 @@ def executar_ppl_dados_economicos() -> None:
     except Exception as e:
         raise RuntimeError(f"Falha ao carregar base de dados: {e}")
 
-    print(f"Registros lidos: {len(df)}")
+    log(f"Registros lidos: {len(df)}", tipo="sucesso")
 
     # Garante que o arquivo de origem não mudou de formato
     validar_esquema(df, MAPA_DADOS_ECONOMICOS.keys())
@@ -193,7 +198,7 @@ def executar_ppl_dados_economicos() -> None:
         prefixo=origem
     )
 
-    # Auditoria não bloqueante: VAB total deveria ~= soma dos componentes setoriais
+    # Auditoria não bloqueante: VAB total ~= soma dos componentes setoriais
     validar_soma_componentes(
         df, 
         coluna_total="vab_total", 
@@ -227,15 +232,12 @@ def executar_ppl_dados_economicos() -> None:
     except Exception as e:
         raise RuntimeError(f"Falha ao salvar output final: {e}")
 
-    print(f"\n{'='*60}")
-    print("PROCESSAMENTO FINALIZADO")
-    print(f"{'='*60}")
-    print(f"  Total de linhas finais : {len(df)}")
-    print(f"  Anos cobertos          : {int(df['ano'].min())} - {int(df['ano'].max())}")
-    print(f"  Municípios distintos   : {df['id_municipio'].nunique()}")
-    print(f"  Arquivo salvo em       : {DADOS_MODIFICADOS / 'dados_economicos_ibge.csv'}")
-    print(f"  Quarentena/auditoria   : {AUDITORIA_DADOS_ECONOMICOS}/")
-    print(f"{'='*60}")
+    log("PROCESSAMENTO FINALIZADO", separador_depois=True)
+    log_resumo_item("Total de linhas finais", len(df))
+    log_resumo_item("Anos cobertos", int(df['ano'].min()) - int(df['ano'].max()))
+    log_resumo_item("Municípios distintos", df['id_municipio'].nunique())
+    log_resumo_item("Arquivo salvo em", DADOS_MODIFICADOS / "dados_economicos_ibge.csv")
+    log_resumo_item("Quarentena/auditoria", AUDITORIA_DADOS_ECONOMICOS / "", separador_final=True)
 
 
 if __name__ == "__main__":

@@ -34,6 +34,11 @@ from utils.auditoria           import (
     validar_intervalo,
     tratar_duplicidades,
 )
+from utils.log                 import (
+    log,
+    log_etapa,
+    log_resumo_item,
+)
 
 
 # =========================================================
@@ -121,7 +126,10 @@ def validar_com_municipios(df, df_ref, origem):
 # =========================================================
 
 def executar_ppl_coordenadas():
-
+    """
+    Executa o pipeline completo de limpeza dos dados de coordenadas.
+    """
+    log("PIPELINE COORDENADAS", separador_depois=True)
     try:
 
         df = ler_csv(
@@ -135,7 +143,7 @@ def executar_ppl_coordenadas():
     except Exception as e:
         raise RuntimeError(f"Erro ao carregar bases: {e}")
 
-    print(f"Registros lidos: {len(df)}")
+    log(f"Registros lidos: {len(df)}", tipo="sucesso")
 
     validar_esquema(
         df,
@@ -151,11 +159,20 @@ def executar_ppl_coordenadas():
 
     df = limpar_textos(df)
     df = converter_tipos(df)
+
+    tamanho_df_antes = len(df)
     df = separar_nulos(
         df,
         colunas=COLUNAS_CRITICAS_COORD_MUNICIPIOS,
         pasta_auditoria=AUDITORIA_COORD_MUNICIPIOS,
         prefixo=origem,
+    )
+    
+    log_etapa(
+        "Separação de nulos",
+        tamanho_df_antes,
+        len(df),
+        origem=origem,
     )
 
     df = aplicar_regras(
@@ -198,13 +215,10 @@ def executar_ppl_coordenadas():
         nome_arquivo="coordenadas_municipios.csv",
     )
 
-    print(f"\n{'='*60}")
-    print("PROCESSAMENTO FINALIZADO")
-    print(f"{'='*60}")
-    print(f"  Total de municípios : {len(df)}")
-    print(f"  Arquivo salvo em    : {ARQUIVO_CONSOLIDADO_COORD}")
-    print(f"  Auditoria           : {AUDITORIA_COORD_MUNICIPIOS}/")
-    print(f"{'='*60}")
+    log("PROCESSAMENTO FINALIZADO", separador_antes=True)
+    log_resumo_item("Total de municípios", len(df))
+    log_resumo_item("Arquivo salvo em", ARQUIVO_CONSOLIDADO_COORD)
+    log_resumo_item("Auditoria", f"{AUDITORIA_COORD_MUNICIPIOS}/", True)
 
 
 if __name__ == "__main__":

@@ -3,17 +3,11 @@ import pandas as pd
 from typing                  import Sequence
 from re                      import Pattern
 from arquivos.salvar_arquivo import salvar_quarentena
-from utils.log               import log_etapa
+from utils.log               import (
+    log, 
+    log_etapa,
+)
 
-
-# Funções genéricas de auditoria e qualidade de dados.
-
-# Convenções das funções implementadas nesse arquivo:
-# - Recebem um DataFrame e retornam o DataFrame filtrado (apenas linhas válidas).
-# - Linhas descartadas são salvas em quarentena antes da remoção.
-# - Logam o número de linhas descartadas em cada etapa.
-
-# ============================================================
 
 def separar_nulos(
     df              : pd.DataFrame,
@@ -26,15 +20,15 @@ def separar_nulos(
     Retorna apenas as linhas válidas.
     """
     n_antes = len(df)
-    mask_nulos = df[colunas].isnull().any(axis=1)
+    linhas_com_nulos = df[colunas].isnull().any(axis=1)
 
     salvar_quarentena(
-        df[mask_nulos].copy(), 
-        pasta_auditoria, 
+        df[linhas_com_nulos].copy(),
+        pasta_auditoria,
         f"nulos_{prefixo}.csv"
     )
 
-    df = df[~mask_nulos].copy()
+    df = df[~linhas_com_nulos].copy()
     log_etapa("Nulos críticos", n_antes, len(df), prefixo)
 
     return df
@@ -51,20 +45,20 @@ def validar_regex(
 ) -> pd.DataFrame:
     """
     Mantém apenas linhas onde a coluna corresponde ao padrão regex
-    (padrão regex esperado (ex: r'^\d{7}$')).
+    (padrão regex esperado (ex: r'^\\d{7}$')).
 
     Linhas fora do padrão vão para quarentena.
     """
     n_antes = len(df)
-    mask = df[coluna].str.match(regex, na=False)
+    linhas_validas = df[coluna].str.match(regex, na=False)
 
     salvar_quarentena(
-        df[~mask].copy(), 
-        pasta_auditoria, 
+        df[~linhas_validas].copy(),
+        pasta_auditoria,
         f"formato_{coluna}_{prefixo}.csv"
     )
 
-    df = df[mask].copy()
+    df = df[linhas_validas].copy()
     log_etapa(f"Formato {coluna}", n_antes, len(df), prefixo)
 
     return df
@@ -84,15 +78,15 @@ def validar_dominio(
     Linhas fora do domínio vão para quarentena.
     """
     n_antes = len(df)
-    mask = df[coluna].isin(valores_validos)
+    linhas_validas = df[coluna].isin(valores_validos)
 
     salvar_quarentena(
-        df[~mask].copy(), 
-        pasta_auditoria, 
+        df[~linhas_validas].copy(),
+        pasta_auditoria,
         f"dominio_{coluna}_{prefixo}.csv"
     )
 
-    df = df[mask].copy()
+    df = df[linhas_validas].copy()
     log_etapa(f"Domínio {coluna}", n_antes, len(df), prefixo)
 
     return df
@@ -113,15 +107,15 @@ def validar_intervalo(
     Linhas fora do intervalo vão para quarentena.
     """
     n_antes = len(df)
-    mask = df[coluna].between(minimo, maximo)
+    linhas_validas = df[coluna].between(minimo, maximo)
 
     salvar_quarentena(
-        df[~mask].copy(), 
-        pasta_auditoria, 
+        df[~linhas_validas].copy(),
+        pasta_auditoria,
         f"fora_intervalo_{coluna}_{prefixo}.csv"
     )
 
-    df = df[mask].copy()
+    df = df[linhas_validas].copy()
     log_etapa(f"Intervalo {coluna}", n_antes, len(df), prefixo)
 
     return df
@@ -141,15 +135,15 @@ def validar_minimo(
     Linhas abaixo do mínimo vão para quarentena.
     """
     n_antes = len(df)
-    mask = df[coluna] >= minimo
+    linhas_validas = df[coluna] >= minimo
 
     salvar_quarentena(
-        df[~mask].copy(),
-        pasta_auditoria, 
+        df[~linhas_validas].copy(),
+        pasta_auditoria,
         f"abaixo_minimo_{coluna}_{prefixo}.csv"
     )
 
-    df = df[mask].copy()
+    df = df[linhas_validas].copy()
     log_etapa(f"Mínimo {coluna}", n_antes, len(df), prefixo)
 
     return df
@@ -174,24 +168,24 @@ def tratar_duplicidades(
     """
     n_antes = len(df)
 
-    mask_exatas = df.duplicated(keep=False)
+    linhas_duplicadas_exatas = df.duplicated(keep=False)
 
     salvar_quarentena(
-        df[mask_exatas].copy(), 
-        pasta_auditoria, 
+        df[linhas_duplicadas_exatas].copy(),
+        pasta_auditoria,
         f"duplicatas_exatas_{prefixo}.csv"
     )
 
     df = df.drop_duplicates(keep="first").copy()
-    mask_logicas = df.duplicated(subset=chave_logica, keep=False)
+    linhas_duplicadas_logicas = df.duplicated(subset=chave_logica, keep=False)
 
     salvar_quarentena(
-        df[mask_logicas].copy(), 
-        pasta_auditoria, 
+        df[linhas_duplicadas_logicas].copy(),
+        pasta_auditoria,
         f"duplicatas_logicas_{prefixo}.csv"
     )
 
-    df = df[~mask_logicas].copy()
+    df = df[~linhas_duplicadas_logicas].copy()
     log_etapa("Deduplicação", n_antes, len(df), prefixo)
 
     return df
@@ -217,16 +211,24 @@ def validar_consistencia_grupo(
 
     if not ids_inconsistentes.empty:
         inconsistencias = df[df[coluna_id].isin(ids_inconsistentes)].copy()
-        print(
-            f"  ⚠  [{prefixo}] {len(ids_inconsistentes)} IDs com {coluna_grupo} inconsistente."
+
+        log(
+            f"[{prefixo}] {len(ids_inconsistentes)} IDs com "
+            f"{coluna_grupo} inconsistente.",
+            tipo="aviso",
         )
+
         salvar_quarentena(
             inconsistencias,
             pasta_auditoria,
             f"inconsistencia_{coluna_id}_{coluna_grupo}_{prefixo}.csv",
         )
     else:
-        print(f"✓ [{prefixo}] Consistência [{coluna_grupo}] x [{coluna_id}]: OK")
+        log(
+            f"[{prefixo}] Consistência "
+            f"[{coluna_grupo}] x [{coluna_id}]: OK",
+            tipo="sucesso",
+        )
 
 
 # ============================================================
@@ -249,14 +251,18 @@ def identificar_outliers(
     suspeitos = df[df[coluna] > limiar].copy()
 
     salvar_quarentena(
-        suspeitos, 
-        pasta_auditoria, 
+        suspeitos,
+        pasta_auditoria,
         f"outliers_p{int(percentil * 100)}{sufixo}.csv"
     )
 
-    print(
-        f"P{int(percentil * 100)} {coluna}: {limiar:,.2f} - {len(suspeitos)} linhas acima do limiar"
+    log(
+        f"P{int(percentil * 100)} {coluna}: "
+        f"{limiar:,.2f} - "
+        f"{len(suspeitos)} linhas acima do limiar",
+        tipo="aviso",
     )
+
 
 # ============================================================
 
@@ -273,20 +279,32 @@ def validar_soma_componentes(
     Só avalia linhas onde total e todos os componentes estão presentes —
     dados suprimidos/ausentes não geram falso positivo.
     """
-    linhas_completas = df.dropna(subset=[coluna_total, *colunas_componentes])
+    linhas_completas = df.dropna(
+        subset=[coluna_total, *colunas_componentes]
+    )
+
     if linhas_completas.empty:
         return
 
     soma = linhas_completas[list(colunas_componentes)].sum(axis=1)
+
     diferenca_relativa = (
         (linhas_completas[coluna_total] - soma).abs()
         / linhas_completas[coluna_total].replace(0, pd.NA)
     )
 
-    divergentes = linhas_completas[diferenca_relativa.fillna(0) > tolerancia].copy()
-    salvar_quarentena(divergentes, pasta_auditoria, f"soma_divergente_{prefixo}.csv")
+    divergentes = linhas_completas[
+        diferenca_relativa.fillna(0) > tolerancia
+    ].copy()
 
-    print(
+    salvar_quarentena(
+        divergentes,
+        pasta_auditoria,
+        f"soma_divergente_{prefixo}.csv"
+    )
+
+    log(
         f"[{prefixo}] {len(divergentes)} linhas com soma de componentes "
-        f"divergente do total (tolerância {tolerancia:.0%})"
+        f"divergente do total (tolerância {tolerancia:.0%})",
+        tipo="aviso",
     )
