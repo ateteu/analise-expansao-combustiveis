@@ -4,8 +4,8 @@ from arquivos.ler_arquivo      import ler_excel, ler_csv
 from arquivos.salvar_arquivo   import salvar_csv
 from configs.caminhos          import (
     ARQUIVO_DADOS_ECONOMICOS,
+    ARQUIVO_CONSOLIDADO_DADOS_ECONOMICOS,
     ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE,
-    DADOS_MODIFICADOS,
     AUDITORIA_DADOS_ECONOMICOS, 
 )
 from configs.mapeamentos       import MAPA_DADOS_ECONOMICOS
@@ -47,30 +47,12 @@ from utils.auditoria           import (
 )
 from utils.log                 import (
     log,
-    log_resumo_item,
 )
 
 
 # =========================================================
 # FUNÇÕES AUXILIARES
 # =========================================================
-
-def carregar_dados() -> pd.DataFrame:
-    """
-    Lê a planilha de dados econômicos do IBGE, restringindo às colunas mapeadas.
-    """
-    return ler_excel(
-        caminho=ARQUIVO_DADOS_ECONOMICOS,
-        usar_colunas=list(MAPA_DADOS_ECONOMICOS.keys()),
-    )
-
-
-def padronizar_colunas(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Renomeia as colunas conforme o mapeamento padrão.
-    """
-    return renomear_colunas(df, MAPA_DADOS_ECONOMICOS)
-
 
 def limpar_textos(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -128,21 +110,6 @@ def aplicar_regras_de_dominio(df: pd.DataFrame, origem: str = "") -> pd.DataFram
 
     return df
 
-
-def validar_com_municipios(df: pd.DataFrame, df_municipios: pd.DataFrame, origem: str = "") -> pd.DataFrame:
-    """
-    Valida se o id_municipio existe na base de referência do IBGE.
-    """
-    return validar_existencia_em_referencia(
-        df=df,
-        df_ref=df_municipios,
-        chaves_df=["id_municipio"],
-        chaves_df_ref=["id_municipio"],
-        diretorio_quarentena=AUDITORIA_DADOS_ECONOMICOS,
-        nome_arquivo=f"fora_ibge_{origem}.csv",
-        origem=origem,
-    )
-
 # =========================================================
 # EXECUÇÃO PRINCIPAL
 # =========================================================
@@ -151,21 +118,25 @@ def executar_ppl_dados_economicos() -> None:
     """
     Executa o pipeline completo de limpeza dos dados econômicos do IBGE.
     """
-    log("PIPELINE DADOS ECONÔMICOS", separador_depois=True)
+    log("PIPELINE DADOS ECONÔMICOS\n", separador_antes=True)
+
     try:
         df_municipios = ler_csv(ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE)
-        df = carregar_dados()
+        df = ler_excel(
+            caminho=ARQUIVO_DADOS_ECONOMICOS,
+            usar_colunas=list(MAPA_DADOS_ECONOMICOS.keys()),
+        )
     
     except Exception as e:
         raise RuntimeError(f"Falha ao carregar base de dados: {e}")
 
-    log(f"Registros lidos: {len(df)}", tipo="sucesso")
+    log("Registros lidos", len(df), tipo="sucesso")
 
     # Garante que o arquivo de origem não mudou de formato
     validar_esquema(df, MAPA_DADOS_ECONOMICOS.keys())
 
     # Padronização estrutural: nomes de coluna, texto e tipos
-    df = padronizar_colunas(df)
+    df = renomear_colunas(df, MAPA_DADOS_ECONOMICOS)
     df = limpar_textos(df)
     df = converter_tipos(df)
 
@@ -190,7 +161,14 @@ def executar_ppl_dados_economicos() -> None:
 
     # Validações de consistência e integridade
     df = aplicar_regras_de_dominio(df, origem)
-    df = validar_com_municipios(df, df_municipios, origem)
+    df = validar_existencia_em_referencia(
+        df=df,
+        df_ref=df_municipios,
+        chaves_df=["id_municipio"],
+        chaves_df_ref=["id_municipio"],
+        caminho=AUDITORIA_DADOS_ECONOMICOS / f"fora_ibge_{origem}.csv",
+    )
+
     df = tratar_duplicidades(
         df, 
         chave_logica=["ano", "id_municipio"], 
@@ -207,7 +185,7 @@ def executar_ppl_dados_economicos() -> None:
         prefixo=origem
     )
 
-    identificar_outliers(
+    resultado_outliers = identificar_outliers(
         df, 
         coluna="pib_per_capita", 
         pasta_auditoria=AUDITORIA_DADOS_ECONOMICOS, 
@@ -227,17 +205,28 @@ def executar_ppl_dados_economicos() -> None:
         )
 
     try:
-        salvar_csv(df, DADOS_MODIFICADOS, "dados_economicos_ibge.csv")
+        salvar_csv(df, ARQUIVO_CONSOLIDADO_DADOS_ECONOMICOS)
     
     except Exception as e:
         raise RuntimeError(f"Falha ao salvar output final: {e}")
 
-    log("PROCESSAMENTO FINALIZADO", separador_depois=True)
-    log_resumo_item("Total de linhas finais", len(df))
-    log_resumo_item("Anos cobertos", int(df['ano'].min()) - int(df['ano'].max()))
-    log_resumo_item("Municípios distintos", df['id_municipio'].nunique())
-    log_resumo_item("Arquivo salvo em", DADOS_MODIFICADOS / "dados_economicos_ibge.csv")
-    log_resumo_item("Quarentena/auditoria", AUDITORIA_DADOS_ECONOMICOS / "", separador_final=True)
+    # Printa a mensagem final de resumo do pipeline
+    log("Processamento finalizado:\n", separador_interno_antes=True)
+    log("Total de registros finais", len(df))
+    log(
+        "Anos cobertos", 
+        f"{int(df['ano'].min())} a {int(df['ano'].max())}"
+    )
+    if resultado_outliers is not None:
+        limiar, quantidade = resultado_outliers
+        log(
+            f"P99 pib_per_capita",
+            f"{limiar:,.2f} ({quantidade} linhas acima do limiar)",
+            tipo="aviso",
+        )
+    log("Municípios distintos", df['id_municipio'].nunique())
+    log("Arquivo salvo em", ARQUIVO_CONSOLIDADO_DADOS_ECONOMICOS)
+    log("Auditoria", AUDITORIA_DADOS_ECONOMICOS)
 
 
 if __name__ == "__main__":

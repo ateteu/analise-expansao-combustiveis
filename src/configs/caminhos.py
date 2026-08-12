@@ -31,11 +31,12 @@ ARQUIVO_VENDAS_GASOLINA  = CAMINHO_VENDAS_ANP / "vendas-anuais-de-gasolina-c-por
 
 
 # Arquivos limpos/tratados
-ARQUIVO_CONSOLIDADO_VENDAS_ANP      = DADOS_MODIFICADOS / "vendas_anp.csv"
-ARQUIVO_CONSOLIDADO_FROTA           = DADOS_MODIFICADOS / "frota_senatran.csv"
-ARQUIVO_CONSOLIDADO_PIB             = DADOS_MODIFICADOS / "pib_ibge.csv"
-ARQUIVO_CONSOLIDADO_COORD           = DADOS_MODIFICADOS / "coordenadas_municipios.csv"
-ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE = DADOS_MODIFICADOS / "municipios_ibge.csv"
+ARQUIVO_CONSOLIDADO_VENDAS_ANP       = DADOS_MODIFICADOS / "vendas_anp.csv"
+ARQUIVO_CONSOLIDADO_DADOS_ECONOMICOS = DADOS_MODIFICADOS / "dados_economicos_ibge.csv"
+ARQUIVO_CONSOLIDADO_FROTA            = DADOS_MODIFICADOS / "frota_senatran.csv"
+ARQUIVO_CONSOLIDADO_PIB              = DADOS_MODIFICADOS / "pib_ibge.csv"
+ARQUIVO_CONSOLIDADO_COORD            = DADOS_MODIFICADOS / "coordenadas_municipios.csv"
+ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE  = DADOS_MODIFICADOS / "municipios_ibge.csv"
 
 
 # Arquivos de domínio do projeto

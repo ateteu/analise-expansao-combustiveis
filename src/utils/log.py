@@ -6,6 +6,7 @@ from pathlib import Path
 # =========================================================
 
 SEPARADOR = "=" * 60
+SEPARADOR_INTERNO = "-" * 50
 SIMBOLOS = {
     "sucesso" : "✓",
     "erro"    : "✗",
@@ -23,6 +24,8 @@ def log(
     tipo: str = "nenhum",
     separador_antes: bool = False,
     separador_depois: bool = False,
+    separador_interno_antes: bool = False,
+    separador_interno_depois: bool = False,
 ) -> None:
     """
     Exibe uma mensagem padronizada no console.
@@ -39,11 +42,11 @@ def log(
             f"Use um destes: {list(SIMBOLOS.keys())}"
         )
 
-    if separador_antes:
-        print(SEPARADOR)
+    if separador_antes: print(SEPARADOR)
+    if separador_interno_antes: print(SEPARADOR_INTERNO)
 
     simbolo = SIMBOLOS[tipo]
-    prefixo = f"{simbolo} " if simbolo else ""
+    prefixo = f"{simbolo} " if simbolo else "  "
 
     # Printa "rotulo : mensagem"
     if mensagem is not None:
@@ -53,8 +56,8 @@ def log(
     else:
         print(f"{prefixo}{rotulo}")
 
-    if separador_depois:
-        print(SEPARADOR)
+    if separador_interno_depois: print(SEPARADOR_INTERNO)
+    if separador_depois: print(SEPARADOR)
 
 
 def log_etapa(

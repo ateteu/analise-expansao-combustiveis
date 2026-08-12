@@ -1,5 +1,6 @@
 import pandas as pd
 
+from pathlib                 import Path
 from arquivos.salvar_arquivo import salvar_quarentena
 from utils.log               import log_etapa
 
@@ -29,25 +30,24 @@ def validar_esquema(
 
 
 def validar_existencia_em_referencia(
-    df                   : pd.DataFrame,
-    df_ref               : pd.DataFrame,
-    chaves_df            : list[str],
-    chaves_df_ref        : list[str],
-    diretorio_quarentena : str,
-    nome_arquivo         : str,
+    df             : pd.DataFrame,
+    df_ref         : pd.DataFrame,
+    chaves_df      : list[str],
+    chaves_df_ref  : list[str],
+    caminho        : Path,
 ):
     """
     Valida, por comparação de tuplas de chaves compostas, 
     se combinações de colunas do df existem no df_ref.
-
-    A variável nome_arquivo é obrigatória.
     """
 
     if len(chaves_df) != len(chaves_df_ref):
-        raise ValueError("chaves_df e chaves_df_ref devem ter o mesmo tamanho")
+        raise ValueError(
+            "'chaves_df' e 'chaves_df_ref' devem ter o mesmo tamanho."
+        )
 
-    if not nome_arquivo:
-        raise ValueError("nome_arquivo é obrigatório para quarentena")
+    if not caminho:
+        raise ValueError("É obrigatório informar 'caminho'!")
 
     n_antes = len(df)
 
@@ -56,26 +56,24 @@ def validar_existencia_em_referencia(
         zip(*(df_ref[col] for col in chaves_df_ref))
     )
 
-    # Chaves do df principal
     chaves_df = list(
         zip(*(df[col] for col in chaves_df))
     )
 
-    mask = pd.Series(
+    linhas_com_chave_valida = pd.Series(
         [chave in ref_set for chave in chaves_df],
         index=df.index
     )
 
-    df_invalidos = df[~mask]
+    df_invalidos = df[~linhas_com_chave_valida]
 
     if not df_invalidos.empty:
         salvar_quarentena(
             df_invalidos,
-            diretorio_quarentena,
-            nome_arquivo
+            caminho
         )
 
-    df_validos = df[mask]
+    df_validos = df[linhas_com_chave_valida]
 
     log_etapa(
         "Validação referência",
@@ -84,6 +82,7 @@ def validar_existencia_em_referencia(
     )
 
     return df_validos
+
 
 def validar_unicidade(df: pd.DataFrame, coluna: str) -> None:
     """

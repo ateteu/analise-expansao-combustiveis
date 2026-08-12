@@ -9,7 +9,6 @@ from configs.caminhos          import (
     ARQUIVO_VENDAS_DIESEL,
     ARQUIVO_VENDAS_GASOLINA,
     ARQUIVO_TIPOS_COMBUSTIVEL,
-    DADOS_MODIFICADOS,
 )
 from configs.esquemas          import ESQUEMA_ORIGINAL_VENDAS
 from configs.constantes        import (
@@ -54,35 +53,30 @@ from utils.auditoria           import (
     validar_consistencia_grupo,
     identificar_outliers,
 )
+from utils.log                 import (
+    log,
+)
 
 
 # =========================================================
-# CONFIGURAÇÕES E FUNÇÕES
+# CONFIGURAÇÕES
 # =========================================================
 
 COMBUSTIVEIS_VALIDOS = {"Etanol", "Diesel", "Gasolina C"}
 ARQUIVOS = {
-    "Etanol"   : ARQUIVO_VENDAS_ETANOL,
-    "Diesel"   : ARQUIVO_VENDAS_DIESEL,
+    "Etanol"     : ARQUIVO_VENDAS_ETANOL,
+    "Diesel"     : ARQUIVO_VENDAS_DIESEL,
     "Gasolina C" : ARQUIVO_VENDAS_GASOLINA,
 }
 
-def validar_com_municipios(df, df_municipios, origem=""):
-    """
-    Valida se o id_municipio existe na base de referência do IBGE.
-    """
-    return validar_existencia_em_referencia(
-        df=df,
-        df_ref=df_municipios,
-        chaves_df=["id_municipio"],
-        chaves_df_ref=["id_municipio"],
-        diretorio_quarentena=AUDITORIA_VENDAS,
-        nome_arquivo=f"fora_ibge_{origem}.csv",
-        origem=origem,
-    )
+# =========================================================
+# FUNÇÕES AUXILIARES
+# =========================================================
 
 def limpar_textos(df):
-    """Normaliza colunas textuais e converte strings nulas em pd.NA."""
+    """
+    Normaliza colunas textuais e converte strings nulas em pd.NA.
+    """
     for coluna in ["uf", "tipo_combustivel", "id_municipio"]:
         df[coluna] = df[coluna].apply(
             lambda x: normalizar_texto(
@@ -105,7 +99,9 @@ def converter_tipos(df):
 
     df = colunas_para_string(df, ["id_municipio"])
     df["id_municipio"] = df["id_municipio"].apply(
-        lambda x: x.zfill(7) if pd.notna(x) and x != "" else pd.NA
+        lambda x: x.zfill(7) 
+            if pd.notna(x) and x != "" 
+            else pd.NA
     )
 
     df = converter_decimal_br(df, ["vol_vendido_m3"])
@@ -169,21 +165,24 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_municipios):
     Executa o pipeline completo de limpeza de um arquivo individual.
     Cada etapa loga quantas linhas sobreviveram e salva os descartados em quarentena.
     """
-    origem = combustivel_fixo
-
-    print(f"\n{'='*60}")
-    print(f"Processando: Arquivo [{origem}]")
+    log(
+        f"ARQUIVO {combustivel_fixo.upper()}:\n",
+        separador_interno_antes=True
+    )
 
     try:
         df = ler_csv(caminho_arquivo)
     
     except Exception as e:
-        raise RuntimeError(f"Erro ao ler arquivo de vendas {caminho_arquivo}: {e}")
+        raise RuntimeError(
+            f"Erro ao ler arquivo de vendas {caminho_arquivo}: {e}"
+        )
     
-    print(f"Linhas lidas: {len(df)}")
+    log("Registros lidos", len(df), tipo="sucesso")
 
     # Coluna temporária de rastreamento p/ identificar a origem nas quarentenas
     df["_arquivo_origem"] = combustivel_fixo
+    origem = combustivel_fixo
 
     validar_esquema(
         df=df.drop(columns=["_arquivo_origem"]), 
@@ -214,7 +213,15 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_municipios):
     df["tipo_combustivel"] = combustivel_fixo
  
     df = aplicar_regras_de_dominio(df, origem)
-    df = validar_com_municipios(df, df_municipios, origem)
+
+    df = validar_existencia_em_referencia(
+        df=df,
+        df_ref=df_municipios,
+        chaves_df=["id_municipio"],
+        chaves_df_ref=["id_municipio"],
+        caminho=AUDITORIA_VENDAS / f"fora_ibge_{origem}.csv",
+    )
+
     df = tratar_duplicidades(df, COLUNAS_IDENTIFICADORAS, AUDITORIA_VENDAS, origem)
 
     validar_consistencia_grupo(
@@ -225,7 +232,7 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_municipios):
         prefixo=origem
     )
 
-    print(f"✓ [{origem}] Linhas aprovadas: {len(df)}")
+    log("Linhas aprovadas", len(df), tipo="sucesso")
     return df
 
 # =========================================================
@@ -237,7 +244,8 @@ def executar_ppl_vendas():
     Executa todas as operações necessárias para realizar 
     a limpeza dos arquivos de vendas.
     """
-    # Carrega base de referência de municípios e a tabela domínio de combustíveis
+    log("PIPELINE VENDAS\n", separador_antes=True)
+    
     try:
         df_municipios = ler_csv(ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE)
         df_combustiveis = ler_csv(ARQUIVO_TIPOS_COMBUSTIVEL)
@@ -270,10 +278,10 @@ def executar_ppl_vendas():
     df_final = ordenar_linhas(df_final, COLUNAS_IDENTIFICADORAS)
 
     # Outliers calculados no consolidado para comparar os 3 combustíveis juntos
-    identificar_outliers(
-        df_final, 
-        coluna="vol_vendido_m3", 
-        pasta_auditoria=AUDITORIA_VENDAS, 
+    resultado_outliers = identificar_outliers(
+        df_final,
+        coluna="vol_vendido_m3",
+        pasta_auditoria=AUDITORIA_VENDAS,
         sufixo="_consolidado"
     )
 
@@ -286,21 +294,29 @@ def executar_ppl_vendas():
         )
 
     try:
-        salvar_csv(df_final, DADOS_MODIFICADOS, "vendas_anp.csv")
+        salvar_csv(df_final, ARQUIVO_CONSOLIDADO_VENDAS_ANP)
 
     except Exception as e:
         raise RuntimeError(f"Falha ao salvar output final: {e}")
 
-    print(f"\n{'='*60}")
-    print("PROCESSAMENTO FINALIZADO")
-    print(f"{'='*60}")
-    print(f"  Total de linhas finais : {len(df_final)}")
-    print(f"  Combustíveis (IDs)     : {sorted(df_final['id_combustivel'].unique())}")
-    print(f"  Anos cobertos          : {int(df_final['ano'].min())} - {int(df_final['ano'].max())}")
-    print(f"  Municípios distintos   : {df_final['id_municipio'].nunique()}")
-    print(f"  Arquivo salvo em       : {ARQUIVO_CONSOLIDADO_VENDAS_ANP}")
-    print(f"  Quarentena/auditoria   : {AUDITORIA_VENDAS}/")
-    print(f"{'='*60}")
+    # Printa a mensagem final de resumo do pipeline
+    log("Processamento finalizado:\n", separador_interno_antes=True)
+    log("Total de registros finais", len(df_final))
+    log("Combustíveis (IDs)", sorted(df_final['id_combustivel'].unique()))
+    log(
+        "Anos cobertos", 
+        f"{int(df_final['ano'].min())} a {int(df_final['ano'].max())}"
+    )
+    if resultado_outliers is not None:
+        limiar, quantidade = resultado_outliers
+        log(
+            f"P99 vol_vendido_m3",
+            f"{limiar:,.2f} ({quantidade} linhas acima do limiar)",
+            tipo="aviso",
+        )
+    log("Municípios distintos", df_final['id_municipio'].nunique())
+    log("Auditoria", AUDITORIA_VENDAS)
+    log("Arquivo limpo salvo em",  ARQUIVO_CONSOLIDADO_VENDAS_ANP)
 
 
 if __name__ == "__main__":

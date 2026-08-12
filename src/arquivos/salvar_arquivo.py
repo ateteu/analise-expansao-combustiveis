@@ -3,11 +3,10 @@ from pathlib import Path
 
 
 def salvar_csv(
-    df           : pd.DataFrame,
-    pasta_saida  : Path,
-    nome_arquivo : str,
-    separador    : str = ";",
-    encoding     : str = "utf-8",
+    df        : pd.DataFrame,
+    caminho   : Path,
+    separador : str = ";",
+    encoding  : str = "utf-8",
 ):
     """
     Salva um DataFrame como um CSV, utilizando por padrão
@@ -15,10 +14,9 @@ def salvar_csv(
 
     Retorna o caminho onde foi salvo o arquivo.
     """
+    
     # Cria a pasta, caso ela não exista
-    pasta_saida.mkdir(parents=True, exist_ok=True)
-
-    caminho = pasta_saida / nome_arquivo
+    caminho.parent.mkdir(parents=True, exist_ok=True)
 
     df.to_csv(
         caminho,
@@ -31,9 +29,8 @@ def salvar_csv(
 
 
 def salvar_quarentena(
-    df           : pd.DataFrame,
-    diretorio    : Path,
-    nome_arquivo : str,
+    df      : pd.DataFrame,
+    caminho : Path,
 ):
     """
     Salva registros descartados para auditoria.
@@ -42,10 +39,9 @@ def salvar_quarentena(
     if df.empty:
         return None
 
-    if not nome_arquivo:
-        raise ValueError("'nome_arquivo' é obrigatório!")
+    if not caminho:
+        raise ValueError("'caminho' é obrigatório!")
 
-    caminho = salvar_csv(df, diretorio, nome_arquivo)
-    print(f"\nQuarentena: {len(df)} linhas salvas\n")
+    caminho = salvar_csv(df, caminho)
 
     return caminho

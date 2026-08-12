@@ -5,7 +5,6 @@ from configs.caminhos          import (
     ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE,
     ARQUIVO_CONSOLIDADO_COORD,
     AUDITORIA_COORD_MUNICIPIOS,
-    DADOS_MODIFICADOS,
 )
 from configs.constantes        import STRINGS_NULAS
 from configs.mapeamentos       import (
@@ -37,7 +36,6 @@ from utils.auditoria           import (
 from utils.log                 import (
     log,
     log_etapa,
-    log_resumo_item,
 )
 
 
@@ -107,20 +105,6 @@ def aplicar_regras(df, origem):
 
     return df
 
-
-def validar_com_municipios(df, df_ref, origem):
-
-    return validar_existencia_em_referencia(
-        df=df,
-        df_ref=df_ref,
-        chaves_df=["id_municipio"],
-        chaves_df_ref=["id_municipio"],
-        diretorio_quarentena=AUDITORIA_COORD_MUNICIPIOS,
-        nome_arquivo=f"fora_ibge_{origem}.csv",
-        origem=origem,
-    )
-
-
 # =========================================================
 # EXECUÇÃO PRINCIPAL
 # =========================================================
@@ -129,7 +113,7 @@ def executar_ppl_coordenadas():
     """
     Executa o pipeline completo de limpeza dos dados de coordenadas.
     """
-    log("PIPELINE COORDENADAS", separador_depois=True)
+    log("PIPELINE COORDENADAS\n", separador_antes=True)
     try:
 
         df = ler_csv(
@@ -143,43 +127,30 @@ def executar_ppl_coordenadas():
     except Exception as e:
         raise RuntimeError(f"Erro ao carregar bases: {e}")
 
-    log(f"Registros lidos: {len(df)}", tipo="sucesso")
+    log("Registros lidos", len(df), tipo="sucesso")
 
-    validar_esquema(
-        df,
-        MAPA_COORD_MUNICIPIOS.keys(),
-    )
+    validar_esquema(df, MAPA_COORD_MUNICIPIOS.keys())
 
-    origem = "coordenadas"
-
-    df = renomear_colunas(
-        df,
-        MAPA_COORD_MUNICIPIOS,
-    )
-
+    df = renomear_colunas(df, MAPA_COORD_MUNICIPIOS)
     df = limpar_textos(df)
     df = converter_tipos(df)
 
-    tamanho_df_antes = len(df)
+    origem = "coordenadas"
     df = separar_nulos(
         df,
         colunas=COLUNAS_CRITICAS_COORD_MUNICIPIOS,
         pasta_auditoria=AUDITORIA_COORD_MUNICIPIOS,
         prefixo=origem,
     )
-    
+
+    tamanho_df_antes = len(df)
     log_etapa(
         "Separação de nulos",
         tamanho_df_antes,
-        len(df),
-        origem=origem,
+        depois=len(df),
     )
 
-    df = aplicar_regras(
-        df,
-        origem,
-    )
-
+    df = aplicar_regras(df, origem)
     df = tratar_duplicidades(
         df,
         chave_logica=["id_municipio"],
@@ -187,10 +158,12 @@ def executar_ppl_coordenadas():
         prefixo=origem,
     )
 
-    df = validar_com_municipios(
-        df,
-        df_municipios,
-        origem,
+    df = validar_existencia_em_referencia(
+        df=df,
+        df_ref=df_municipios,
+        chaves_df=["id_municipio"],
+        chaves_df_ref=["id_municipio"],
+        caminho=AUDITORIA_COORD_MUNICIPIOS / f"fora_ibge_{origem}.csv",
     )
 
     df = selecionar_colunas(
@@ -198,10 +171,7 @@ def executar_ppl_coordenadas():
         col_mantidas=COLUNAS_CRITICAS_COORD_MUNICIPIOS,
     )
 
-    df = ordenar_linhas(
-        df,
-        colunas=["id_municipio"],
-    )
+    df = ordenar_linhas(df, colunas=["id_municipio"])
 
     if df.duplicated(subset=["id_municipio"]).any():
 
@@ -209,16 +179,13 @@ def executar_ppl_coordenadas():
             "Duplicidade lógica encontrada após processamento."
         )
 
-    salvar_csv(
-        df,
-        pasta_saida=DADOS_MODIFICADOS,
-        nome_arquivo="coordenadas_municipios.csv",
-    )
+    salvar_csv(df, ARQUIVO_CONSOLIDADO_COORD)
 
-    log("PROCESSAMENTO FINALIZADO", separador_antes=True)
-    log_resumo_item("Total de municípios", len(df))
-    log_resumo_item("Arquivo salvo em", ARQUIVO_CONSOLIDADO_COORD)
-    log_resumo_item("Auditoria", f"{AUDITORIA_COORD_MUNICIPIOS}/", True)
+    log("Processamento finalizado:\n", separador_interno_antes=True)
+
+    log("Total de municípios", len(df))
+    log("Auditoria", AUDITORIA_COORD_MUNICIPIOS)
+    log("Arquivo limpo salvo em", ARQUIVO_CONSOLIDADO_COORD)
 
 
 if __name__ == "__main__":

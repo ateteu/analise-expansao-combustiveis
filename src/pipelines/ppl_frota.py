@@ -6,7 +6,7 @@ from arquivos.salvar_arquivo   import salvar_csv
 from arquivos.listagem         import listar_arquivos
 from configs.caminhos          import (
     CAMINHO_FROTA_SENATRAN,
-    DADOS_MODIFICADOS,
+    ARQUIVO_CONSOLIDADO_FROTA,
     ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE,
     AUDITORIA_FROTA,
 )
@@ -51,7 +51,6 @@ from utils.auditoria           import (
 )
 from utils.log                 import (
     log,
-    log_resumo_item,
 )
 
 
@@ -282,14 +281,14 @@ def processar_arquivo(
 
 
 # =========================================================
-# PIPELINE PRINCIPAL
+# EXECUÇÃO PRINCIPAL
 # =========================================================
 
 def executar_ppl_frota() -> None:
     """
     Executa o pipeline completo de limpeza dos dados de frota.
     """
-    log("PIPELINE FROTA", separador_depois=True)
+    log("PIPELINE FROTA\n", separador_antes=True)
 
     try:
         df_municipios = ler_csv(ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE)
@@ -335,7 +334,7 @@ def executar_ppl_frota() -> None:
         prefixo="consolidado",
     )
 
-    identificar_outliers(
+    resultado_outliers = identificar_outliers(
         df_final,
         coluna="total",
         pasta_auditoria=AUDITORIA_FROTA,
@@ -351,17 +350,31 @@ def executar_ppl_frota() -> None:
         )
 
     try:
-        salvar_csv(df_final, DADOS_MODIFICADOS, "frota.csv")
+        salvar_csv(
+            df_final,
+            ARQUIVO_CONSOLIDADO_FROTA,
+        )
     
     except Exception as e:
         raise RuntimeError(f"Falha ao salvar output final: {e}")
 
-    log("PROCESSAMENTO FINALIZADO", separador_depois=True)
-    log_resumo_item("Total de linhas finais", len(df_final))
-    log_resumo_item("Anos cobertos", int(df_final['ano'].min()) - int(df_final['ano'].max()))
-    log_resumo_item("Municípios distintos", df_final['id_municipio'].nunique())
-    log_resumo_item("Arquivo salvo em", DADOS_MODIFICADOS / "frota.csv")
-    log_resumo_item("Quarentena/auditoria", AUDITORIA_FROTA / "", separador_final=True)
+    # Printa a mensagem final de resumo do pipeline
+    log("Processamento finalizado:\n", separador_interno_antes=True)
+    log("Total de registros finais", len(df_final))
+    log(
+        "Anos cobertos", 
+        f"{int(df_final['ano'].min())} a {int(df_final['ano'].max())}"
+    )
+    if resultado_outliers is not None:
+        limiar, quantidade = resultado_outliers
+        log(
+            f"P99 total (veículos)",
+            f"{limiar:,.2f} ({quantidade} linhas acima do limiar)",
+            tipo="aviso",
+        )
+    log("Municípios distintos", df_final['id_municipio'].nunique())
+    log("Auditoria", AUDITORIA_FROTA / "", separador_final=True)
+    log("Arquivo salvo em", ARQUIVO_CONSOLIDADO_FROTA)
 
 
 if __name__ == "__main__":

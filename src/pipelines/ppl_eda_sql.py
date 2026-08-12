@@ -1,3 +1,5 @@
+# Excluir depois
+
 import duckdb
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -162,11 +164,7 @@ def executar_ppl_eda():
             caminho_saida=DADOS_ANALISES / f"{nome.lower()}.png"
         )
 
-        salvar_csv(
-            df, 
-            pasta_saida=DADOS_ANALISES, 
-            nome_arquivo=f"{nome.lower()}.csv"
-        )
+        salvar_csv(df, DADOS_ANALISES / f"{nome.lower()}.csv")
 
     conexao.close()
     print("Análises exploratórias concluídas.")

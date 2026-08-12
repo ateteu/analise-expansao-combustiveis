@@ -20,10 +20,10 @@ def main():
     carrega o BD e executa as queries SQL.
     """
     passos = [
-        ("Pipeline de limpeza [coord. municípios]", executar_ppl_coordenadas)
+        #("Pipeline de limpeza [coord. municípios]", executar_ppl_coordenadas),
         #("Pipeline de limpeza [municipios]", executar_ppl_municipios),
         #("Pipeline de limpeza [frota]", executar_ppl_frota),
-        #("Pipeline de limpeza [dados econômicos]", executar_ppl_dados_economicos),
+        ("Pipeline de limpeza [dados econômicos]", executar_ppl_dados_economicos),
         #("Pipeline de limpeza [vendas]", executar_ppl_vendas),
         #("Pipeline do banco de dados", carregar_bd),
         #("Queries SQL", executar_queries_sql),

@@ -22,7 +22,6 @@ from utils.auditoria           import (
 from configs.caminhos          import (
     ARQUIVO_CODIGOS_IBGE,
     ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE,
-    DADOS_MODIFICADOS,
     AUDITORIA_MUNICIPIOS, 
 )
 from configs.mapeamentos       import MAPA_CODIGOS_IBGE
@@ -32,12 +31,11 @@ from configs.constantes        import (
 )
 from utils.log                 import (
     log,
-    log_resumo_item,
 )
 
 
 # =========================================================
-# CONFIGURAÇÕES E FUNÇÕES
+# FUNÇÕES AUXILIARES
 # =========================================================
 
 def carregar_dados() -> pd.DataFrame:
@@ -159,10 +157,14 @@ def validar_id_municipio(df: pd.DataFrame) -> pd.DataFrame:
 
 def validar_quantidade_municipios(df: pd.DataFrame) -> None:
     """
-    Avisa (sem interromper) se o total de municípios estiver abaixo do esperado.
+    Avisa (sem interromper) se o total de municípios 
+    estiver abaixo do esperado (5560).
     """
     if len(df) < 5560:
-        print(f"!! Quantidade de municípios abaixo do esperado: {len(df)}")
+        log(
+            f"Quantidade de municípios abaixo do esperado: {len(df)}", 
+            tipo="aviso"
+        )
 
 # =========================================================
 # EXECUÇÃO PRINCIPAL
@@ -172,15 +174,17 @@ def executar_ppl_municipios() -> None:
     """
     Executa o pipeline de municípios e salva o resultado consolidado.
     """
-    # Leitura da planilha bruta do IBGE
+    log("PIPELINE MUNICÍPIOS\n", separador_antes=True)
+
     try:
-        print("Carregando base do IBGE...")
         df = carregar_dados()
 
     except Exception as e:
-        raise RuntimeError(f"Erro ao ler arquivo do IBGE {ARQUIVO_CODIGOS_IBGE}: {e}")
+        raise RuntimeError(
+            f"Erro ao ler arquivo do IBGE {ARQUIVO_CODIGOS_IBGE}: {e}"
+        )
 
-    print(f"Registros lidos: {len(df)}")
+    log("Registros lidos", len(df), tipo="sucesso")
 
     # Garante que o arquivo de origem não mudou de formato
     validar_esquema(df, MAPA_CODIGOS_IBGE.keys())
@@ -200,22 +204,22 @@ def executar_ppl_municipios() -> None:
     validar_prefixo(df, "id_municipio", "id_uf", tamanho=2)
     validar_quantidade_municipios(df)
 
-    # Ordenação determinística do resultado final
     df = ordenar_linhas(df, ["id_uf", "nome_municipio"])
 
     try:
-        salvar_csv(df, DADOS_MODIFICADOS, "municipios_ibge.csv")
+        salvar_csv(df, ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE)
 
     except Exception as e:
         raise RuntimeError(f"Falha ao salvar output final: {e}")
 
-    log("PROCESSAMENTO FINALIZADO", separador_depois=True)
-    print(f"  Total de municípios    : {len(df)}")
-    print(f"  UFs presentes          : {sorted(df['id_uf'].unique())}")
-    print(f"  Regiões intermediárias : {df['id_regiao_intermediaria'].nunique()}")
-    print(f"  Regiões imediatas      : {df['id_regiao_imediata'].nunique()}")
-    print(f"  Arquivo salvo em       : {ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE}")
-    log_resumo_item("Quarentena/auditoria", AUDITORIA_MUNICIPIOS / "", separador_final=True)
+    log("Processamento finalizado:\n", separador_interno_antes=True)
+
+    log("Total de municípios", len(df))
+    log("UFs", len(df['id_uf'].unique()))
+    log("Regiões intermediárias", df['id_regiao_intermediaria'].nunique())
+    log("Regiões imediatas", df['id_regiao_imediata'].nunique())
+    log("Auditoria", AUDITORIA_MUNICIPIOS)
+    log("Arquivo limpo salvo em", ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE)
 
 
 if __name__ == "__main__":
