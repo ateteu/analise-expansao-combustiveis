@@ -24,6 +24,3 @@ STRINGS_NULAS = {
     "--",
     "?",
 }
-
-NOME_CSV_GERADO_SENATRAN   = "frota_senatran.csv"
-NOME_CSV_GERADO_PIB        = "pib_ibge.csv"

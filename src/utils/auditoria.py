@@ -264,11 +264,11 @@ def validar_soma_componentes(
     pasta_auditoria     : str,
     prefixo             : str = "",
     tolerancia          : float = 0.01,
-) -> None:
+) -> int:
     """
     Audita (sem remover) se coluna_total diverge da soma de colunas_componentes.
-    Só avalia linhas onde total e todos os componentes estão presentes —
-    dados suprimidos/ausentes não geram falso positivo.
+    
+    OBS: Essa função não imprime resultados!
     """
     linhas_completas = df.dropna(
         subset=[coluna_total, *colunas_componentes]
@@ -292,9 +292,4 @@ def validar_soma_componentes(
         caminho=pasta_auditoria / f"soma_divergente_{prefixo}.csv"
     )
 
-    log(
-        "Consistência soma",
-        f"{len(divergentes)} linhas com soma divergente do total "
-        f"(tolerância {tolerancia:.0%})",
-        tipo="aviso",
-    )
+    return len(divergentes)

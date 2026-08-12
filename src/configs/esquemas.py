@@ -1,14 +1,3 @@
-from configs.colunas import COLUNAS_INT_FROTA
-
-# Este arquivo contém esquemas utilizados nos códigos.
-
-# Um esquema define estrutura de dados.
-# Ele responde:
-# - quais colunas existem
-# - como elas devem ser chamadas internamente
-# - qual forma final o DataFrame deve ter
-
-
 # =========================================================
 # VENDAS DE COMBUSTÍVEIS - ANP
 # =========================================================
@@ -37,9 +26,3 @@ ESQUEMA_CODIGOS_IBGE = {
     "Código Município Completo",
     "Nome_Município",
 }
-
-# =========================================================
-# DADOS DE FROTA - SENATRAN
-# =========================================================
-
-ESQUEMA_FROTA = {"uf", "municipio"} | set(COLUNAS_INT_FROTA)

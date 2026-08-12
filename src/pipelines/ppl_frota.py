@@ -28,7 +28,6 @@ from configs.colunas           import (
     COLUNAS_IDENTIFICADORAS_FROTA,
     COLUNAS_SAIDA_FROTA,
 )
-from configs.esquemas          import ESQUEMA_FROTA
 from transformadores.arquivos  import extrair_ano
 from transformadores.texto     import normalizar_texto
 from transformadores.tipos     import (
@@ -58,13 +57,17 @@ from utils.log                 import (
 # CONFIGURAÇÕES
 # =========================================================
 
-UFS_VALIDAS = set(MAPA_UF_SIGLA.values())
+ESQUEMA_FROTA = {"uf", "municipio"} | set(COLUNAS_INT_FROTA)
+UFS_VALIDAS = set(MAPA_UF_SIGLA.keys())
 
-# Nomes das colunas na tabela de referência de municípios usados para o join
-# Ajustar se o output do pipeline de municípios usar nomes diferentes
-COL_REF_SIGLA_UF  = "sigla_uf"
+UFS_ESCOPO_SIGLAS = {
+    uf
+    for uf, codigo in MAPA_UF_SIGLA.items()
+    if codigo in UFS_ESCOPO
+}
+
+COL_REF_SIGLA_UF  = "id_uf"
 COL_REF_NOME_MUN  = "nome_municipio"
-
 
 # =========================================================
 # FUNÇÕES AUXILIARES
@@ -119,7 +122,9 @@ def _preparar_referencia_municipios(df_municipios: pd.DataFrame) -> pd.DataFrame
     Normaliza nome do município e sigla da UF no mesmo formato usado nos dados de frota,
     garantindo que ambos os lados do merge sejam comparáveis.
     """
-    ref = df_municipios[[COL_REF_SIGLA_UF, COL_REF_NOME_MUN, "id_municipio"]].copy()
+    ref = df_municipios[
+        [COL_REF_SIGLA_UF, COL_REF_NOME_MUN, "id_municipio"]
+    ].copy()
 
     ref[COL_REF_NOME_MUN] = ref[COL_REF_NOME_MUN].apply(
         lambda x: normalizar_texto(
@@ -135,6 +140,12 @@ def _preparar_referencia_municipios(df_municipios: pd.DataFrame) -> pd.DataFrame
             maiusculo=True
         )
     )
+    # Renomeia a coluna para fazer o merge corretamente depois
+    ref = ref.rename(
+        columns={
+            COL_REF_NOME_MUN: "municipio"
+        }
+    )
     return ref
 
 
@@ -144,19 +155,24 @@ def _mapear_id_municipio(
 ) -> pd.DataFrame:
     """
     Adiciona a coluna id_municipio via merge com a tabela de referência do IBGE.
-    Linhas sem correspondência ficam com id_municipio nulo e são capturadas
-    pela etapa seguinte de separar_nulos.
+
+    A frota identifica a UF por sua sigla (MG, ES, SP...), enquanto a
+    referência do IBGE identifica a UF pelo código numérico (31, 32, 35...).
+    A sigla é convertida para id_uf antes do merge.
     """
+    df = df.copy()
+
+    # Converte a sigla da UF da frota para o código da UF usado pela referência
+    df["id_uf"] = df["uf"].map(MAPA_UF_SIGLA)
+
+    # Merge pela chave municipal: código da UF + nome do município
     df = df.merge(
         ref_municipios,
-        left_on=["uf", "municipio"],
-        right_on=[COL_REF_SIGLA_UF, COL_REF_NOME_MUN],
+        on=["id_uf", "municipio"],
         how="left",
     )
-    # Remove colunas auxiliares trazidas pelo merge
-    df = df.drop(columns=[COL_REF_SIGLA_UF, COL_REF_NOME_MUN], errors="ignore")
-    return df
 
+    return df
 
 # =========================================================
 # PIPELINE DE UM ARQUIVO INDIVIDUAL
@@ -226,7 +242,6 @@ def processar_arquivo(
     )
 
     df = colunas_para_inteiro(df, COLUNAS_INT_FROTA)
-
     df = separar_nulos(
         df,
         colunas=COLUNAS_CRITICAS_FROTA,
@@ -243,7 +258,7 @@ def processar_arquivo(
     df = validar_dominio(
         df,
         coluna="uf",
-        valores_validos=UFS_ESCOPO,
+        valores_validos=UFS_ESCOPO_SIGLAS,
         pasta_auditoria=AUDITORIA_FROTA,
         prefixo=f"{origem}_escopo"
     )
@@ -255,6 +270,8 @@ def processar_arquivo(
         pasta_auditoria=AUDITORIA_FROTA,
         prefixo=origem
     )
+
+    df["id_uf"] = df["uf"].map(MAPA_UF_SIGLA)
 
     # Corrige grafias erradas antes do join com o IBGE
     df = _corrigir_municipios(df)
@@ -310,6 +327,7 @@ def executar_ppl_frota() -> None:
     dfs = []
     for arquivo in arquivos:
         try:
+            log(f"ARQUIVO: {Path(arquivo).name}\n", separador_interno_antes=True)
             df = processar_arquivo(arquivo, ref_municipios)
             dfs.append(df)
         
@@ -325,8 +343,13 @@ def executar_ppl_frota() -> None:
     df_final = concatenar(dfs)
     df_final = ordenar_linhas(df_final, COLUNAS_IDENTIFICADORAS_FROTA)
 
+    if df_final.empty:
+        raise RuntimeError(
+            "Nenhum registro restou após as etapas de limpeza."
+        )
+
     # Auditoria: total deve ser igual à soma dos tipos de veículo (sem remoção)
-    validar_soma_componentes(
+    quantidade_divergentes = validar_soma_componentes(
         df_final,
         coluna_total="total",
         colunas_componentes=COMPONENTES_FROTA,
@@ -372,8 +395,14 @@ def executar_ppl_frota() -> None:
             f"{limiar:,.2f} ({quantidade} linhas acima do limiar)",
             tipo="aviso",
         )
+    log(
+        "Consistência soma",
+        f"{quantidade_divergentes} linhas com soma divergente do total "
+        f"(tolerância 1%)",
+        tipo="aviso",
+    )
     log("Municípios distintos", df_final['id_municipio'].nunique())
-    log("Auditoria", AUDITORIA_FROTA / "", separador_final=True)
+    log("Auditoria", AUDITORIA_FROTA)
     log("Arquivo salvo em", ARQUIVO_CONSOLIDADO_FROTA)
 
 
