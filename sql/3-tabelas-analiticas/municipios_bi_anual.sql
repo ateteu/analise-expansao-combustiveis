@@ -28,20 +28,20 @@ SELECT
     f.combustivel_por_veiculo_leve,
 
     -- Métricas e medidas econômicas
-    p.vab_total,
-    p.vab_agropecuaria,
-    p.vab_industria,
-    p.vab_servicos,
-    p.atividade_1,
-    p.atividade_2,
-    p.atividade_3,
-    p.pib,
-    p.pib_per_capita,
-    e.pib_per_capita_relativo,
-    e.populacao,
-    e.contribuicao_agro,
-    e.contribuicao_industria,
-    e.contribuicao_servicos
+    de.vab_total,
+    de.vab_agropecuaria,
+    de.vab_industria,
+    de.vab_servicos,
+    de.atividade_1,
+    de.atividade_2,
+    de.atividade_3,
+    de.pib,
+    de.pib_per_capita,
+    me.pib_per_capita_relativo,
+    me.populacao,
+    me.contribuicao_agro,
+    me.contribuicao_industria,
+    me.contribuicao_servicos
 
 FROM 
     scores s 
@@ -54,10 +54,10 @@ LEFT JOIN metricas_frota f
     ON s.id_municipio = f.id_municipio 
     AND s.ano = f.ano 
 
-LEFT JOIN metricas_economicas e 
-    ON s.id_municipio = e.id_municipio 
-    AND s.ano = e.ano 
+LEFT JOIN metricas_economicas me 
+    ON s.id_municipio = me.id_municipio 
+    AND s.ano = me.ano 
 
-LEFT JOIN pib_ibge p 
-    ON s.id_municipio = p.id_municipio 
-    AND s.ano = p.ano 
+LEFT JOIN dados_economicos de 
+    ON s.id_municipio = de.id_municipio 
+    AND s.ano = de.ano 

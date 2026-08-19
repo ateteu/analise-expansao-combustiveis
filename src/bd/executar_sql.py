@@ -24,7 +24,6 @@ def executar_queries_sql():
         "sql/3-tabelas-analiticas/dimensao_municipio.sql",
         "sql/3-tabelas-analiticas/municipios_bi_anual.sql",
         "sql/3-tabelas-analiticas/municipios_bi_crescimento.sql",
-        "sql/teste.sql"
     ]
 
     for arquivo in arquivos_sql:

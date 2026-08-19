@@ -1,28 +1,27 @@
 from pathlib import Path
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+DIR_BASE = Path(__file__).resolve().parent.parent.parent
 
 
 # Diretórios base
-DADOS_BRUTOS      = BASE_DIR / "dados" / "brutos"
-DADOS_MODIFICADOS = BASE_DIR / "dados" / "intermediarios"
-DADOS_MODELADOS   = BASE_DIR / "dados" / "modelados"
-DADOS_ANALISES    = BASE_DIR / "dados" / "4-analises"
-DADOS_DOMINIO     = BASE_DIR / "dados" / "dominio"
-DIR_SQL           = BASE_DIR / "sql"
+DADOS_BRUTOS      = DIR_BASE / "dados" / "brutos"
+DADOS_MODIFICADOS = DIR_BASE / "dados" / "intermediarios"
+DADOS_MODELADOS   = DIR_BASE / "dados" / "modelados"
+DADOS_DOMINIO     = DIR_BASE / "dados" / "dominio"
+DIR_SQL           = DIR_BASE / "sql"
 
 
 # Diretórios das bases de dados brutos
 CAMINHO_FROTA_SENATRAN   = DADOS_BRUTOS / "frota-senatran"
 CAMINHO_VENDAS_ANP       = DADOS_BRUTOS / "vendas-anp"
-CAMINHO_PIB              = DADOS_BRUTOS / "pib-ibge"
+CAMINHO_DADOS_ECONOMICOS = DADOS_BRUTOS / "dados-economicos-ibge"
 CAMINHO_CODIGOS_IBGE     = DADOS_BRUTOS / "codigos-ibge"
-CAMINHO_COORD_MUNICIPIOS = DADOS_BRUTOS / "lat-lon-github"
+CAMINHO_COORD_MUNICIPIOS = DADOS_BRUTOS / "coordenadas-github"
 
 
 # Arquivos brutos
-ARQUIVO_DADOS_ECONOMICOS = CAMINHO_PIB / "PIB dos Municipios - base de dados 2010-2023.xlsx"
+ARQUIVO_DADOS_ECONOMICOS = CAMINHO_DADOS_ECONOMICOS / "PIB dos Municipios - base de dados 2010-2023.xlsx"
 ARQUIVO_CODIGOS_IBGE     = CAMINHO_CODIGOS_IBGE / "RELATORIO_DTB_BRASIL_2024_MUNICIPIOS.xls"
 ARQUIVO_COORD_MUNICIPIOS = CAMINHO_COORD_MUNICIPIOS / "municipios.csv"
 ARQUIVO_VENDAS_ETANOL    = CAMINHO_VENDAS_ANP / "vendas-anuais-de-etanol-hidratado-por-municipio.csv"
@@ -34,7 +33,6 @@ ARQUIVO_VENDAS_GASOLINA  = CAMINHO_VENDAS_ANP / "vendas-anuais-de-gasolina-c-por
 ARQUIVO_CONSOLIDADO_VENDAS_ANP       = DADOS_MODIFICADOS / "vendas_anp.csv"
 ARQUIVO_CONSOLIDADO_DADOS_ECONOMICOS = DADOS_MODIFICADOS / "dados_economicos_ibge.csv"
 ARQUIVO_CONSOLIDADO_FROTA            = DADOS_MODIFICADOS / "frota_senatran.csv"
-ARQUIVO_CONSOLIDADO_PIB              = DADOS_MODIFICADOS / "pib_ibge.csv"
 ARQUIVO_CONSOLIDADO_COORD            = DADOS_MODIFICADOS / "coordenadas_municipios.csv"
 ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE  = DADOS_MODIFICADOS / "municipios_ibge.csv"
 
@@ -48,11 +46,7 @@ ARQUIVO_UFS_ESCOPO           = DADOS_DOMINIO / "ufs_em_escopo.csv"
 
 
 # Arquivo do banco de dados DuckDB
-ARQUIVO_BD      = BASE_DIR / "dados" / "banco_dados.duckdb"
-
-
-# Arquivos SQL
-ARQUIVO_EDA_SQL = DIR_SQL / "4-analise" / "perguntas_investigativas.sql"
+ARQUIVO_BD  = DIR_BASE / "dados" / "banco_dados.duckdb"
 
 
 # Diretórios das pastas de auditoria (quarentenas/limpezas)

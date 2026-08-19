@@ -5,8 +5,8 @@ from configs.caminhos import (
     ARQUIVO_MUNICIPIOS_ATENDIDOS,
     ARQUIVO_CONSOLIDADO_VENDAS_ANP,
     ARQUIVO_CONSOLIDADO_FROTA,
-    ARQUIVO_CONSOLIDADO_PIB,
-    ARQUIVO_CONSOLIDADO_COORD
+    ARQUIVO_CONSOLIDADO_DADOS_ECONOMICOS,
+    ARQUIVO_CONSOLIDADO_COORD,
 )
 
 TABELAS = {
@@ -14,8 +14,8 @@ TABELAS = {
     "municipios_atendidos"   : ARQUIVO_MUNICIPIOS_ATENDIDOS,
     "vendas_anp"             : ARQUIVO_CONSOLIDADO_VENDAS_ANP,
     "frota_senatran"         : ARQUIVO_CONSOLIDADO_FROTA,
-    "pib_ibge"               : ARQUIVO_CONSOLIDADO_PIB,
-    "coordenadas_municipios" : ARQUIVO_CONSOLIDADO_COORD
+    "dados_economicos"       : ARQUIVO_CONSOLIDADO_DADOS_ECONOMICOS,
+    "coordenadas_municipios" : ARQUIVO_CONSOLIDADO_COORD,
 }
 
 def carregar_bd():

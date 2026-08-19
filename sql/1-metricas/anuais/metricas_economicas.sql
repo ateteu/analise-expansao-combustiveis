@@ -29,37 +29,37 @@ WITH
                 )
             ) AS pib_per_capita_estadual
 
-        FROM pib_ibge
+        FROM dados_economicos
         GROUP BY ano
     ),
 
     metricas_base AS (
         SELECT
-            p.id_municipio,
-            p.ano,
+            e.id_municipio,
+            e.ano,
             pe.populacao,
 
             CASE
-                WHEN p.vab_total IS NULL THEN 0
+                WHEN e.vab_total IS NULL THEN 0
                 ELSE 1
             END AS possui_vab,
 
-            (p.pib_per_capita / pe.pib_per_capita_estadual)
+            (e.pib_per_capita / pe.pib_per_capita_estadual)
             AS pib_per_capita_relativo,
 
-            (p.vab_agropecuaria / p.vab_total)
+            (e.vab_agropecuaria / e.vab_total)
             AS contribuicao_agro,
 
-            (p.vab_industria / p.vab_total)
+            (e.vab_industria / e.vab_total)
             AS contribuicao_industria,
 
-            (p.vab_servicos / p.vab_total)
+            (e.vab_servicos / e.vab_total)
             AS contribuicao_servicos
 
-        FROM pib_ibge p
+        FROM dados_economicos e
 
         LEFT JOIN pib_estadual pe 
-            ON p.ano = pe.ano
+            ON e.ano = pe.ano
     )
 
 SELECT
