@@ -10,7 +10,6 @@ from configs.caminhos          import (
     ARQUIVO_VENDAS_GASOLINA,
     ARQUIVO_TIPOS_COMBUSTIVEL,
 )
-from configs.esquemas          import ESQUEMA_ORIGINAL_VENDAS
 from configs.constantes        import (
     ANO_INICIO_ESCOPO_PROJETO,
     ANO_FIM_ESCOPO_PROJETO,
@@ -62,7 +61,6 @@ from utils.log                 import (
 # CONFIGURAÇÕES
 # =========================================================
 
-COMBUSTIVEIS_VALIDOS = {"Etanol", "Diesel", "Gasolina C"}
 ARQUIVOS = {
     "Etanol"     : ARQUIVO_VENDAS_ETANOL,
     "Diesel"     : ARQUIVO_VENDAS_DIESEL,
@@ -77,7 +75,7 @@ def limpar_textos(df):
     """
     Normaliza colunas textuais e converte strings nulas em pd.NA.
     """
-    for coluna in ["uf", "tipo_combustivel", "id_municipio"]:
+    for coluna in ["uf", "nome_combustivel", "id_municipio"]:
         df[coluna] = df[coluna].apply(
             lambda x: normalizar_texto(
                 x,
@@ -87,6 +85,7 @@ def limpar_textos(df):
             )
         )
     return df
+
 
 def converter_tipos(df):
     """
@@ -108,7 +107,8 @@ def converter_tipos(df):
 
     return df
 
-def aplicar_regras_de_dominio(df, origem=""):
+
+def aplicar_regras_de_dominio(df, origem, ids_combustiveis_validos):
     """
     Aplica regras de plausibilidade por coluna.
     Linhas reprovadas em cada regra vão para quarentena separada.
@@ -140,8 +140,8 @@ def aplicar_regras_de_dominio(df, origem=""):
 
     df = validar_dominio(
         df, 
-        coluna="tipo_combustivel", 
-        valores_validos=COMBUSTIVEIS_VALIDOS, 
+        coluna="id_combustivel", 
+        valores_validos=ids_combustiveis_validos, 
         pasta_auditoria=AUDITORIA_VENDAS, 
         prefixo=origem
     )
@@ -160,7 +160,13 @@ def aplicar_regras_de_dominio(df, origem=""):
 # PIPELINE COMPLETO DE UM ARQUIVO INDIVIDUAL
 # =========================================================
 
-def processar_arquivo(caminho_arquivo, combustivel_fixo, df_municipios):
+def processar_arquivo(
+        caminho_arquivo, 
+        combustivel_fixo, 
+        df_municipios,
+        mapa_combustivel_id,
+        ids_combustiveis_validos,
+    ):
     """
     Executa o pipeline completo de limpeza de um arquivo individual.
     Cada etapa loga quantas linhas sobreviveram e salva os descartados em quarentena.
@@ -186,13 +192,20 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_municipios):
 
     validar_esquema(
         df=df.drop(columns=["_arquivo_origem"]), 
-        esperado=ESQUEMA_ORIGINAL_VENDAS, 
+        esperado=MAPA_VENDAS.keys(), 
         origem=origem
     )
 
     df = renomear_colunas(df, MAPA_VENDAS)
     df = limpar_textos(df)
     df = converter_tipos(df)
+
+    id_combustivel = mapa_combustivel_id.get(combustivel_fixo)
+    if id_combustivel is None:
+        raise ValueError(
+            f"Combustível '{combustivel_fixo}' não possui ID na tabela domínio."
+        )
+    df["id_combustivel"] = id_combustivel
 
     df = separar_nulos(
         df, 
@@ -208,11 +221,8 @@ def processar_arquivo(caminho_arquivo, combustivel_fixo, df_municipios):
         pasta_auditoria=AUDITORIA_VENDAS, 
         prefixo=origem
     )
-
-    # Força o combustível fixo após validação de nulos
-    df["tipo_combustivel"] = combustivel_fixo
  
-    df = aplicar_regras_de_dominio(df, origem)
+    df = aplicar_regras_de_dominio(df, origem, ids_combustiveis_validos)
 
     df = validar_existencia_em_referencia(
         df=df,
@@ -248,7 +258,7 @@ def executar_ppl_vendas():
     
     try:
         df_municipios = ler_csv(ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE)
-        df_combustiveis = ler_csv(ARQUIVO_TIPOS_COMBUSTIVEL)
+        df_combustiveis = ler_csv(ARQUIVO_TIPOS_COMBUSTIVEL) # Domínio dos combustíveis
     
     except Exception as e:
         raise RuntimeError(f"Falha ao carregar bases de referência: {e}")
@@ -259,20 +269,24 @@ def executar_ppl_vendas():
         df_combustiveis["id_combustivel"]
     ))
 
+    ids_combustiveis_validos = set(
+        df_combustiveis["id_combustivel"].dropna()
+    )
+
     # Processa individualmente os arquivos de cada combustível
     dfs = [
-        processar_arquivo(arquivo, combustivel, df_municipios)
+        processar_arquivo(
+            arquivo, 
+            combustivel, 
+            df_municipios, 
+            mapa_combustivel_id,
+            ids_combustiveis_validos
+        )
         for combustivel, arquivo in ARQUIVOS.items()
     ]
 
     df_final = concatenar(dfs)
     df_final = df_final.drop(columns=["_arquivo_origem"], errors="ignore")
-
-    # Mapeia o nome do combustível para o ID da tabela domínio
-    df_final["id_combustivel"] = df_final["tipo_combustivel"].map(mapa_combustivel_id)
-
-    if df_final["id_combustivel"].isna().any():
-        raise ValueError("Combustível sem ID correspondente.")
     
     df_final = selecionar_colunas(df_final, COLUNAS_SAIDA_VENDAS)
     df_final = ordenar_linhas(df_final, COLUNAS_IDENTIFICADORAS)

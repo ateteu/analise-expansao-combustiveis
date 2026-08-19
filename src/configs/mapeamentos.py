@@ -55,7 +55,7 @@ MAPA_VENDAS = {
     "ANO"           : "ano",
     "UF"            : "uf",
     "GRANDE REGIÃO" : "nome_grande_regiao",
-    "PRODUTO"       : "tipo_combustivel",
+    "PRODUTO"       : "nome_combustivel", 
     "CÓDIGO IBGE"   : "id_municipio",
     "MUNICÍPIO"     : "nome_municipio", 
     "VENDAS"        : "vol_vendido_m3",

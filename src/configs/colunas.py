@@ -13,13 +13,13 @@ ORDEM_LINHAS = [
 COLUNAS_CRITICAS_VENDAS = [
     "ano",
     "id_municipio",
-    "tipo_combustivel",
+    "id_combustivel",
     "vol_vendido_m3",
 ]
 COLUNAS_IDENTIFICADORAS = [
     "ano",
     "id_municipio",
-    "tipo_combustivel",
+    "id_combustivel",
 ]
 COLUNAS_IDENTIFICADORAS_FINAIS = [
     "ano",

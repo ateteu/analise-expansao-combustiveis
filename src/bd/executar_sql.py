@@ -37,8 +37,9 @@ def executar_queries_sql():
             print("OK")
         
         except Exception as e:
-            print(f"Erro: {e}")
-            break
+            raise RuntimeError(
+                f"Erro ao executar SQL [{arquivo}]: {e}"
+            ) from e
 
     exports = [
         "dimensao_municipio",
