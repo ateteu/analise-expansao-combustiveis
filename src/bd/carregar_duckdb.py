@@ -1,4 +1,6 @@
 import duckdb
+
+from utils.log        import log
 from configs.caminhos import (
     ARQUIVO_BD,
     ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE,
@@ -9,6 +11,7 @@ from configs.caminhos import (
     ARQUIVO_CONSOLIDADO_COORD,
 )
 
+
 TABELAS = {
     "municipios"             : ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE,
     "municipios_atendidos"   : ARQUIVO_MUNICIPIOS_ATENDIDOS,
@@ -17,6 +20,7 @@ TABELAS = {
     "dados_economicos"       : ARQUIVO_CONSOLIDADO_DADOS_ECONOMICOS,
     "coordenadas_municipios" : ARQUIVO_CONSOLIDADO_COORD,
 }
+
 
 def carregar_bd():
     conexao = duckdb.connect(ARQUIVO_BD)
@@ -32,5 +36,11 @@ def carregar_bd():
             FROM read_csv_auto('{str(caminho_arquivo)}')
         """)
 
-    print("Tabelas intermediárias carregadas com sucesso no Banco de dados.")
+    log(
+        rotulo="Banco de dados (Duck DB)",
+        mensagem="Tabelas intermediárias carregadas",
+        tipo="sucesso",
+        separador_antes=True,
+        separador_depois=True,
+    )
     conexao.close() 

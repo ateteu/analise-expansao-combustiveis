@@ -1,6 +1,7 @@
 import duckdb
 
 from pathlib          import Path
+from utils.log        import log
 from configs.caminhos import (
     ARQUIVO_BD,
     DADOS_MODELADOS
@@ -27,13 +28,12 @@ def executar_queries_sql():
     ]
 
     for arquivo in arquivos_sql:
-        print(f"Executando: {arquivo} ...")
+        log(rotulo="Queries SQL", mensagem=f"Executando {arquivo}")
 
         sql = Path(arquivo).read_text(encoding = "utf-8")
 
         try:
             conexao.execute(sql)
-            print("OK")
         
         except Exception as e:
             raise RuntimeError(
@@ -44,7 +44,6 @@ def executar_queries_sql():
         "dimensao_municipio",
         "municipios_bi_anual",
         "municipios_bi_crescimento",
-        "teste"
     ]
 
     DADOS_MODELADOS.mkdir(parents = True, exist_ok = True)
@@ -59,4 +58,8 @@ def executar_queries_sql():
             (HEADER, DELIMITER ';');
         """)
 
-        print(f"CSV final criado: {caminho_saida}")
+        log(
+            "Queries SQL",
+            f"CSV final criado. Caminho: {caminho_saida}",
+            tipo="sucesso",
+        )

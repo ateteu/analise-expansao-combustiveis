@@ -1,6 +1,7 @@
 import warnings
 import traceback
 
+from utils.log                      import log
 from pipelines.ppl_frota            import executar_ppl_frota
 from pipelines.ppl_dados_economicos import executar_ppl_dados_economicos
 from pipelines.ppl_vendas           import executar_ppl_vendas
@@ -34,7 +35,11 @@ def main():
             passo()
 
         except Exception:
-            print(f"\nFalha em: {nome}")
+            log(
+                "Função principal (main)",
+                f"Falha em: {nome}",
+                tipo="erro",
+            )
             traceback.print_exc()
 
 

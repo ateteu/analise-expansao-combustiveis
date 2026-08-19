@@ -17,21 +17,21 @@ WITH
 
             SUM(
                 CASE 
-                    WHEN id_combustivel = '02' THEN volume_vendas_m3 -- ID 02 = Diesel
+                    WHEN id_combustivel = '02' THEN vol_vendido_m3 -- ID 02 = Diesel
                     ELSE 0
                 END
             ) AS vol_vendido_diesel_m3,
 
             SUM(
                 CASE 
-                    WHEN id_combustivel = '01' THEN volume_vendas_m3 -- ID 01 = Etanol
+                    WHEN id_combustivel = '01' THEN vol_vendido_m3 -- ID 01 = Etanol
                     ELSE 0
                 END
             ) AS vol_vendido_etanol_m3,
 
             SUM(
                 CASE
-                    WHEN id_combustivel = '03' THEN volume_vendas_m3 -- ID 03 = Gasolina
+                    WHEN id_combustivel = '03' THEN vol_vendido_m3 -- ID 03 = Gasolina
                     ELSE 0
                 END
             ) AS vol_vendido_gasolina_m3
