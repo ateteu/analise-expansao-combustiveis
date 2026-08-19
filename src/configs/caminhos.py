@@ -5,9 +5,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Diretórios base
-DADOS_BRUTOS      = BASE_DIR / "dados" / "1-brutos"
-DADOS_MODIFICADOS = BASE_DIR / "dados" / "2-intermediarios"
-DADOS_MODELADOS   = BASE_DIR / "dados" / "3-modelados"
+DADOS_BRUTOS      = BASE_DIR / "dados" / "brutos"
+DADOS_MODIFICADOS = BASE_DIR / "dados" / "intermediarios"
+DADOS_MODELADOS   = BASE_DIR / "dados" / "modelados"
 DADOS_ANALISES    = BASE_DIR / "dados" / "4-analises"
 DADOS_DOMINIO     = BASE_DIR / "dados" / "dominio"
 DIR_SQL           = BASE_DIR / "sql"

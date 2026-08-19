@@ -14,12 +14,12 @@ A operação é estruturada ao longo de um eixo logístico principal, utilizando
 O modelo operacional segue o fluxo:
 `Refinaria → Base de distribuição → Postos atendidos`
 
-
 ## Área de Atuação Atual
 
 A empresa possui atuação consolidada nas seguintes regiões:
 
 ### Região Intermediária de Belo Horizonte
+
 - Região Imediata de Belo Horizonte: [Belo Horizonte, Contagem, Betim, Mateus Leme, Ribeirão das Neves, Juatuba]
 
 ### Região Intermediária de Divinópolis
@@ -36,7 +36,6 @@ A empresa possui atuação consolidada nas seguintes regiões:
 
 Além disso, a empresa atende postos localizados ao longo das rodovias BR-381 e BR-262.
 
-
 ## Problema de Negócio
 
 Com a expansão da área de atuação, a empresa enfrenta aumento da distância média de entrega, elevando os custos logísticos.
@@ -44,7 +43,6 @@ Com a expansão da área de atuação, a empresa enfrenta aumento da distância 
 O problema central é:
 
 **"Como expandir a malha de distribuição maximizando a cobertura de demanda e minimizando os custos logísticos?"**
-
 
 ## Estrutura do Problema
 
@@ -121,17 +119,18 @@ Os dados foram obtidos a partir de fontes públicas oficiais:
 Bases utilizadas:
 
 - **ANP (Agência Nacional do Petróleo)**
-  - Vendas de combustíveis por município (gasolina, diesel, etanol)
 
-- **IBGE (Instituo Brasileiro de Geografia e Estatística)** 
+  - Vendas de combustíveis por município (gasolina, diesel, etanol)
+- **IBGE (Instituo Brasileiro de Geografia e Estatística)**
+
   - PIB dos municípios (total, per capita e composição setorial)
   - Mapas de regiões
   - Códigos dos municípios e regiões
+- **SENATRAN (Secretaria Nacional de Trânsito)**
 
-- **SENATRAN (Secretaria Nacional de Trânsito)** 
   - Frota de veículos por tipo e município (dados de dezembro de cada ano como proxy anual)
-
 - **GitHub: kelvins/municípios-brasileiros**
+
   - Coordenadas geográficas dos municípios brasileiros
 
 ## Métricas e Scores Analíticos
@@ -162,10 +161,9 @@ Os scores são posteriormente consolidados em um `Score Final` de atratividade d
 ```text
 analise-expansao-combustiveis/
 ├── dados/
-│   ├── 1-brutos/             # Dados originais das fontes
-│   ├── 2-intermediarios/     # Dados limpos e padronizados
-│   ├── 3-modelados/          # Dados modelados, prontos para BI
-│   ├── 4-analises/           # Dados investigativos e gráficos
+│   ├── brutos/               # Dados originais das fontes
+│   ├── intermediarios/       # Dados limpos e padronizados
+│   ├── modelados/            # Dados modelados, prontos para BI
 │   ├── dominio/              # Dados de domínio do projeto
 │   └── banco_dados.duckdb    # Banco de dados local
 │
@@ -173,7 +171,6 @@ analise-expansao-combustiveis/
 │   ├── 1-metricas/           # Cálculo de métricas
 │   ├── 2-pontuacoes/         # Cálculo dos scores
 │   ├── 3-tabelas-analiticas/ # Consolidação das tabelas finais
-│   ├── 4-analises/           # Queries investigativas
 │   └── ddl                   # Esquema SQL
 │
 └── src/
@@ -189,25 +186,25 @@ analise-expansao-combustiveis/
 ## Pipeline de Dados
 
 1. Coleta de dados:
+
    - Frota (SENATRAN)
    - PIB municipal (IBGE)
    - Vendas e preços (ANP)
    - Coordenadas dos municípios (Rep. Github)
-
 2. Tratamento (Python):
+
    - Limpeza e padronização
    - Consolidação de séries históricas
-
 3. Modelagem Analítica (SQL | DuckDB):
+
    - Criação de métricas derivadas
    - Construção de scores dimensionais
    - Consolidação das tabelas analíticas
-
 4. Análise e Visualização:
+
    - Exploração dos resultados
    - Mapas e indicadores no Power BI
    - Avaliação de cenários de expansão
-
 
 ## Ferramentas Utilizadas
 

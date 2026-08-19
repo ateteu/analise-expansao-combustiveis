@@ -8,7 +8,6 @@ from pipelines.ppl_coordenadas      import executar_ppl_coordenadas
 from pipelines.ppl_municipios       import executar_ppl_municipios
 from bd.carregar_duckdb             import carregar_bd
 from bd.executar_sql                import executar_queries_sql
-from pipelines.ppl_eda_sql          import executar_ppl_eda
 
 
 # Ignorar avisos sobre headers e footers
@@ -27,7 +26,6 @@ def main():
         ("Pipeline de limpeza [vendas]", executar_ppl_vendas),
         ("Pipeline do banco de dados", carregar_bd),
         ("Queries SQL", executar_queries_sql),
-        #("Análise exploratória", executar_ppl_eda)
     ]
 
     # Se um processo falhar, tenta o próximo

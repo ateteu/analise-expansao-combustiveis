@@ -9,7 +9,7 @@ from configs.caminhos import (
 
 def executar_queries_sql():
     """
-    Tenta executar as queries SQL e salva os arquivos csv na pasta 'dados/3-modelados'.
+    Tenta executar as queries SQL e salva os arquivos csv na pasta adequada.
     """
     conexao = duckdb.connect(ARQUIVO_BD)
 

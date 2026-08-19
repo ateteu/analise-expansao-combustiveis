@@ -1,6 +1,8 @@
 # Locais
 observacoes/
-dados/2-intermediarios/auditoria-dados/
+dados/intermediarios/
+dados/modelados
+*.duckdb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
