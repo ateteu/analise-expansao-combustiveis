@@ -62,7 +62,7 @@ WITH
         INNER JOIN municipios_atendidos a
             ON d.id_municipio = a.id_municipio
         
-        WHERE a.status_atendimento = TRUE
+        WHERE a.atendido = TRUE
     ),
     ---------------------------------------------------------------------
     dist_referencia AS (
