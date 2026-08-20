@@ -23,6 +23,8 @@ TABELAS = {
 
 
 def carregar_bd():
+    log("BANCO DE DADOS (DUCK DB)\n", separador_antes=True)
+
     conexao = duckdb.connect(ARQUIVO_BD)
 
     # Cria as tabelas relativas a cada um dos csvs intermediários
@@ -35,12 +37,6 @@ def carregar_bd():
             SELECT *
             FROM read_csv_auto('{str(caminho_arquivo)}')
         """)
+        log("Tabela carregada", f"{nome_tabela}", tipo="sucesso")
 
-    log(
-        rotulo="Banco de dados (Duck DB)",
-        mensagem="Tabelas intermediárias carregadas",
-        tipo="sucesso",
-        separador_antes=True,
-        separador_depois=True,
-    )
     conexao.close() 
