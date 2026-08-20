@@ -9,6 +9,7 @@ from pipelines.ppl_coordenadas      import executar_ppl_coordenadas
 from pipelines.ppl_municipios       import executar_ppl_municipios
 from bd.carregar_duckdb             import carregar_bd
 from bd.executar_sql                import executar_queries_sql
+from utils.diagnostico              import diagnosticar_csv, arquivos_finais
 
 
 # Ignorar avisos sobre headers e footers
@@ -20,13 +21,13 @@ def main():
     carrega o BD e executa as queries SQL.
     """
     passos = [
-        ("Pipeline de limpeza [coord. municípios]", executar_ppl_coordenadas),
-        ("Pipeline de limpeza [municipios]", executar_ppl_municipios),
-        ("Pipeline de limpeza [frota]", executar_ppl_frota),
-        ("Pipeline de limpeza [dados econômicos]", executar_ppl_dados_economicos),
-        ("Pipeline de limpeza [vendas]", executar_ppl_vendas),
-        ("Pipeline do banco de dados", carregar_bd),
-        ("Queries SQL", executar_queries_sql),
+        #("Pipeline de limpeza [coord. municípios]", executar_ppl_coordenadas),
+        #("Pipeline de limpeza [municipios]", executar_ppl_municipios),
+        #("Pipeline de limpeza [frota]", executar_ppl_frota),
+        #("Pipeline de limpeza [dados econômicos]", executar_ppl_dados_economicos),
+        #("Pipeline de limpeza [vendas]", executar_ppl_vendas),
+        #("Pipeline do banco de dados", carregar_bd),
+        #("Queries SQL", executar_queries_sql),
     ]
 
     # Se um processo falhar, tenta o próximo
@@ -42,6 +43,10 @@ def main():
             )
             traceback.print_exc()
 
+    # Faz uma verificação dos arquivos finais gerados para o BI
+    log("DIAGNÓSTICO DOS DADOS FINAIS GERADOS", separador_antes=True)
+    for arquivo in arquivos_finais:
+        diagnosticar_csv(arquivo)
 
 if __name__ == "__main__":
     main()

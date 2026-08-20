@@ -12,6 +12,14 @@ DADOS_DOMINIO     = DIR_BASE / "dados" / "dominio"
 DIR_SQL           = DIR_BASE / "sql"
 
 
+# Arquivos de domínio do projeto
+ARQUIVO_MUNICIPIOS_ATENDIDOS = DADOS_DOMINIO / "municipios_atendidos.csv"
+ARQUIVO_BASES_LOGISTICAS     = DADOS_DOMINIO / "bases_logisticas.csv"
+ARQUIVO_REFINARIAS           = DADOS_DOMINIO / "refinarias.csv"
+ARQUIVO_TIPOS_COMBUSTIVEL    = DADOS_DOMINIO / "tipos_combustivel.csv"
+ARQUIVO_UFS_ESCOPO           = DADOS_DOMINIO / "ufs_em_escopo.csv"
+
+
 # Diretórios das bases de dados brutos
 CAMINHO_FROTA_SENATRAN   = DADOS_BRUTOS / "frota-senatran"
 CAMINHO_VENDAS_ANP       = DADOS_BRUTOS / "vendas-anp"
@@ -37,18 +45,6 @@ ARQUIVO_CONSOLIDADO_COORD            = DADOS_MODIFICADOS / "coordenadas_municipi
 ARQUIVO_CONSOLIDADO_MUNICIPIOS_IBGE  = DADOS_MODIFICADOS / "municipios_ibge.csv"
 
 
-# Arquivos de domínio do projeto
-ARQUIVO_MUNICIPIOS_ATENDIDOS = DADOS_DOMINIO / "municipios_atendidos.csv"
-ARQUIVO_BASES_LOGISTICAS     = DADOS_DOMINIO / "bases_logisticas.csv"
-ARQUIVO_REFINARIAS           = DADOS_DOMINIO / "refinarias.csv"
-ARQUIVO_TIPOS_COMBUSTIVEL    = DADOS_DOMINIO / "tipos_combustivel.csv"
-ARQUIVO_UFS_ESCOPO           = DADOS_DOMINIO / "ufs_em_escopo.csv"
-
-
-# Arquivo do banco de dados DuckDB
-ARQUIVO_BD  = DIR_BASE / "dados" / "banco_dados.duckdb"
-
-
 # Diretórios das pastas de auditoria (quarentenas/limpezas)
 AUDITORIA                  = DADOS_MODIFICADOS / "auditoria-dados"
 AUDITORIA_VENDAS           = AUDITORIA / "aud-vendas"
@@ -56,3 +52,13 @@ AUDITORIA_COORD_MUNICIPIOS = AUDITORIA / "aud-coord-municipios"
 AUDITORIA_MUNICIPIOS       = AUDITORIA / "aud-municipios-ibge"
 AUDITORIA_DADOS_ECONOMICOS = AUDITORIA / "aud-dados-economicos"
 AUDITORIA_FROTA            = AUDITORIA / "aud-frota"
+
+
+# Arquivo do banco de dados DuckDB
+ARQUIVO_BD  = DIR_BASE / "dados" / "banco_dados.duckdb"
+
+
+# Arquivos finais para o Power BI e EDAs
+ARQUIVO_DIMENSAO_MUNICIPIOS = DADOS_MODELADOS / "dimensao_municipio.csv"
+ARQUIVO_MUNICIPIOS_BI_ANUAL = DADOS_MODELADOS / "municipios_bi_anual.csv"
+ARQUIVO_MUNICIPIOS_BI_CRESC = DADOS_MODELADOS / "municipios_bi_crescimento.csv"
