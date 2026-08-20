@@ -2,36 +2,27 @@ import re
 import pandas as pd
 import unicodedata
 
+from collections.abc import Collection
+
 
 def normalizar_texto(
     texto,
-    separador         = " ",
-    maiusculo         = True,
-    remover_acentos   = True,
-    remover_pontuacao = True,
-    strings_nulas     = None,
+    separador: str = " ",
+    maiusculo: bool | None = True,
+    remover_acentos: bool = True,
+    remover_pontuacao: bool = True,
+    strings_nulas: Collection[str] | None = None,
 ):
     """
     Padroniza texto para comparação e limpeza.
 
     Parâmetros
     ----------
-    separador : str
-        Separador usado entre palavras.
-
-    maiusculo : bool
-        True  -> converte para maiúsculo.
-        False -> converte para minúsculo.
-
-    remover_acentos : bool
-        Remove acentos e diacríticos.
-
-    remover_pontuacao : bool
-        Remove pontuação, substituindo por espaço.
-
-    strings_nulas : collection[str] | None
-        Conjunto de valores que devem ser tratados como ausentes.
-        A comparação ocorre após a normalização.
+    - separador: Separador usado entre palavras.
+    - maiusculo: True - maiúsculo, False - minúsculo, None - mantém capitalização.
+    - remover_acentos: Remove acentos e diacríticos.
+    - remover_pontuacao: Remove pontuação, substituindo por espaço.
+    - strings_nulas: Conjunto de valores que devem ser tratados como ausentes.
     """
 
     if pd.isna(texto):
@@ -53,7 +44,10 @@ def normalizar_texto(
         texto = unicodedata.normalize("NFKC", texto)
 
     # Caixa
-    texto = texto.upper() if maiusculo else texto.lower()
+    if maiusculo is True:
+        texto = texto.upper()
+    elif maiusculo is False:
+        texto = texto.lower()
 
     # Pontuação
     if remover_pontuacao:

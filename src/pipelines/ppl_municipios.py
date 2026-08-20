@@ -60,7 +60,7 @@ def padronizar_colunas(df: pd.DataFrame) -> pd.DataFrame:
 def limpar_textos(df: pd.DataFrame) -> pd.DataFrame:
     """
     Normaliza colunas de exibição (nome de município, UF, etc.).
-    Sem maiúsculo/sem remover acento: são campos de exibição, não chave de join.
+    OBS: Capitalização e acentos são mantidos.
     """
     colunas_texto = [
         "nome_municipio",
@@ -73,7 +73,7 @@ def limpar_textos(df: pd.DataFrame) -> pd.DataFrame:
         df[coluna] = df[coluna].apply(
             lambda x: normalizar_texto(
                 x,
-                maiusculo=False,
+                maiusculo=None, # Mantém capitalização atual
                 remover_acentos=False,
                 remover_pontuacao=False,
                 strings_nulas=STRINGS_NULAS,
