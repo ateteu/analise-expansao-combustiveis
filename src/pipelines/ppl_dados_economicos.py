@@ -1,5 +1,6 @@
 import pandas as pd
 
+from utils.log                 import log
 from arquivos.ler_arquivo      import ler_excel, ler_csv
 from arquivos.salvar_arquivo   import salvar_csv
 from configs.caminhos          import (
@@ -44,9 +45,6 @@ from utils.auditoria           import (
     tratar_duplicidades,
     validar_soma_componentes,
     identificar_outliers,
-)
-from utils.log                 import (
-    log,
 )
 
 

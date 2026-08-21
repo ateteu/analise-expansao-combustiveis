@@ -54,24 +54,17 @@ COLUNAS_NUM_DADOS_ECONOMICOS = [
     "pib_per_capita",
 ]
 COLUNAS_VAB_COMPONENTES = [
-    "vab_agropecuaria", 
-    "vab_industria", 
-    "vab_servicos", 
+    "vab_agropecuaria",
+    "vab_industria",
+    "vab_servicos",
     "vab_adm_publica",
 ]
 COLUNAS_CRITICAS_DADOS_ECONOMICOS = [
-    "ano", 
-    "id_municipio", 
-    "vab_total", 
-    "pib", 
+    "ano",
+    "id_municipio",
+    "pib",
     "pib_per_capita",
 ]
-
-# =================================================
-# MUNICÍPIOS - IBGE
-# =================================================
-
-
 
 # =================================================
 # COORD. MUNICÍPIOS - GITHUB/KELVINS

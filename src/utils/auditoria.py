@@ -127,11 +127,14 @@ def validar_minimo(
     prefixo         : str = "",
 ) -> pd.DataFrame:
     """
-    Mantém apenas linhas cujo valor da coluna é >= minimo.
-    Linhas abaixo do mínimo vão para quarentena.
+    Mantém apenas linhas cujo valor da coluna é >= minimo;
+    linhas abaixo do mínimo vão para quarentena.
+    OBS: Não remove nulos!
     """
     n_antes = len(df)
-    linhas_validas = df[coluna] >= minimo
+
+    # Permite linhas acima do mínimo e linhas nulas
+    linhas_validas = (df[coluna] >= minimo) | (df[coluna].isna())
 
     salvar_quarentena(
         df[~linhas_validas].copy(),
